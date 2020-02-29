@@ -217,6 +217,9 @@
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Matrix4f.h">
 			<Option target="cedar"/>
 		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/OpenSimplexNoise.h">
+			<Option target="cedar"/>
+		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Quaternionf.h">
 			<Option target="cedar"/>
 		</Unit>
@@ -305,6 +308,9 @@
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/math/Matrix4f.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/math/OpenSimplexNoise.cpp">
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/math/Quaternionf.cpp">
