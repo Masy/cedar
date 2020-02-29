@@ -7,6 +7,9 @@
 
 #include <cmath>
 
+/**
+ * Base namespace for mathematical functions.
+ */
 namespace cedar::math
 {
 
@@ -143,6 +146,30 @@ namespace cedar::math
 	inline double clamp(const double value, const double min, const double max)
 	{
 		return value < min ? min : (value > max ? max : value);
+	}
+
+	/**
+	 * Floors the given value and returns it as integer.
+	 *
+	 * @param value The value that will be floored.
+	 * @return the floored integer.
+	 */
+	inline int fastFloor(const float value)
+	{
+		int _value = static_cast<int>(value);
+		return value < _value ? _value - 1 : _value;
+	}
+
+	/**
+	 * Floors the given value and returns it as integer.
+	 *
+	 * @param value The value that will be floored.
+	 * @return the floored integer.
+	 */
+	inline int fastFloor(const double value)
+	{
+		int _value = static_cast<int>(value);
+		return value < _value ? _value - 1 : _value;
 	}
 
 };

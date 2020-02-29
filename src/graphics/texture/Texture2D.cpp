@@ -53,7 +53,7 @@ void Texture2D::reserve(const int levels)
 
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_WRAP_S, CEDAR_REPEAT);
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_WRAP_T, CEDAR_REPEAT);
-	glTexParameteri(this->m_target, CEDAR_TEXTURE_MIN_FILTER, CEDAR_NEAREST_MIPMAP_LINEAR);
+	glTexParameteri(this->m_target, CEDAR_TEXTURE_MIN_FILTER, CEDAR_LINEAR);
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_MAG_FILTER, CEDAR_LINEAR);
 
 	this->m_reservedLevels = levels;
@@ -78,7 +78,7 @@ void Texture2D::reserveMultisample(const int samples, bool fixedSampleLocations)
 
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_WRAP_S, CEDAR_REPEAT);
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_WRAP_T, CEDAR_REPEAT);
-	glTexParameteri(this->m_target, CEDAR_TEXTURE_MIN_FILTER, CEDAR_NEAREST_MIPMAP_LINEAR);
+	glTexParameteri(this->m_target, CEDAR_TEXTURE_MIN_FILTER, CEDAR_LINEAR);
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_MAG_FILTER, CEDAR_LINEAR);
 
 	this->m_samples = samples;
@@ -102,7 +102,7 @@ void Texture2D::init(const unsigned int format, const unsigned int type, const v
 
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_WRAP_S, CEDAR_REPEAT);
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_WRAP_T, CEDAR_REPEAT);
-	glTexParameteri(this->m_target, CEDAR_TEXTURE_MIN_FILTER, CEDAR_NEAREST_MIPMAP_LINEAR);
+	glTexParameteri(this->m_target, CEDAR_TEXTURE_MIN_FILTER, CEDAR_LINEAR);
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_MAG_FILTER, CEDAR_LINEAR);
 }
 
@@ -124,7 +124,7 @@ void Texture2D::initMultisample(const int samples, const bool fixedSampleLocatio
 
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_WRAP_S, CEDAR_REPEAT);
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_WRAP_T, CEDAR_REPEAT);
-	glTexParameteri(this->m_target, CEDAR_TEXTURE_MIN_FILTER, CEDAR_NEAREST_MIPMAP_LINEAR);
+	glTexParameteri(this->m_target, CEDAR_TEXTURE_MIN_FILTER, CEDAR_LINEAR);
 	glTexParameteri(this->m_target, CEDAR_TEXTURE_MAG_FILTER, CEDAR_LINEAR);
 	this->m_reservedLevels = 1;
 	this->m_samples = samples;
