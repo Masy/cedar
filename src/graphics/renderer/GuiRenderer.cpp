@@ -74,7 +74,7 @@ layout (location = 0) out vec4 diffuseColor;
 in vec3 f_uvs;
 in vec4 f_tint;
 
-uniform sampler2D[16] u_samplers;
+uniform sampler2D[32] u_samplers;
 
 void main()
 {
@@ -160,7 +160,7 @@ void GuiRenderer::endBatch()
 
 void GuiRenderer::flush()
 {
-	for (unsigned int n = 0; n < this->m_textureUnitCount; n++)
+	for (unsigned int n = 0; n < this->m_textureCount; n++)
 		glBindTextureUnit(n, this->m_textures[n]);
 
 	this->m_shader->bind();
@@ -212,7 +212,7 @@ void GuiRenderer::drawTexturedRect(float posX, float posY, float posZ, float wid
 	}
 
 	float textureUnit = 0.0f;
-	for (unsigned int n = 0; n < this->m_textureCount; n++)
+	for (unsigned int n = 0; n < this->m_textureUnitCount; n++)
 	{
 		if (this->m_textures[n] == texture->getId())
 		{
@@ -223,6 +223,8 @@ void GuiRenderer::drawTexturedRect(float posX, float posY, float posZ, float wid
 		{
 			this->m_textures[n] = texture->getId();
 			textureUnit = static_cast<float>(n);
+			this->m_textureCount++;
+			break;
 		}
 	}
 
@@ -237,8 +239,9 @@ void GuiRenderer::drawTexturedRect(float posX, float posY, float posZ, float wid
 
 	this->m_nextQuad->positions = {posX, posY, posX + width, posY + height};
 	this->m_nextQuad->layerAndTexture = {-posZ, textureUnit};
-	this->m_nextQuad->uvs = {uvX1, uvY1, uvX1 + uvX2, uvY1 + uvY2};
-	this->m_nextQuad->tint = {0.0f, 0.0f, 0.0f, 0.0f};
+	this->m_nextQuad->uvs = {uvX1, uvY1, uvX2, uvY2};
+	this->m_nextQuad->tint = {1.0f, 1.0f, 1.0f, 1.0f};
 
+	this->m_nextQuad++;
 	this->m_quadCount++;
 }
