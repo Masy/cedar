@@ -269,6 +269,15 @@ void Window::setResizeCallback(const std::function<void (int, int)> &callback) {
 	this->m_resizeCallback = callback;
 }
 
+std::string Window::getTitle() const {
+	return this->m_title;
+}
+
+void Window::setTitle(const std::string &newTitle) {
+	this->m_title = newTitle;
+	glfwSetWindowTitle(this->m_windowHandle, newTitle.c_str());
+}
+
 bool Window::isKeyPressed(const int keyCode) const
 {
 	if (keyCode < 8)
