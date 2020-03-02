@@ -46,12 +46,12 @@ void Quaternionf::identity()
 	this->x = 0.0f;
 	this->y = 0.0f;
 	this->z = 0.0f;
-	this->w = 0.0f;
+	this->w = 1.0f;
 }
 
 void Quaternionf::normalize()
 {
-	float invNorm = math::invSqrt(std::fma(this->x, this->x, std::fma(this->y, this->y, std::fma(this->z, this->z, this->w * this->w))));
+	float invNorm = math::invSqrt(std::fmaf(this->x, this->x, std::fmaf(this->y, this->y, std::fmaf(this->z, this->z, this->w * this->w))));
 	this->x *= invNorm;
 	this->y *= invNorm;
 	this->z *= invNorm;
@@ -60,7 +60,7 @@ void Quaternionf::normalize()
 
 void Quaternionf::invert()
 {
-	float invNorm = math::invSqrt(std::fma(this->x, this->x, std::fma(this->y, this->y, std::fma(this->z, this->z, this->w * this->w))));
+	float invNorm = math::invSqrt(std::fmaf(this->x, this->x, std::fmaf(this->y, this->y, std::fmaf(this->z, this->z, this->w * this->w))));
 	this->x = (0.0f - this->x) * invNorm;
 	this->y = (0.0f - this->y) * invNorm;
 	this->z = (0.0f - this->z) * invNorm;
@@ -73,10 +73,15 @@ void Quaternionf::rotateX(float angle)
 	float sin = std::sin(halfAngle);
 	float cos = std::cos(halfAngle);
 
-	this->x = this->w * sin + this->x * cos;
-	this->y = this->y * cos + this->z * sin;
-	this->z = this->z * cos - this->y * sin;
-	this->w = this->w * cos - this->x * sin;
+	float _x = std::fmaf(this->w, sin, this->x * cos);
+	float _y = std::fmaf(this->y, cos, this->z * sin);
+	float _z = std::fmaf(this->z, cos, (0.0f - this->y) * sin);
+	float _w = std::fmaf(this->w, cos, (0.0f - this->x) * sin);
+
+	this->x = _x;
+	this->y = _y;
+	this->z = _z;
+	this->w = _w;
 }
 
 void Quaternionf::rotateLocalX(float angle)
@@ -85,10 +90,15 @@ void Quaternionf::rotateLocalX(float angle)
 	float sin = std::sin(halfAngle);
 	float cos = std::cos(halfAngle);
 
-	this->x = this->x * cos + this->w * sin;
-	this->y = this->y * cos - this->z * sin;
-	this->z = this->z * cos + this->y * sin,
-			this->w = this->w * cos - this->x * sin;
+	float _x = std::fmaf(this->x, cos, this->w * sin);
+	float _y = std::fmaf(this->y, cos, (0.0f - this->z) * sin);
+	float _z = std::fmaf(this->z, cos, this->y * sin);
+	float _w = std::fmaf(this->w, cos, (0.0f - this->x) * sin);
+
+	this->x = _x;
+	this->y = _y;
+	this->z = _z,
+	this->w = _w;
 }
 
 void Quaternionf::rotationX(float angle)
@@ -106,10 +116,15 @@ void Quaternionf::rotateY(float angle)
 	float sin = std::sin(halfAngle);
 	float cos = std::cos(halfAngle);
 
-	this->x = this->x * cos - this->z * sin;
-	this->y = this->w * sin + this->y * cos;
-	this->z = this->x * sin + this->z * cos;
-	this->w = this->w * cos - this->y * sin;
+	float _x = std::fmaf(this->x, cos, (0.0f - this->z) * sin);
+	float _y = std::fmaf(this->w, sin, this->y * cos);
+	float _z = std::fmaf(this->x, sin, this->z * cos);
+	float _w = std::fmaf(this->w, cos, (0.0f - this->y) * sin);
+
+	this->x = _x;
+	this->y = _y;
+	this->z = _z;
+	this->w = _w;
 }
 
 void Quaternionf::rotateLocalY(float angle)
@@ -118,10 +133,15 @@ void Quaternionf::rotateLocalY(float angle)
 	float sin = std::sin(halfAngle);
 	float cos = std::cos(halfAngle);
 
-	this->x = this->x * cos + this->z * sin;
-	this->y = this->y * cos + this->w * sin;
-	this->z = this->z * cos - this->x * sin;
-	this->w = this->w * cos - this->y * sin;
+	float _x = std::fmaf(this->x, cos, this->z * sin);
+	float _y = std::fmaf(this->y, cos, this->w * sin);
+	float _z = std::fmaf(this->z, cos, (0.0f - this->x) * sin);
+	float _w = std::fmaf(this->w, cos, (0.0f - this->y) * sin);
+
+	this->x = _x;
+	this->y = _y;
+	this->z = _z;
+	this->w = _w;
 }
 
 void Quaternionf::rotationY(float angle)
@@ -139,10 +159,15 @@ void Quaternionf::rotateZ(float angle)
 	float sin = std::sin(halfAngle);
 	float cos = std::cos(halfAngle);
 
-	this->x = this->x * cos + this->y * sin;
-	this->y = this->y * cos - this->x * sin;
-	this->z = this->w * sin + this->z * cos;
-	this->w = this->w * cos - this->z * sin;
+	float _x = std::fmaf(this->x, cos, this->y * sin);
+	float _y = std::fmaf(this->y, cos, (0.0f - this->x) * sin);
+	float _z = std::fmaf(this->w, sin, this->z * cos);
+	float _w = std::fmaf(this->w, cos, (0.0f - this->z) * sin);
+
+	this->x = _x;
+	this->y = _y;
+	this->z = _z;
+	this->w = _w;
 }
 
 void Quaternionf::rotateLocalZ(float angle)
@@ -151,10 +176,15 @@ void Quaternionf::rotateLocalZ(float angle)
 	float sin = std::sin(halfAngle);
 	float cos = std::cos(halfAngle);
 
-	this->x = this->x * cos - this->y * sin;
-	this->y = this->y * cos + this->x * sin;
-	this->z = this->z * cos + this->w * sin;
-	this->w = this->w * cos - this->z * sin;
+	float _x = std::fmaf(this->x, cos, (0.0f - this->y) * sin);
+	float _y = std::fmaf(this->y, cos, this->x * sin);
+	float _z = std::fmaf(this->z, cos, this->w * sin);
+	float _w = std::fmaf(this->w, cos, (0.0f - this->z) * sin);
+
+	this->x = _x;
+	this->y = _y;
+	this->z = _z;
+	this->w = _w;
 }
 
 void Quaternionf::rotationZ(float angle)
@@ -183,15 +213,20 @@ void Quaternionf::rotate(float angleX, float angleY, float angleZ)
 	float sinYCosZ = sinY * cosZ;
 	float cosYSinZ = cosY * sinZ;
 
-	float deltaX = cosX * cosYCosZ - sinX * sinYSinZ;
-	float deltaY = sinX * cosYCosZ + cosX * sinYSinZ;
-	float deltaZ = cosX * sinYCosZ - sinX * cosYSinZ;
-	float deltaW = cosX * cosYSinZ + sinX * sinYCosZ;
+	float deltaW = cosX * cosYCosZ - sinX * sinYSinZ;
+	float deltaX = sinX * cosYCosZ + cosX * sinYSinZ;
+	float deltaY = cosX * sinYCosZ - sinX * cosYSinZ;
+	float deltaZ = cosX * cosYSinZ + sinX * sinYCosZ;
 
-	this->x = std::fma(this->w, deltaX, std::fma(this->x, deltaW, std::fma(this->y, deltaZ, (0.0f - this->z) * deltaY)));
-	this->y = std::fma(this->w, deltaY, std::fma(0.0f - this->x, deltaZ, std::fma(this->y, deltaW, this->z * deltaX)));
-	this->z = std::fma(this->w, deltaZ, std::fma(this->x, deltaY, std::fma(0.0f - this->y, deltaX, this->z * deltaW)));
-	this->w = std::fma(this->w, deltaW, std::fma(0.0f - this->x, deltaX, std::fma(0.0f - this->y, y, (0.0f - this->z) * deltaZ)));
+	float _x = std::fmaf(this->w, deltaX, std::fmaf(this->x, deltaW, std::fmaf(this->y, deltaZ, (0.0f - this->z) * deltaY)));
+	float _y = std::fmaf(this->w, deltaY, std::fmaf(0.0f - this->x, deltaZ, std::fmaf(this->y, deltaW, this->z * deltaX)));
+	float _z = std::fmaf(this->w, deltaZ, std::fmaf(this->x, deltaY, std::fmaf(0.0f - this->y, deltaX, this->z * deltaW)));
+	float _w = std::fmaf(this->w, deltaW, std::fmaf(0.0f - this->x, deltaX, std::fmaf(0.0f - this->y, deltaY, (0.0f - this->z) * deltaZ)));
+
+	this->x = _x;
+	this->y = _y;
+	this->z = _z;
+	this->w = _w;
 }
 
 void Quaternionf::rotate(const Vector3f *angles)
@@ -216,10 +251,10 @@ void Quaternionf::rotation(float angleX, float angleY, float angleZ)
 	float sinYCosZ = sinY * cosZ;
 	float cosYSinZ = cosY * sinZ;
 
-	this->x = cosX * cosYCosZ - sinX * sinYSinZ;
-	this->y = sinX * cosYCosZ + cosX * sinYSinZ;
-	this->z = cosX * sinYCosZ - sinX * cosYSinZ;
-	this->w = cosX * cosYSinZ + sinX * sinYCosZ;
+	this->x = sinX * cosYCosZ + cosX * sinYSinZ;
+	this->y = cosX * sinYCosZ - sinX * cosYSinZ;
+	this->z = cosX * cosYSinZ + sinX * sinYCosZ;
+	this->w = cosX * cosYCosZ - sinX * sinYSinZ;
 }
 
 void Quaternionf::rotation(const Vector3f *angles)
@@ -238,10 +273,15 @@ void Quaternionf::rotateAxis(float angle, float axisX, float axisY, float axisZ)
 	float deltaZ = axisZ * invAxisLength * sinHalfAngle;
 	float deltaW = std::cos(halfAngle);
 
-	this->x = std::fma(this->w, deltaX, std::fma(this->x, deltaW, std::fma(this->y, deltaZ, (0.0f - this->z) * deltaY)));
-	this->y = std::fma(this->w, deltaY, std::fma(0.0f - this->x, deltaZ, std::fma(this->y, deltaW, this->z * deltaX)));
-	this->z = std::fma(this->w, deltaZ, std::fma(this->x, deltaY, std::fma(0.0f - this->y, deltaX, this->z * deltaW)));
-	this->w = std::fma(this->w, deltaW, std::fma(0.0f - this->x, deltaX, std::fma(0.0f - this->y, y, (0.0f - this->z) * deltaZ)));
+	float _x = std::fmaf(this->w, deltaX, std::fmaf(this->x, deltaW, std::fmaf(this->y, deltaZ, (0.0f - this->z) * deltaY)));
+	float _y = std::fmaf(this->w, deltaY, std::fmaf(0.0f - this->x, deltaZ, std::fmaf(this->y, deltaW, this->z * deltaX)));
+	float _z = std::fmaf(this->w, deltaZ, std::fmaf(this->x, deltaY, std::fmaf(0.0f - this->y, deltaX, this->z * deltaW)));
+	float _w = std::fmaf(this->w, deltaW, std::fmaf(0.0f - this->x, deltaX, std::fmaf(0.0f - this->y, deltaY, (0.0f - this->z) * deltaZ)));
+
+	this->x = _x;
+	this->y = _y;
+	this->z = _z;
+	this->w = _w;
 }
 
 void Quaternionf::rotateAxis(float angle, const Vector3f *axis)
@@ -278,11 +318,19 @@ void Quaternionf::transform(const float vecX, const float vecY, const float vecZ
 	float yz = this->y * this->z;
 	float yw = this->y * this->w;
 	float zw = this->z * this->w;
-	float k = 1.0f / (xSquared + ySquared + zSquared + wSquared);
+	float m00 = wSquared + xSquared - zSquared - ySquared;
+	float m01 = xy + zw + zw + xy;
+	float m02 = xz - yw + xz - yw;
+	float m10 = -zw + xy - zw + xy;
+	float m11 = ySquared - zSquared + wSquared - xSquared;
+	float m12 = yz + yz + xw + xw;
+	float m20 = yw + xz + xz + yw;
+	float m21 = yz + yz - xw - xw;
+	float m22 = zSquared - ySquared - xSquared + wSquared;
 
-	dest->x = std::fma((xSquared - ySquared - zSquared + wSquared) * k, vecX, std::fma(2 * (xy - zw) * k, vecY, (2 * (xz + yw) * k) * vecZ));
-	dest->y = std::fma(2 * (xy + zw) * k, vecX, std::fma((ySquared - xSquared - zSquared + wSquared) * k, vecY, (2 * (yz - xw) * k) * z));
-	dest->z = std::fma(2 * (xz - yw) * k, vecX, std::fma(2 * (yz * zw) * k, vecY, ((zSquared - xSquared - ySquared - wSquared) * k) * z));
+	dest->x = std::fmaf(m00, vecX, std::fmaf(m10, vecY, m20 * vecZ));
+	dest->y = std::fmaf(m01, vecX, std::fmaf(m11, vecY, m21 * vecZ));
+	dest->z = std::fmaf(m02, vecX, std::fmaf(m12, vecY, m22 * vecZ));
 }
 
 Vector3f *Quaternionf::getEulerAngles(Vector3f *result)
@@ -296,7 +344,7 @@ Vector3f *Quaternionf::getEulerAngles(Vector3f *result)
 
 Quaternionf *Quaternionf::slerp(const Quaternionf *other, Quaternionf *dest, float t) const
 {
-	float cosom = std::fma(this->x, other->x, std::fma(this->y, other->y, std::fma(this->z, other->z, this->w * other->w)));
+	float cosom = std::fmaf(this->x, other->x, std::fmaf(this->y, other->y, std::fmaf(this->z, other->z, this->w * other->w)));
 	float absCosom = std::abs(cosom);
 	float scale0;
 	float scale1;
@@ -315,10 +363,10 @@ Quaternionf *Quaternionf::slerp(const Quaternionf *other, Quaternionf *dest, flo
 	}
 
 	scale1 = cosom >= 0.0f ? scale1 : 0.0f - scale1;
-	dest->x = std::fma(scale0, this->x, scale1 * other->x);
-	dest->y = std::fma(scale0, this->y, scale1 * other->y);
-	dest->z = std::fma(scale0, this->z, scale1 * other->z);
-	dest->w = std::fma(scale0, this->w, scale1 * other->w);
+	dest->x = std::fmaf(scale0, this->x, scale1 * other->x);
+	dest->y = std::fmaf(scale0, this->y, scale1 * other->y);
+	dest->z = std::fmaf(scale0, this->z, scale1 * other->z);
+	dest->w = std::fmaf(scale0, this->w, scale1 * other->w);
 	return dest;
 }
 Quaternionf &Quaternionf::operator=(const Quaternionf &other) = default;
