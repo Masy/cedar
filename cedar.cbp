@@ -193,6 +193,9 @@
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/glfw/src/xkb_unicode.h">
 			<Option target="glfw"/>
 		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Cedar.h">
+			<Option target="cedar"/>
+		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/GLConstants.h">
 			<Option target="cedar"/>
 		</Unit>
@@ -215,6 +218,12 @@
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Matrix4f.h">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Model.h">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/ModelRegistry.h">
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/OpenSimplexNoise.h">
@@ -280,6 +289,18 @@
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/XException.h">
 			<Option target="cedar"/>
 		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/core/Cedar.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/core/XException.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/model/Model.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/model/ModelRegistry.cpp">
+			<Option target="cedar"/>
+		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/renderer/GuiRenderer.cpp">
 			<Option target="cedar"/>
 		</Unit>
@@ -329,9 +350,6 @@
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/multithreading/Thread.cpp">
-			<Option target="cedar"/>
-		</Unit>
-		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/utils/XException.cpp">
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/CMakeLists.txt">

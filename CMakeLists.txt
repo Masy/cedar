@@ -15,7 +15,7 @@ add_library(cedar
 		glad/src/glad.c
 		glad/include/glad/glad.h
 		include/cedar/XException.h
-		src/utils/XException.cpp
+		src/core/XException.cpp
 		include/cedar/Thread.h
 		src/multithreading/Thread.cpp
 		include/cedar/Logger.h
@@ -38,7 +38,7 @@ add_library(cedar
 		include/cedar/Window.h
 		src/graphics/window/Window.cpp
 		include/cedar/ShaderProgram.h
-		src/graphics/shader/ShaderProgram.cpp include/cedar/Vector2i.h include/cedar/Vector2ui.h include/cedar/Vector2d.h include/cedar/Vector3i.h include/cedar/Vector3ui.h include/cedar/Vector3d.h include/cedar/Vector4i.h include/cedar/Vector4d.h include/cedar/Vector4ui.h include/cedar/Input.h include/cedar/InputHandler.h src/input/InputHandler.cpp src/math/Vector2d.cpp include/cedar/GuiRenderer.h src/graphics/renderer/GuiRenderer.cpp include/cedar/Texture.h src/graphics/texture/Texture.cpp include/cedar/Texture2D.h src/graphics/texture/Texture2D.cpp include/cedar/GLConstants.h include/cedar/OpenSimplexNoise.h src/math/OpenSimplexNoise.cpp)
+		src/graphics/shader/ShaderProgram.cpp include/cedar/Vector2i.h include/cedar/Vector2ui.h include/cedar/Vector2d.h include/cedar/Vector3i.h include/cedar/Vector3ui.h include/cedar/Vector3d.h include/cedar/Vector4i.h include/cedar/Vector4d.h include/cedar/Vector4ui.h include/cedar/Input.h include/cedar/InputHandler.h src/input/InputHandler.cpp src/math/Vector2d.cpp include/cedar/GuiRenderer.h src/graphics/renderer/GuiRenderer.cpp include/cedar/Texture.h src/graphics/texture/Texture.cpp include/cedar/Texture2D.h src/graphics/texture/Texture2D.cpp include/cedar/GLConstants.h include/cedar/OpenSimplexNoise.h src/math/OpenSimplexNoise.cpp include/cedar/Model.h src/graphics/model/Model.cpp include/cedar/Cedar.h src/core/Cedar.cpp include/cedar/ModelRegistry.h src/graphics/model/ModelRegistry.cpp)
 
 target_include_directories(cedar PUBLIC
 		glad/include
