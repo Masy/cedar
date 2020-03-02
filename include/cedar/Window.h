@@ -286,6 +286,20 @@ namespace cedar
 		void setResizeCallback(const std::function<void(int, int)> &callback);
 
 		/**
+		 * Gets the title of the window.
+		 *
+		 * @return The title of the window.
+		 */
+		[[nodiscard]] std::string getTitle() const;
+
+		/**
+		 * Sets the title of the window.
+		 *
+		 * @param newTitle The new title of the window.
+		 */
+		void setTitle(const std::string &newTitle);
+
+		/**
 		 * Checks whether the given key is pressed.
 		 *
 		 * @param keyCode The key code that will be checked.
