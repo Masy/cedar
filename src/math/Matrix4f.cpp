@@ -360,21 +360,15 @@ void Matrix4f::rotate(const Quaternionf *rotation)
 	float yw = rotation->y * rotation->w;
 	float yz = rotation->y * rotation->z;
 	float xw = rotation->x * rotation->w;
-	float dzw = zw + zw;
-	float dxy = xy + xy;
-	float dxz = xz + xz;
-	float dyw = yw + yw;
-	float dyz = yz * yz;
-	float dxw = xw + xw;
 
 	float rm00 = wSquared + xSquared - zSquared - ySquared;
-	float rm01 = dxy + dzw;
-	float rm02 = dxz - dyw;
-	float rm10 = (0.0f - dzw) + dxy;
+	float rm01 = xy + zw + zw + xy;
+	float rm02 = xz - yw + xz - yw;
+	float rm10 = -zw + xy - zw + xy;
 	float rm11 = ySquared - zSquared + wSquared - xSquared;
-	float rm12 = dyz + dxw;
-	float rm20 = dyw + dxz;
-	float rm21 = dyz - dxw;
+	float rm12 = yz + yz + xw + xw;
+	float rm20 = yw + xz + xz + yw;
+	float rm21 = yz + yz - xw - xw ;
 	float rm22 = zSquared - ySquared - xSquared + wSquared;
 	float nm00 = this->m_00 * rm00 + this->m_10 * rm01 + this->m_20 * rm02;
 	float nm01 = this->m_01 * rm00 + this->m_11 * rm01 + this->m_21 * rm02;
@@ -426,17 +420,17 @@ void Matrix4f::rotation(const Quaternionf *rotation)
 	float dxw = xw + xw;
 
 	this->m_00 = wSquared + xSquared - zSquared - ySquared;
-	this->m_01 = dxy + dzw;
-	this->m_02 = dxz - dyw;
+	this->m_01 = xy + zw + zw + xy;
+	this->m_02 = xz - yw + xz - yw;
 	this->m_03 = 0.0f;
 
-	this->m_10 = (0.0f - dzw) + dxy;
+	this->m_10 = -zw + xy - zw + xy;
 	this->m_11 = ySquared - zSquared + wSquared - xSquared;
-	this->m_12 = dyz + dxw;
+	this->m_12 = yz + yz + xw + xw;
 	this->m_13 = 0.0f;
 
-	this->m_20 = dyw + dxw;
-	this->m_21 = dyz - dxw;
+	this->m_20 = yw + xz + xz + yw;
+	this->m_21 = yz + yz - xw - xw;
 	this->m_22 = zSquared - ySquared - xSquared + wSquared;
 	this->m_23 = 0.0f;
 
