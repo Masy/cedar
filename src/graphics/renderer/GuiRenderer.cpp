@@ -3,8 +3,9 @@
 //
 
 #include "cedar/GuiRenderer.h"
+#include "cedar/Cedar.h"
 #include "glad/glad.h"
-#include <iostream>
+#include <cmath>
 
 using namespace cedar;
 
@@ -244,4 +245,141 @@ void GuiRenderer::drawTexturedRect(float posX, float posY, float posZ, float wid
 
 	this->m_nextQuad++;
 	this->m_quadCount++;
+}
+
+
+
+
+void GuiRenderer::drawText(const float posX, const float posY, const float posZ, const std::string &text, Font *font, const Vector4f *color, const unsigned int alignment)
+{
+	if (this->m_quadCount + text.length() > this->m_batchSize)
+	{
+		this->endBatch();
+		this->flush();
+		this->beginBatch();
+	}
+
+	float textureUnit = 0.0f;
+	for (unsigned int n = 0; n < this->m_textureUnitCount; n++)
+	{
+		if (this->m_textures[n] == font->getGlyphAtlas()->getId())
+		{
+			textureUnit = static_cast<float>(n);
+			break;
+		}
+		else if (this->m_textures[n] == 0)
+		{
+			this->m_textures[n] = font->getGlyphAtlas()->getId();
+			textureUnit = static_cast<float>(n);
+			this->m_textureCount++;
+			break;
+		}
+	}
+
+	if (textureUnit == 0.0f)
+	{
+		this->endBatch();
+		this->flush();
+		this->beginBatch();
+		textureUnit = 1.0f;
+		this->m_textures[1] = font->getGlyphAtlas()->getId();
+	}
+
+	float nextPosX = posX;
+	float currentPosX;
+	float nextPosY;
+	unsigned int codepoint;
+	unsigned int state = UTF8_ACCEPT;
+
+	unsigned int horizontalAlignment = alignment & 0x03u;
+	unsigned int verticalAlignment = alignment & 0x0Cu;
+	if (horizontalAlignment == CEDAR_ALIGNMENT_LEFT)
+	{
+		for (const uint8_t *s = (uint8_t *) text.c_str(); *s; ++s)
+		{
+			if (!Font::decode(&state, &codepoint, *s))
+			{
+				const Glyph *glyph = font->getGlyph(codepoint);
+
+				currentPosX = nextPosX + static_cast<float>(glyph->m_bearing.x);
+
+				switch (verticalAlignment)
+				{
+					case CEDAR_ALIGNMENT_TOP:
+						nextPosY = posY - static_cast<float>(glyph->m_bearing.y) + static_cast<float>(font->getSize());
+						break;
+
+					case CEDAR_ALIGNMENT_MIDDLE:
+						nextPosY = posY - static_cast<float>(glyph->m_bearing.y) + (static_cast<float>(font->getSize()) * 0.5f);
+						break;
+
+					default:
+						nextPosY = posY - static_cast<float>(glyph->m_bearing.y);
+						break;
+				}
+
+				this->m_nextQuad->positions = {currentPosX, nextPosY, currentPosX + static_cast<float>(glyph->m_size.x),
+											   nextPosY + static_cast<float>(glyph->m_size.y)};
+				this->m_nextQuad->layerAndTexture = {-posZ, textureUnit};
+				this->m_nextQuad->uvs = glyph->m_uvs;
+				this->m_nextQuad->tint = *color;
+
+				this->m_nextQuad++;
+				this->m_quadCount++;
+
+				nextPosX += static_cast<float>(glyph->m_advance);
+			}
+		}
+	}
+	else
+	{
+		Glyph glyphs[text.length()];
+		unsigned int width = 0;
+		unsigned int characters = 0;
+		for (const uint8_t *s = (uint8_t *) text.c_str(); *s; ++s)
+		{
+			if (!Font::decode(&state, &codepoint, *s))
+			{
+				glyphs[characters] = *font->getGlyph(codepoint);
+				width += glyphs[characters].m_advance;
+				characters++;
+			}
+		}
+
+		if (horizontalAlignment == CEDAR_ALIGNMENT_CENTER)
+			nextPosX = posX - std::floor(static_cast<float>(width) * 0.5f);
+		else
+			nextPosX = posX - static_cast<float>(width);
+
+		for (unsigned int n = 0; n < characters; n++)
+		{
+			currentPosX = nextPosX + static_cast<float>(glyphs[n].m_bearing.x);
+
+			switch (verticalAlignment)
+			{
+				case CEDAR_ALIGNMENT_TOP:
+					nextPosY = posY - static_cast<float>(glyphs[n].m_bearing.y) + static_cast<float>(font->getSize());
+					break;
+
+				case CEDAR_ALIGNMENT_MIDDLE:
+					nextPosY = posY - static_cast<float>(glyphs[n].m_bearing.y) + (static_cast<float>(font->getSize()) * 0.5f);
+					break;
+
+				default:
+					nextPosY = posY - static_cast<float>(glyphs[n].m_bearing.y);
+					break;
+			}
+
+			this->m_nextQuad->positions = {currentPosX, nextPosY, currentPosX + static_cast<float>(glyphs[n].m_size.x),
+										   nextPosY + static_cast<float>(glyphs[n].m_size.y)};
+			this->m_nextQuad->layerAndTexture = {-posZ, textureUnit};
+			this->m_nextQuad->uvs = glyphs[n].m_uvs;
+			this->m_nextQuad->tint = *color;
+
+			this->m_nextQuad++;
+			this->m_quadCount++;
+
+			nextPosX += static_cast<float>(glyphs[n].m_advance);
+		}
+	}
 }

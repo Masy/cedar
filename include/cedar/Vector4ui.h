@@ -22,7 +22,7 @@ namespace cedar
 
 		explicit Vector4ui(unsigned int values);
 
-		Vector4ui(const Vector3ui &xyz, unsigned int z);
+		Vector4ui(const Vector3ui &xyz, unsigned int w);
 
 		Vector4ui(const Vector2ui &xy, const Vector2ui &zw);
 

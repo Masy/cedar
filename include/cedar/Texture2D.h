@@ -236,13 +236,14 @@ namespace cedar
 		/**
 		 * Sets the size of the texture.
 		 *
-		 * <p>This will wipe any data currently in the texture.</p>
+		 * <p>If <code>keepData</code> is true and the new size is smaller than the old one the image is cropped.</p>
 		 *
 		 * @param newWidth The new width of the texture.
 		 * @param newHeight The new height of the texture.
+		 * @param keepData If this is true, the data of the texture will stay.
 		 * @throws TextureResizeException if the texture is <code>immutable</code>.
 		 */
-		void setSize(int newWidth, int newHeight);
+		void setSize(int newWidth, int newHeight, bool keepData = false);
 
 		/**
 		 * Checks whether the texture is multisampled or not.
