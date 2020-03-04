@@ -3,14 +3,10 @@
 //
 
 #include <cedar/Cedar.h>
-#include "cedar/GlyphData.h"
-#include "cedar/Vector4ui.h"
 #include "cedar/Font.h"
 
 #define STB_IMAGE_WRITE_STATIC
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-
-#include "stb_image_write.h"
 
 using namespace cedar;
 
@@ -67,6 +63,7 @@ Font::Font(const std::string &name, const std::string &path, unsigned int size, 
 	this->m_atlasHeight = 1024;
 	this->m_tallestCharacterInRow = 0;
 	this->m_glyphs = std::map<unsigned int, Glyph*>();
+	this->m_glyphData = nullptr;
 
 	this->generateGlyphs(firstCharacter, lastCharacter);
 }
@@ -83,7 +80,152 @@ Font::~Font()
 
 const Glyph *Font::generateGlyph(const unsigned int unicode)
 {
-	return nullptr;
+	// Set the size of all glyphs.
+	FT_Set_Pixel_Sizes(this->m_face, 0, this->m_size);
+
+	FT_Render_Mode ftRenderMode = this->m_renderingMode ? FT_RENDER_MODE_NORMAL : FT_RENDER_MODE_MONO;
+
+	// Render glyph image
+	unsigned int glyphIndex = FT_Get_Char_Index(this->m_face, unicode);
+	FT_Load_Glyph(this->m_face, glyphIndex, FT_LOAD_DEFAULT);
+	FT_GlyphSlot glyphSlot = this->m_face->glyph;
+	FT_Render_Glyph(glyphSlot, ftRenderMode);
+
+	// Get glyph metrics
+	unsigned int glyphWidth = glyphSlot->bitmap.width;
+	unsigned int glyphHeight = glyphSlot->bitmap.rows;
+	unsigned int glyphSize = glyphWidth * glyphHeight;
+
+	// Allocate memory for the image data
+	unsigned char glyphImageData[glyphSize];
+
+	// Freetype stores mono rendered glyphs in bits, so it requires special handling
+	if (glyphSlot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
+	{
+		// The pitch defines the number of bytes in one row of the bitmap.
+		// Since the image buffer is in bits, there are multiple pixel per byte
+		unsigned int glyphPitch = std::abs(glyphSlot->bitmap.pitch);
+		unsigned int dataIndex = 0;
+		for (unsigned int y = 0; y < glyphHeight; y++)
+		{
+			// Set the number of pixels that need to be read.
+			int pixelLeft = static_cast<int>(glyphWidth);
+			for (int x = 0; x < glyphPitch; x++)
+			{
+				unsigned int byte = glyphSlot->bitmap.buffer[y * glyphPitch + x];
+
+				// Check how many bits need to be read from the byte.
+				// Since the bits are stored left-to-right this is actually the lower boundary.
+				unsigned int boundary = std::max(8 - pixelLeft, 0);
+				for (unsigned int m = 7; m >= boundary; m--)
+				{
+					glyphImageData[dataIndex++] = ((byte >> m) & 0x1U) ? 255 : 0;
+				}
+				// Update the amount of bits left
+				pixelLeft -= 8;
+			}
+		}
+	}
+	else
+	{
+		for (unsigned int n = 0; n < glyphSize; n++)
+		{
+			glyphImageData[n] = glyphSlot->bitmap.buffer[n];
+		}
+	}
+
+	// Check if the glyph fits on the glyph atlas vertically
+	if (this->m_currentOffsetY + glyphHeight >= this->m_atlasHeight)
+		this->resize();
+
+	// Check if the glyph fits on the texture horizontally
+	if (this->m_currentOffsetX + glyphWidth >= CEDAR_FONT_ATLAS_WIDTH)
+	{
+		this->m_currentOffsetY += this->m_tallestCharacterInRow;
+
+		// Since we advanced the y offset we need to check for space again
+		if (this->m_currentOffsetY + glyphHeight >= this->m_atlasHeight)
+			this->resize();
+
+		// Reset x offset to 0 because of new row
+		this->m_currentOffsetX = 0;
+		this->m_tallestCharacterInRow = glyphHeight;
+	}
+	else if (glyphHeight > this->m_tallestCharacterInRow)
+	{
+		this->m_tallestCharacterInRow = glyphHeight;
+	}
+
+	float pixelWidth = 1.0f / CEDAR_FONT_ATLAS_WIDTH;
+	float pixelHeight = 1.0f / static_cast<float>(this->m_atlasHeight);
+	Glyph *glyph = new Glyph(Vector2i(static_cast<int>(glyphWidth), static_cast<int>(glyphHeight)),
+							 Vector2i(glyphSlot->bitmap_left, glyphSlot->bitmap_top),
+							 static_cast<unsigned int>(glyphSlot->advance.x) >> 6U,
+							 Vector4f(pixelWidth * static_cast<float>(this->m_currentOffsetX),
+									  pixelHeight * static_cast<float>(this->m_currentOffsetY),
+									  pixelWidth * static_cast<float>(this->m_currentOffsetX + static_cast<int>(glyphWidth)),
+									  pixelHeight * static_cast<float>(this->m_currentOffsetY + static_cast<int>(glyphHeight))
+									 )
+							);
+	this->m_glyphAtlas->upload(this->m_currentOffsetX, this->m_currentOffsetY,
+							   static_cast<int>(glyphWidth), static_cast<int>(glyphHeight),
+							   CEDAR_RED, CEDAR_UNSIGNED_BYTE, glyphImageData);
+
+	this->m_currentOffsetX += glyphWidth;
+
+	this->m_glyphs.insert(std::make_pair(unicode, glyph));
+}
+
+void Font::resize()
+{
+	this->m_glyphAtlas->setSize(CEDAR_FONT_ATLAS_WIDTH, this->m_atlasHeight * 2);
+	for (auto pair : this->m_glyphs)
+		pair.second->m_uvs *= Vector4f(1.0f, 0.5f, 1.0f, 0.5f);
+}
+
+void Font::stitchAtlas(unsigned int firstIndex, unsigned int lastIndex, const cedar::Vector4ui &region)
+{
+	float pixelWidth = 1.0f / CEDAR_FONT_ATLAS_WIDTH;
+	float pixelHeight = 1.0f / static_cast<float>(this->m_atlasHeight);
+
+	// allocate memory for the first region
+	unsigned int regionDataLength = region.z * region.w;
+	unsigned char *regionData = new unsigned char[regionDataLength];
+
+	// Stitch first region together
+	for (unsigned int n = firstIndex; n < lastIndex; n++)
+	{
+		GlyphData *glyphData = &this->m_glyphData[n];
+		Glyph *glyph = new Glyph(glyphData->m_size,
+								 glyphData->m_bearing,
+								 glyphData->m_advance,
+								 Vector4f(pixelWidth * static_cast<float>(glyphData->m_offset.x),
+										  pixelHeight * static_cast<float>(glyphData->m_offset.y),
+										  pixelWidth * static_cast<float>(glyphData->m_offset.x + glyphData->m_size.x),
+										  pixelHeight * static_cast<float>(glyphData->m_offset.y + glyphData->m_size.y)
+										 )
+								);
+
+		// Copy glyph image into region data
+		for (int x = 0; x < glyphData->m_size.x; x++)
+		{
+			for (int y = 0; y < glyphData->m_size.y; y++)
+			{
+				unsigned int regionIndex = region.z * (glyphData->m_offset.y - region.y + y) + x + glyphData->m_offset.x;
+				unsigned int dataIndex = glyphData->m_size.x * y + x;
+				regionData[regionIndex] = glyphData->m_data[dataIndex];
+			}
+		}
+
+		this->m_glyphs.insert(std::make_pair(glyphData->m_unicode, glyph));
+	}
+
+	// Upload region to texture
+	this->m_glyphAtlas->upload(static_cast<int>(region.x), static_cast<int>(region.y),
+							   static_cast<int>(region.z), static_cast<int>(region.w),
+							   CEDAR_RED, CEDAR_UNSIGNED_BYTE, regionData);
+
+	delete[] regionData;
 }
 
 void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int lastCharacter)
@@ -93,7 +235,7 @@ void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int 
 
 	// Count glyphs and allocate memory for them.
 	unsigned int glyphCount = lastCharacter - firstCharacter + 1;
-	GlyphData *glyphsData = new GlyphData[glyphCount];
+	this->m_glyphData = new GlyphData[glyphCount];
 
 	FT_Render_Mode ftRenderMode = this->m_renderingMode ? FT_RENDER_MODE_NORMAL : FT_RENDER_MODE_MONO;
 
@@ -103,7 +245,7 @@ void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int 
 	// region is needed.
 	Vector4ui firstRegion(this->m_currentOffsetX, this->m_currentOffsetY, 0, 0);
 	int glyphsInFirstRegion = 0;
-	Vector4ui secondRegion(0, 0, CEDAR_FONT_ATLAS_WIDTH, 0);
+	Vector4ui secondRegion(0, 0, 0, 0);
 	bool needsTwoRegions = false;
 
 	unsigned int glyphDataIndex = 0;
@@ -130,7 +272,7 @@ void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int 
 		unsigned int glyphSize = glyphWidth * glyphHeight;
 
 		// Allocate memory for the image data
-		glyphsData[glyphDataIndex].m_data = new unsigned char[glyphSize];
+		this->m_glyphData[glyphDataIndex].m_data = new unsigned char[glyphSize];
 
 		// Freetype stores mono rendered glyphs in bits, so it requires special handling
 		if (glyphSlot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
@@ -152,7 +294,7 @@ void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int 
 					unsigned int boundary = std::max(8 - pixelLeft, 0);
 					for (unsigned int m = 7; m >= boundary; m--)
 					{
-						glyphsData[glyphDataIndex].m_data[dataIndex++] = ((byte >> m) & 0x1U) ? 255 : 0;
+						this->m_glyphData[glyphDataIndex].m_data[dataIndex++] = ((byte >> m) & 0x1U) ? 255 : 0;
 					}
 					// Update the amount of bits left
 					pixelLeft -= 8;
@@ -163,13 +305,13 @@ void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int 
 		{
 			for (unsigned int n = 0; n < glyphSize; n++)
 			{
-				glyphsData[glyphDataIndex].m_data[n] = glyphSlot->bitmap.buffer[n];
+				this->m_glyphData[glyphDataIndex].m_data[n] = glyphSlot->bitmap.buffer[n];
 			}
 		}
 
 		// Check if the glyph fits on the glyph atlas vertically
 		if (this->m_currentOffsetY + glyphHeight >= this->m_atlasHeight)
-			this->m_glyphAtlas->setSize(CEDAR_FONT_ATLAS_WIDTH, this->m_atlasHeight * 2);
+			this->resize();
 
 		// Check if the glyph fits on the texture horizontally
 		if (this->m_currentOffsetX + glyphWidth >= CEDAR_FONT_ATLAS_WIDTH)
@@ -178,7 +320,7 @@ void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int 
 
 			// Since we advanced the y offset we need to check for space again
 			if (this->m_currentOffsetY + glyphHeight >= this->m_atlasHeight)
-				this->m_glyphAtlas->setSize(CEDAR_FONT_ATLAS_WIDTH, this->m_atlasHeight * 2);
+				this->resize();
 
 			if (!needsTwoRegions)
 			{
@@ -192,6 +334,7 @@ void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int 
 			else
 			{
 				secondRegion.w += this->m_tallestCharacterInRow;
+				secondRegion.z = std::max(secondRegion.z, this->m_currentOffsetX);
 			}
 			// Reset x offset to 0 because of new row
 			this->m_currentOffsetX = 0;
@@ -206,11 +349,11 @@ void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int 
 		}
 
 		// Set data of the glyph
-		glyphsData[glyphDataIndex].m_unicode = unicode;
-		glyphsData[glyphDataIndex].m_offset = Vector2ui(this->m_currentOffsetX, this->m_currentOffsetY);
-		glyphsData[glyphDataIndex].m_size = Vector2i(static_cast<int>(glyphWidth), static_cast<int>(glyphHeight));
-		glyphsData[glyphDataIndex].m_bearing = Vector2i(glyphSlot->bitmap_left, glyphSlot->bitmap_top);
-		glyphsData[glyphDataIndex].m_advance = static_cast<unsigned int>(glyphSlot->advance.x) >> 6U;
+		this->m_glyphData[glyphDataIndex].m_unicode = unicode;
+		this->m_glyphData[glyphDataIndex].m_offset = Vector2ui(this->m_currentOffsetX, this->m_currentOffsetY);
+		this->m_glyphData[glyphDataIndex].m_size = Vector2i(static_cast<int>(glyphWidth), static_cast<int>(glyphHeight));
+		this->m_glyphData[glyphDataIndex].m_bearing = Vector2i(glyphSlot->bitmap_left, glyphSlot->bitmap_top);
+		this->m_glyphData[glyphDataIndex].m_advance = static_cast<unsigned int>(glyphSlot->advance.x) >> 6U; // freetype stores the advance as 1/64th pixel
 
 		if (!needsTwoRegions)
 			glyphsInFirstRegion++;
@@ -227,93 +370,21 @@ void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int 
 		firstRegion.w = this->m_tallestCharacterInRow;
 	}
 
-	float pixelWidth = 1.0f / CEDAR_FONT_ATLAS_WIDTH;
-	float pixelHeight = 1.0f / static_cast<float>(this->m_atlasHeight);
-
-	// allocate memory for the first region
-	unsigned int regionDataLength = firstRegion.z * firstRegion.w;
-	unsigned char *regionData = new unsigned char[regionDataLength];
-
-	// Stitch first region together
-	for (int n = 0; n < glyphsInFirstRegion; n++)
-	{
-		GlyphData *glyphData = &glyphsData[n];
-		Glyph *glyph = new Glyph(glyphData->m_size,
-								 glyphData->m_bearing,
-								 glyphData->m_advance,
-								 Vector4f(pixelWidth * static_cast<float>(glyphData->m_offset.x),
-										  pixelHeight * static_cast<float>(glyphData->m_offset.y),
-										  pixelWidth * static_cast<float>(glyphData->m_offset.x + glyphData->m_size.x),
-										  pixelHeight * static_cast<float>(glyphData->m_offset.y + glyphData->m_size.y)
-										 )
-								);
-
-		// Copy glyph image into region data
-		for (int x = 0; x < glyphData->m_size.x; x++)
-		{
-			for (int y = 0; y < glyphData->m_size.y; y++)
-			{
-				unsigned int regionIndex = firstRegion.z * (glyphData->m_offset.y - firstRegion.y + y) + x + glyphData->m_offset.x;
-				unsigned int dataIndex = glyphData->m_size.x * y + x;
-				regionData[regionIndex] = glyphData->m_data[dataIndex];
-			}
-		}
-
-		this->m_glyphs.insert(std::make_pair(glyphData->m_unicode, glyph));
-	}
-
-	// Upload first region to texture
-	this->m_glyphAtlas->upload(static_cast<int>(firstRegion.x), static_cast<int>(firstRegion.y),
-							   static_cast<int>(firstRegion.z), static_cast<int>(firstRegion.w),
-							   CEDAR_RED, CEDAR_UNSIGNED_BYTE, regionData);
-
-	delete[] regionData;
+	// Stitch the image data of the first region together and upload it to the graphics card
+	this->stitchAtlas(0, glyphsInFirstRegion, firstRegion);
 
 	if (needsTwoRegions)
 	{
-		// Update the height of the region once more since we only add up the height of the last row if we start a new one
+		// Update the size of the region once more since we only update if we start a new one
 		secondRegion.w += this->m_tallestCharacterInRow;
+		secondRegion.z = std::max(secondRegion.z, this->m_currentOffsetX);
 
-		// allocate memory for the second region
-		regionData = new unsigned char[secondRegion.z * secondRegion.w];
-
-		// Stitch second region together
-		for (int n = glyphsInFirstRegion; n < glyphCount; n++)
-		{
-			GlyphData *glyphData = &glyphsData[n];
-			Glyph *glyph = new Glyph(glyphData->m_size,
-									 glyphData->m_bearing,
-									 glyphData->m_advance,
-									 Vector4f(pixelWidth * static_cast<float>(glyphData->m_offset.x),
-											  pixelHeight * static_cast<float>(glyphData->m_offset.y),
-											  pixelWidth * static_cast<float>(glyphData->m_offset.x + glyphData->m_size.x),
-											  pixelWidth * static_cast<float>(glyphData->m_offset.y + glyphData->m_size.y))
-									);
-
-			// Copy glyph image into region data
-			for (int x = 0; x < glyphData->m_size.x; x++)
-			{
-				for (int y = 0; y < glyphData->m_size.y; y++)
-				{
-					unsigned int regionIndex = firstRegion.z * (glyphData->m_offset.y - firstRegion.y + y) + x + glyphData->m_offset.x;
-					unsigned int dataIndex = glyphData->m_size.x * y + x;
-					regionData[regionIndex] = glyphData->m_data[dataIndex];
-				}
-			}
-
-			std::pair<unsigned int, Glyph*> pair = std::make_pair(glyphData->m_unicode, glyph);
-			this->m_glyphs.insert(pair);
-		}
-
-		// Upload second region to texture
-		this->m_glyphAtlas->upload(static_cast<int>(secondRegion.x), static_cast<int>(secondRegion.y),
-								   static_cast<int>(secondRegion.z), static_cast<int>(secondRegion.w),
-								   CEDAR_RED, CEDAR_UNSIGNED_BYTE, regionData);
-
-		delete[] regionData;
+		// Stitch the image data of the second region together and upload it to the graphics card
+		this->stitchAtlas(glyphsInFirstRegion, glyphCount, secondRegion);
 	}
 
-	delete[] glyphsData;
+	// Free the allocated memory for the glyphs data
+	delete[] this->m_glyphData;
 }
 
 unsigned int Font::getSize() const
