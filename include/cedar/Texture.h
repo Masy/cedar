@@ -173,6 +173,13 @@ namespace cedar
 
 	public:
 		/**
+		 * Gets the unsized internal format of the given sized internal format.
+		 *
+		 * @param sizedInternalFormat The sized internal format that will be converted.
+		 * @return The unsized internal format of the given sized internal format.
+		 */
+		static unsigned int sizedToUnsized(unsigned int sizedInternalFormat);
+		/**
 		 * Destroys the texture.
 		 *
 		 * <p>This will also free the memory of the texture on the graphics card.</p>

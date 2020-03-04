@@ -9,6 +9,32 @@
 #include "cedar/ShaderProgram.h"
 #include "cedar/Matrix4f.h"
 #include "cedar/Texture2D.h"
+#include "cedar/Font.h"
+
+/**
+ * Defines the horizontal alignment to be left.
+ */
+#define CEDAR_ALIGNMENT_LEFT 0x00
+/**
+ * Defines the horizontal alignment to be center.
+ */
+#define CEDAR_ALIGNMENT_CENTER 0x01
+/**
+ * Defines the horizontal alignment to be right.
+ */
+#define CEDAR_ALIGNMENT_RIGHT 0x02
+/**
+ * Defines the vertical alignment to be top.
+ */
+#define CEDAR_ALIGNMENT_TOP 0x00
+/**
+ * Defines the vertical alignment to be middle
+ */
+#define CEDAR_ALIGNMENT_MIDDLE 0x04
+/**
+ * Defines the vertical alignment to be bottom.
+ */
+#define CEDAR_ALIGNMENT_BOTTOM 0x08
 
 /**
  * Base namespace of the cedar engine.
@@ -137,13 +163,12 @@ namespace cedar
 		 */
 		void initShader();
 
-	protected:
-
 	public:
 		/**
 		 * Creates a new gui renderer.
 		 */
 		GuiRenderer();
+
 		/**
 		 * Destroys the gui renderer.
 		 */
@@ -166,10 +191,12 @@ namespace cedar
 		 * reset the {@link #m_quadCount quad count} to 0 and set the {@link #m_textureCount texture count} back to 1.</p>
 		 */
 		void beginBatch();
+
 		/**
 		 * Uploads the data of the current batch to the vertex buffer object on the graphics card.
 		 */
 		void endBatch();
+
 		/**
 		 * Renders all quads currently in the batch.
 		 */
@@ -188,6 +215,7 @@ namespace cedar
 		 * @param color A pointer to the color of the rectangle.
 		 */
 		void drawRect(float posX, float posY, float posZ, float width, float height, const Vector4f *color);
+
 		/**
 		 * Draws a textured rectangle.
 		 *
@@ -207,7 +235,35 @@ namespace cedar
 		 * @param uvY2 The y coordinate of the second corner of the uv section of the texture.
 		 * @param texture A pointer to the 2 dimensional texture a section will be rendered of.
 		 */
-		void drawTexturedRect(float posX, float posY, float posZ, float width, float height, float uvX1, float uvY1, float uvX2, float uvY2, const Texture2D *texture);
+		void drawTexturedRect(float posX, float posY, float posZ, float width, float height, float uvX1, float uvY1, float uvX2, float uvY2,
+							  const Texture2D *texture);
+
+		/**
+		 * Draws a text.
+		 *
+		 * <p>The <code>alignment</code> should be a combination of a horizontal alignment:
+		 * <ul>
+		 *   <li>{@link CEDAR_ALIGNMENT_LEFT}</li>
+		 *   <li>{@link CEDAR_ALIGNMENT_CENTER}</li>
+		 *   <li>{@link CEDAR_ALIGNMENT_RIGHT}</li>
+		 * </ul>
+		 * and a vertical alignment:
+		 * <ul>
+		 *   <li>{@link CEDAR_ALIGNMENT_TOP}</li>
+		 *   <li>{@link CEDAR_ALIGNMENT_MIDDLE}</li>
+		 *   <li>{@link CEDAR_ALIGNMENT_BOTTOM}</li>
+		 * </ul></p>
+		 *
+		 * @param posX The x coordinate of the text.
+		 * @param posY The y coordinate of the text.
+		 * @param posZ The z index of the text.
+		 * @param text The string of the text.
+		 * @param font A pointer to the font of the text.
+		 * @param color A pointer to the color of the text.
+		 * @param alignment The alignment of the text.
+		 */
+		void drawText(float posX, float posY, float posZ, const std::string &text, Font *font, const Vector4f *color,
+					  unsigned int alignment = CEDAR_ALIGNMENT_TOP | CEDAR_ALIGNMENT_LEFT);
 	};
 }
 

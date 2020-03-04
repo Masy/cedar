@@ -26,6 +26,8 @@
 				<Compiler>
 					<Add directory="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/glad/include"/>
 					<Add directory="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include"/>
+					<Add directory="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/freetype2/include"/>
+					<Add directory="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/stb/include"/>
 					<Add directory="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/glfw/include"/>
 				</Compiler>
 				<MakeCommands>
@@ -44,6 +46,8 @@
 				<Compiler>
 					<Add directory="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/glad/include"/>
 					<Add directory="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include"/>
+					<Add directory="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/freetype2/include"/>
+					<Add directory="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/stb/include"/>
 					<Add directory="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/glfw/include"/>
 				</Compiler>
 				<MakeCommands>
@@ -196,7 +200,19 @@
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Cedar.h">
 			<Option target="cedar"/>
 		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Font.h">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/FontRegistry.h">
+			<Option target="cedar"/>
+		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/GLConstants.h">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Glyph.h">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/GlyphData.h">
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/GuiRenderer.h">
@@ -295,6 +311,18 @@
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/core/XException.cpp">
 			<Option target="cedar"/>
 		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/font/Font.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/font/FontRegistry.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/font/Glyph.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/font/GlyphData.cpp">
+			<Option target="cedar"/>
+		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/model/Model.cpp">
 			<Option target="cedar"/>
 		</Unit>
@@ -343,13 +371,25 @@
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/math/Vector2f.cpp">
 			<Option target="cedar"/>
 		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/math/Vector2i.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/math/Vector2ui.cpp">
+			<Option target="cedar"/>
+		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/math/Vector3f.cpp">
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/math/Vector4f.cpp">
 			<Option target="cedar"/>
 		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/math/Vector4ui.cpp">
+			<Option target="cedar"/>
+		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/multithreading/Thread.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/stb/include/stb_image_write.h">
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/media/Daten/Dokumente/Projekte/TalesOfCatventure/CMakeLists.txt">

@@ -15,17 +15,9 @@ Texture2D::Texture2D(const int width, const int height, const int internalFormat
 		case CEDAR_TEXTURE_2D:
 		case CEDAR_TEXTURE_1D_ARRAY:
 		case CEDAR_TEXTURE_RECTANGLE:
-		case CEDAR_TEXTURE_CUBE_MAP:
-		case CEDAR_TEXTURE_CUBE_MAP_POSITIVE_X:
-		case CEDAR_TEXTURE_CUBE_MAP_NEGATIVE_X:
-		case CEDAR_TEXTURE_CUBE_MAP_POSITIVE_Y:
-		case CEDAR_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-		case CEDAR_TEXTURE_CUBE_MAP_POSITIVE_Z:
-		case CEDAR_TEXTURE_CUBE_MAP_NEGATIVE_Z:
 		case CEDAR_PROXY_TEXTURE_2D:
 		case CEDAR_PROXY_TEXTURE_1D_ARRAY:
 		case CEDAR_PROXY_TEXTURE_RECTANGLE:
-		case CEDAR_PROXY_TEXTURE_CUBE_MAP:
 			break;
 
 		default:
@@ -163,8 +155,30 @@ void Texture2D::upload(int offsetX, int offsetY, int width, int height, unsigned
 	if (this->m_reservedLevels != 0 && level < this->m_reservedLevels)
 		throw TextureUploadException("Could not upload data to Texture2D. The given level is greater than the reserved number of levels!");
 
+	int alignment;
+	switch (format)
+	{
+
+		case CEDAR_RG:
+			alignment = 2;
+			break;
+
+		case CEDAR_RGB:
+			alignment = 3;
+			break;
+
+		case CEDAR_RGBA:
+			alignment = 4;
+			break;
+
+		default:
+			alignment = 1;
+			break;
+	}
+	glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
 	glBindTexture(this->m_target, this->m_textureId);
 	glTexSubImage2D(this->m_target, level, offsetX, offsetY, width, height, format, type, data);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
 
 int Texture2D::getWidth() const
@@ -177,22 +191,87 @@ int Texture2D::getHeight() const
 	return this->m_height;
 }
 
-void Texture2D::setSize(int newWidth, int newHeight)
+void Texture2D::setSize(int newWidth, int newHeight, bool keepData)
 {
-	if (this->m_textureId == 0)
-	{
-		this->m_width = newWidth;
-		this->m_height = newHeight;
-	}
-	else
+	if (this->m_textureId != 0)
 	{
 		if (this->m_immutable)
 			throw TextureResizeException("Could not set size of texture. The texture is immutable!");
 
-		glBindTexture(this->m_target, this->m_textureId);
-		int dataFormat = this->m_depthTexture ? CEDAR_DEPTH_COMPONENT : (this->m_stencilTexture ? CEDAR_STENCIL_INDEX : CEDAR_RGBA);
-		glTexImage2D(this->m_target, 0, this->m_internalFormat, newWidth, newHeight, 0, dataFormat, CEDAR_UNSIGNED_BYTE, nullptr);
+		unsigned int format = sizedToUnsized(this->m_internalFormat);
+		if (keepData)
+		{
+			switch (this->m_target)
+			{
+				case CEDAR_TEXTURE_2D:
+				case CEDAR_TEXTURE_1D_ARRAY:
+				case CEDAR_TEXTURE_RECTANGLE:
+					break;
+
+				default:
+					std::string message = "Could not resize Texture2D. The data of the texture could not be copied due to the target (";
+					message.append(std::to_string(this->m_target));
+					message.append(") not being supported!");
+					throw TextureCreationException(message);
+			}
+
+			int bufferWidth = std::min(newWidth, this->m_width);
+			int bufferHeight = std::min(newHeight, this->m_height);
+			unsigned int bufferSize = bufferWidth * bufferHeight;
+			int alignment;
+			switch (format)
+			{
+				case CEDAR_RG:
+					bufferSize *= 2;
+					alignment = 2;
+					break;
+
+				case CEDAR_RGB:
+					bufferSize *= 3;
+					alignment = 3;
+					break;
+
+				case CEDAR_RGBA:
+					bufferSize *= 4;
+					alignment = 4;
+					break;
+
+				default:
+					alignment = 1;
+					break;
+			}
+
+			unsigned char *buffer = new unsigned char[bufferSize];
+
+			glPixelStorei(GL_PACK_ALIGNMENT, 1);
+			glGetTextureSubImage(this->m_textureId, 0, 0, 0, 0, bufferWidth, bufferHeight, 0, format, CEDAR_UNSIGNED_BYTE, bufferSize, buffer);
+			glPixelStorei(GL_PACK_ALIGNMENT, 4);
+
+			glBindTexture(this->m_target, this->m_textureId);
+
+			glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
+			if (newWidth > this->m_width || newHeight > this->m_height)
+			{
+				glTexImage2D(this->m_target, 0, this->m_internalFormat, newWidth, newHeight, 0, format, CEDAR_UNSIGNED_BYTE, nullptr);
+				glTexSubImage2D(this->m_target, 0, 0, 0, bufferWidth, bufferHeight, format, CEDAR_UNSIGNED_BYTE, buffer);
+			}
+			else
+			{
+				glTexImage2D(this->m_target, 0, this->m_internalFormat, bufferWidth, bufferHeight, 0, format, CEDAR_UNSIGNED_BYTE, buffer);
+			}
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+			delete[] buffer;
+		}
+		else
+		{
+			glBindTexture(this->m_target, this->m_textureId);
+			glTexImage2D(this->m_target, 0, this->m_internalFormat, newWidth, newHeight, 0, format, CEDAR_UNSIGNED_BYTE, nullptr);
+		}
 	}
+
+	this->m_width = newWidth;
+	this->m_height = newHeight;
 }
 
 bool Texture2D::isMultisample() const
