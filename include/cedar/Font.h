@@ -11,6 +11,8 @@
 
 #include "cedar/Texture2D.h"
 #include "cedar/Glyph.h"
+#include "cedar/GlyphData.h"
+#include "cedar/Vector4ui.h"
 
 #define CEDAR_RENDERING_SHARP 0x00
 #define CEDAR_RENDERING_SMOOTH 0x01
@@ -131,6 +133,10 @@ namespace cedar
 		  * Map for storing glyphs for unicode characters.
 		  */
 		std::map<unsigned int, Glyph*> m_glyphs;
+		/**
+		 * Pointer to temporary storage that is used by {@link generate
+		 */
+		GlyphData *m_glyphData;
 
 		/**
 		 * Generates the glyph with the given unicode if it does not exist.
@@ -139,6 +145,24 @@ namespace cedar
 		 * @return A constant pointer to the generated glyph.
 		 */
 		const Glyph *generateGlyph(unsigned int unicode);
+
+		/**
+		 * Resizes the glyph atlas.
+		 *
+		 * <p>This doubles the height of the glyph atlas and recalculates the uv coordinates of every
+		 * currently loaded glyph.</p>
+		 */
+		void resize();
+
+		/**
+		 * Stitches the given glyphs from {@link #m_glyphData} into a single image and uploads it to the glyph atlas.
+		 *
+		 * @param firstIndex The first index of the glyphs to stitch.
+		 * @param lastIndex The last (exclusive) index of the glyphs to stitch.
+		 * @param region The coordinates and size of the region that is being uploaded to the glyph atlas.
+		 */
+		void stitchAtlas(unsigned int firstIndex, unsigned int lastIndex, const Vector4ui &region);
+
 
 	public:
 
