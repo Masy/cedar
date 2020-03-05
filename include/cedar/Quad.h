@@ -26,12 +26,13 @@ namespace cedar
 		 */
 		Vector4f m_corners;
 		/**
-		 * The layer and texture unit of the quad.
-		 *
-		 * <p>The <code>X</code> is basically the z coordinate of the quad instance, which determines if it is rendered
-		 * in front of or behind other quads. The <code>Y</code> coordinate is the id of the texture unit this quad uses.</p>
+		 * The z index of the quad.
 		 */
-		Vector2f m_layerAndTexture;
+		float m_zIndex;
+		/**
+		 * The texture unit of the quad.
+		 */
+		int m_textureUnit;
 		/**
 		 * The uv coordinates of the quad.
 		 *
@@ -55,21 +56,23 @@ namespace cedar
 		 * Creates a new quad.
 		 *
 		 * @param corners The top-left and bottom-right corners of the quad in pixel.
-		 * @param layerAndTexture The layer and texture unit of the quad.
+		 * @param zIndex The z index of the quad.
+		 * @param textureUnit The texture unit of the quad.
 		 * @param uvs The uvs coordinates of the top-left and bottom-right corner.
 		 * @param tint The tint of the color.
 		 */
-		Quad(const Vector4f &corners, const Vector2f &layerAndTexture, const Vector4f &uvs, const Vector4f &tint);
+		Quad(const Vector4f &corners, float zIndex, int textureUnit, const Vector4f &uvs, const Vector4f &tint);
 
 		/**
 		 * Sets the values of the quad.
 		 *
 		 * @param corners The new corners of the quad,
-		 * @param layerAndTexture The new layer and texture unit of the quad.
+		 * @param zIndex The new z index of the quad.
+		 * @param textureUnit The new texture unit of the quad.
 		 * @param uvs The new uv coordinates of the quad.
 		 * @param tint The new tint of the quad.
 		 */
-		void set(const Vector4f &corners, const Vector2f &layerAndTexture, const Vector4f &uvs, const Vector4f &tint);
+		void set(const Vector4f &corners, float zIndex, int textureUnit, const Vector4f &uvs, const Vector4f &tint);
 
 		/**
 		 * Sets the values of the quad.
@@ -78,7 +81,7 @@ namespace cedar
 		 * @param cornerY1 The y coordinate of the top-left corner of the quad.
 		 * @param cornerX2 The x coordinate of the bottom-right corner of the quad.
 		 * @param cornerY2 The y coordinate of the bottom-right corner of the quad.
-		 * @param layer The layer of the quad.
+		 * @param zIndex The zIndex of the quad.
 		 * @param textureUnit The texture unit of the quad.
 		 * @param uvX1 The x uv coordinate of the top-left corner of the quad.
 		 * @param uvY1 The y uv coordinate of the top-left corner of the quad.
@@ -89,7 +92,7 @@ namespace cedar
 		 * @param tintBlue The blue component of the tint of the quad.
 		 * @param tintAlpha The alpha component of the tint of the quad.
 		 */
-		void set(float cornerX1, float cornerY1, float cornerX2, float cornerY2, float layer, float textureUnit, float uvX1, float uvY1, float uvX2,
+		void set(float cornerX1, float cornerY1, float cornerX2, float cornerY2, float zIndex, int textureUnit, float uvX1, float uvY1, float uvX2,
 				 float uvY2, float tintRed, float tintGreen, float tintBlue, float tintAlpha);
 	};
 };
