@@ -25,6 +25,85 @@ TextureUploadException::TextureUploadException(const std::string &message) : Tex
 TextureParameterException::TextureParameterException(const std::string &message) : TextureException(message)
 {}
 
+unsigned int Texture::sizedToUnsized(const unsigned int sizedInternalFormat)
+{
+	switch (sizedInternalFormat)
+	{
+		case CEDAR_R8:
+		case CEDAR_R8_SNORM:
+		case CEDAR_R16:
+		case CEDAR_R16_SNORM:
+		case CEDAR_R8UI:
+		case CEDAR_R8I:
+		case CEDAR_R16UI:
+		case CEDAR_R16I:
+		case CEDAR_R16F:
+		case CEDAR_R32UI:
+		case CEDAR_R32I:
+		case CEDAR_R32F:
+			return CEDAR_RED;
+
+		case CEDAR_RG8:
+		case CEDAR_RG8_SNORM:
+		case CEDAR_RG16:
+		case CEDAR_RG16_SNORM:
+		case CEDAR_RG8UI:
+		case CEDAR_RG8I:
+		case CEDAR_RG16UI:
+		case CEDAR_RG16I:
+		case CEDAR_RG16F:
+		case CEDAR_RG32UI:
+		case CEDAR_RG32I:
+		case CEDAR_RG32F:
+			return CEDAR_RG;
+
+		case CEDAR_RGB8:
+		case CEDAR_RGB8_SNORM:
+		case CEDAR_RGB16:
+		case CEDAR_RGB16_SNORM:
+		case CEDAR_RGB8UI:
+		case CEDAR_RGB8I:
+		case CEDAR_RGB16UI:
+		case CEDAR_RGB16I:
+		case CEDAR_RGB16F:
+		case CEDAR_RGB32UI:
+		case CEDAR_RGB32I:
+		case CEDAR_RGB32F:
+			return CEDAR_RGB;
+
+		case CEDAR_RGBA8:
+		case CEDAR_RGBA8_SNORM:
+		case CEDAR_RGBA16:
+		case CEDAR_RGBA16_SNORM:
+		case CEDAR_RGBA8UI:
+		case CEDAR_RGBA8I:
+		case CEDAR_RGBA16UI:
+		case CEDAR_RGBA16I:
+		case CEDAR_RGBA16F:
+		case CEDAR_RGBA32UI:
+		case CEDAR_RGBA32I:
+		case CEDAR_RGBA32F:
+			return CEDAR_RGBA;
+
+		case CEDAR_DEPTH_COMPONENT16:
+		case CEDAR_DEPTH_COMPONENT24:
+		case CEDAR_DEPTH_COMPONENT32:
+		case CEDAR_DEPTH_COMPONENT32F:
+		case CEDAR_DEPTH24_STENCIL8:
+		case CEDAR_DEPTH32F_STENCIL8:
+			return CEDAR_DEPTH_COMPONENT;
+
+		case CEDAR_STENCIL_INDEX1:
+		case CEDAR_STENCIL_INDEX4:
+		case CEDAR_STENCIL_INDEX8:
+		case CEDAR_STENCIL_INDEX16:
+			return CEDAR_STENCIL_INDEX;
+
+		default:
+			return CEDAR_RGBA;
+	}
+}
+
 Texture::Texture(const int internalFormat, const unsigned int target)
 {
 	this->m_textureId = 0;

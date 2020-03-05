@@ -9,6 +9,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(OpenGL_GL_PREFERENCE LEGACY)
 
 add_subdirectory(glfw)
+find_package(Freetype REQUIRED)
 find_package(OpenGL REQUIRED)
 
 add_library(cedar
@@ -38,13 +39,55 @@ add_library(cedar
 		include/cedar/Window.h
 		src/graphics/window/Window.cpp
 		include/cedar/ShaderProgram.h
-		src/graphics/shader/ShaderProgram.cpp include/cedar/Vector2i.h include/cedar/Vector2ui.h include/cedar/Vector2d.h include/cedar/Vector3i.h include/cedar/Vector3ui.h include/cedar/Vector3d.h include/cedar/Vector4i.h include/cedar/Vector4d.h include/cedar/Vector4ui.h include/cedar/Input.h include/cedar/InputHandler.h src/input/InputHandler.cpp src/math/Vector2d.cpp include/cedar/GuiRenderer.h src/graphics/renderer/GuiRenderer.cpp include/cedar/Texture.h src/graphics/texture/Texture.cpp include/cedar/Texture2D.h src/graphics/texture/Texture2D.cpp include/cedar/GLConstants.h include/cedar/OpenSimplexNoise.h src/math/OpenSimplexNoise.cpp include/cedar/Model.h src/graphics/model/Model.cpp include/cedar/Cedar.h src/core/Cedar.cpp include/cedar/ModelRegistry.h src/graphics/model/ModelRegistry.cpp)
+		src/graphics/shader/ShaderProgram.cpp
+		include/cedar/Vector2i.h
+		include/cedar/Vector2ui.h
+		include/cedar/Vector2d.h
+		include/cedar/Vector3i.h
+		include/cedar/Vector3ui.h
+		include/cedar/Vector3d.h
+		include/cedar/Vector4i.h
+		include/cedar/Vector4d.h
+		include/cedar/Vector4ui.h
+		include/cedar/Input.h
+		include/cedar/InputHandler.h
+		src/input/InputHandler.cpp
+		src/math/Vector2d.cpp
+		include/cedar/GuiRenderer.h
+		src/graphics/renderer/GuiRenderer.cpp
+		include/cedar/Texture.h
+		src/graphics/texture/Texture.cpp
+		include/cedar/Texture2D.h
+		src/graphics/texture/Texture2D.cpp
+		include/cedar/GLConstants.h
+		include/cedar/OpenSimplexNoise.h
+		src/math/OpenSimplexNoise.cpp
+		include/cedar/Model.h
+		src/graphics/model/Model.cpp
+		include/cedar/Cedar.h
+		src/core/Cedar.cpp
+		include/cedar/ModelRegistry.h
+		src/graphics/model/ModelRegistry.cpp
+		include/cedar/Font.h
+		src/graphics/font/Font.cpp
+		include/cedar/Glyph.h
+		src/graphics/font/Glyph.cpp
+		include/cedar/GlyphData.h
+		src/graphics/font/GlyphData.cpp
+		include/cedar/FontRegistry.h
+		src/graphics/font/FontRegistry.cpp
+		src/math/Vector2ui.cpp
+		src/math/Vector2i.cpp
+		src/math/Vector4ui.cpp
+		stb/include/stb_image_write.h include/cedar/TextBuffer.h include/cedar/Quad.h src/graphics/model/Quad.cpp src/graphics/model/TextBuffer.cpp)
 
 target_include_directories(cedar PUBLIC
 		glad/include
 		include
+		freetype2/include
+		stb/include
 		${OPENGL_INCLUDE_DIR})
 
-target_link_libraries(cedar glfw ${OPENGL_gl_LIBRARY})
+target_link_libraries(cedar glfw ${FREETYPE_LIBRARIES} ${OPENGL_gl_LIBRARY})
 
 

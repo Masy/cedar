@@ -161,7 +161,16 @@ void ShaderProgram::link()
 	int status;
 	glGetProgramiv(this->m_shaderProgramId, GL_LINK_STATUS, &status);
 	if (status == 0)
-		throw ShaderProgramLinkException("Could not link shader!");
+	{
+		int logLength;
+		glGetProgramiv(this->m_shaderProgramId, GL_INFO_LOG_LENGTH, &logLength);
+		char infoLog[logLength];
+		glGetProgramInfoLog(this->m_shaderProgramId, logLength, &logLength, infoLog);
+
+		std::string message = "Could not link shader! ";
+		message.append(infoLog);
+		throw ShaderProgramLinkException(message);
+	}
 
 	this->m_linked = true;
 }

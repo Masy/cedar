@@ -3,8 +3,9 @@
 //
 
 #include "cedar/GuiRenderer.h"
+#include "cedar/Cedar.h"
 #include "glad/glad.h"
-#include <iostream>
+#include <cmath>
 
 using namespace cedar;
 
@@ -128,13 +129,13 @@ void GuiRenderer::init(const unsigned int batchSize, Matrix4f *projectionMatrix)
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->m_instanceVboId);
 
-	glVertexAttribPointer(1, 4, GL_FLOAT, false, sizeof(Quad), (void*) (offsetof(Quad, positions)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_corners)));
 	glVertexAttribDivisor(1, 1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, false, sizeof(Quad), (void*) (offsetof(Quad, layerAndTexture)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_layerAndTexture)));
 	glVertexAttribDivisor(2, 1);
-	glVertexAttribPointer(3, 4, GL_FLOAT, false, sizeof(Quad), (void*) (offsetof(Quad, uvs)));
+	glVertexAttribPointer(3, 4, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_uvs)));
 	glVertexAttribDivisor(3, 1);
-	glVertexAttribPointer(4, 4, GL_FLOAT, false, sizeof(Quad), (void*) (offsetof(Quad, tint)));
+	glVertexAttribPointer(4, 4, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_tint)));
 	glVertexAttribDivisor(4, 1);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Quad) * this->m_batchSize, nullptr, GL_DYNAMIC_DRAW);
 
@@ -173,12 +174,14 @@ void GuiRenderer::flush()
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 	glEnableVertexAttribArray(4);
+	glEnableVertexAttribArray(5);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, this->m_quadCount);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(3);
 	glDisableVertexAttribArray(4);
+	glDisableVertexAttribArray(5);
 	glBindVertexArray(0);
 
 	this->m_shader->unbind();
@@ -193,16 +196,15 @@ void GuiRenderer::drawRect(const float posX, const float posY, const float posZ,
 		this->beginBatch();
 	}
 
-	this->m_nextQuad->positions = {posX, posY, posX + width, posY + height};
-	this->m_nextQuad->layerAndTexture = {-posZ, 0.0f};
-	this->m_nextQuad->uvs = {0.0f, 0.0f, 1.0f, 1.0f};
-	this->m_nextQuad->tint = *color;
+	this->m_nextQuad->set(posX, posY, posX + width, posY + height, -posZ, 0.0f,
+					  0.0f, 0.0f, 1.0f, 1.0f, color->x, color->y, color->z, color->w);
 
 	this->m_nextQuad++;
 	this->m_quadCount++;
 }
 
-void GuiRenderer::drawTexturedRect(float posX, float posY, float posZ, float width, float height, float uvX1, float uvY1, float uvX2, float uvY2, const Texture2D *texture)
+void GuiRenderer::drawTexturedRect(float posX, float posY, float posZ, float width, float height, float uvX1, float uvY1, float uvX2, float uvY2,
+								   const Texture2D *texture)
 {
 	if (this->m_quadCount == this->m_batchSize)
 	{
@@ -237,11 +239,285 @@ void GuiRenderer::drawTexturedRect(float posX, float posY, float posZ, float wid
 		this->m_textures[1] = texture->getId();
 	}
 
-	this->m_nextQuad->positions = {posX, posY, posX + width, posY + height};
-	this->m_nextQuad->layerAndTexture = {-posZ, textureUnit};
-	this->m_nextQuad->uvs = {uvX1, uvY1, uvX2, uvY2};
-	this->m_nextQuad->tint = {1.0f, 1.0f, 1.0f, 1.0f};
+	this->m_nextQuad->set(posX, posY, posX + width, posY + height, -posZ, textureUnit,
+						 uvX1, uvY1, uvX2, uvY2, 1.0f, 1.0f, 1.0f, 1.0f);
 
 	this->m_nextQuad++;
 	this->m_quadCount++;
+}
+
+void GuiRenderer::drawText(const float posX, const float posY, const float posZ, const std::string &text, Font *font, const Vector4f *color,
+						   const unsigned int alignment)
+{
+	if (this->m_quadCount + text.length() > this->m_batchSize)
+	{
+		this->endBatch();
+		this->flush();
+		this->beginBatch();
+	}
+
+	float textureUnit = 0.0f;
+	for (unsigned int n = 0; n < this->m_textureUnitCount; n++)
+	{
+		if (this->m_textures[n] == font->getGlyphAtlas()->getId())
+		{
+			textureUnit = static_cast<float>(n);
+			break;
+		}
+		else if (this->m_textures[n] == 0)
+		{
+			this->m_textures[n] = font->getGlyphAtlas()->getId();
+			textureUnit = static_cast<float>(n);
+			this->m_textureCount++;
+			break;
+		}
+	}
+
+	if (textureUnit == 0.0f)
+	{
+		this->endBatch();
+		this->flush();
+		this->beginBatch();
+		textureUnit = 1.0f;
+		this->m_textures[1] = font->getGlyphAtlas()->getId();
+	}
+
+	float nextPosX = posX;
+	float currentPosX;
+	float nextPosY;
+	unsigned int codepoint;
+	unsigned int state = UTF8_ACCEPT;
+
+	unsigned int horizontalAlignment = alignment & 0x03u;
+	unsigned int verticalAlignment = alignment & 0x0Cu;
+	if (horizontalAlignment == CEDAR_ALIGNMENT_LEFT)
+	{
+		for (const uint8_t *s = (uint8_t *) text.c_str(); *s; ++s)
+		{
+			if (!Font::decode(&state, &codepoint, *s))
+			{
+				const Glyph *glyph = font->getGlyph(codepoint);
+
+				currentPosX = nextPosX + static_cast<float>(glyph->m_bearing.x);
+
+				switch (verticalAlignment)
+				{
+					case CEDAR_ALIGNMENT_TOP:
+						nextPosY = posY - static_cast<float>(glyph->m_bearing.y) + static_cast<float>(font->getSize());
+						break;
+
+					case CEDAR_ALIGNMENT_MIDDLE:
+						nextPosY = posY - static_cast<float>(glyph->m_bearing.y) + (static_cast<float>(font->getSize()) * 0.5f);
+						break;
+
+					default:
+						nextPosY = posY - static_cast<float>(glyph->m_bearing.y);
+						break;
+				}
+
+				this->m_nextQuad->set(
+						Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyph->m_size.x), nextPosY + static_cast<float>(glyph->m_size.y)),
+						Vector2f(-posZ, textureUnit), glyph->m_uvs, *color
+						);
+
+				this->m_nextQuad++;
+				this->m_quadCount++;
+
+				nextPosX += static_cast<float>(glyph->m_advance);
+			}
+		}
+	}
+	else
+	{
+		Glyph glyphs[text.length()];
+		unsigned int width = 0;
+		unsigned int characters = 0;
+		for (const uint8_t *s = (uint8_t *) text.c_str(); *s; ++s)
+		{
+			if (!Font::decode(&state, &codepoint, *s))
+			{
+				glyphs[characters] = *font->getGlyph(codepoint);
+				width += glyphs[characters].m_advance;
+				characters++;
+			}
+		}
+
+		if (horizontalAlignment == CEDAR_ALIGNMENT_CENTER)
+			nextPosX = posX - std::floor(static_cast<float>(width) * 0.5f);
+		else
+			nextPosX = posX - static_cast<float>(width);
+
+		for (unsigned int n = 0; n < characters; n++)
+		{
+			currentPosX = nextPosX + static_cast<float>(glyphs[n].m_bearing.x);
+
+			switch (verticalAlignment)
+			{
+				case CEDAR_ALIGNMENT_TOP:
+					nextPosY = posY - static_cast<float>(glyphs[n].m_bearing.y) + static_cast<float>(font->getSize());
+					break;
+
+				case CEDAR_ALIGNMENT_MIDDLE:
+					nextPosY = posY - static_cast<float>(glyphs[n].m_bearing.y) + (static_cast<float>(font->getSize()) * 0.5f);
+					break;
+
+				default:
+					nextPosY = posY - static_cast<float>(glyphs[n].m_bearing.y);
+					break;
+			}
+
+			this->m_nextQuad->set(
+					Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyphs[n].m_size.x), nextPosY + static_cast<float>(glyphs[n].m_size.y)),
+					Vector2f(-posZ, textureUnit), glyphs[n].m_uvs, *color
+					);
+
+			this->m_nextQuad++;
+			this->m_quadCount++;
+
+			nextPosX += static_cast<float>(glyphs[n].m_advance);
+		}
+	}
+}
+
+TextBuffer *GuiRenderer::generateTextBuffer(const std::string &text, Font *font, const Vector4f *color, const unsigned int alignment)
+{
+	Quad *quads = new Quad[text.length()];
+
+	unsigned int glyphCount = 0;
+	float nextPosX = 0.0f;
+	float currentPosX;
+	float nextPosY;
+	unsigned int codepoint;
+	unsigned int state = UTF8_ACCEPT;
+
+	unsigned int horizontalAlignment = alignment & 0x03u;
+	unsigned int verticalAlignment = alignment & 0x0Cu;
+	if (horizontalAlignment == CEDAR_ALIGNMENT_LEFT)
+	{
+		for (const uint8_t *s = (uint8_t *) text.c_str(); *s; ++s)
+		{
+			if (!Font::decode(&state, &codepoint, *s))
+			{
+				const Glyph *glyph = font->getGlyph(codepoint);
+
+				currentPosX = nextPosX + static_cast<float>(glyph->m_bearing.x);
+
+				switch (verticalAlignment)
+				{
+					case CEDAR_ALIGNMENT_TOP:
+						nextPosY = -static_cast<float>(glyph->m_bearing.y) + static_cast<float>(font->getSize());
+						break;
+
+					case CEDAR_ALIGNMENT_MIDDLE:
+						nextPosY = -static_cast<float>(glyph->m_bearing.y) + (static_cast<float>(font->getSize()) * 0.5f);
+						break;
+
+					default:
+						nextPosY = -static_cast<float>(glyph->m_bearing.y);
+						break;
+				}
+
+				quads[glyphCount++].set(
+						Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyph->m_size.x), nextPosY + static_cast<float>(glyph->m_size.y)),
+						Vector2f(0.0f, 0.0f), glyph->m_uvs, *color
+									   );
+
+				nextPosX += static_cast<float>(glyph->m_advance);
+			}
+		}
+	}
+	else
+	{
+		Glyph glyphs[text.length()];
+		unsigned int width = 0;
+		unsigned int characters = 0;
+		for (const uint8_t *s = (uint8_t *) text.c_str(); *s; ++s)
+		{
+			if (!Font::decode(&state, &codepoint, *s))
+			{
+				glyphs[characters] = *font->getGlyph(codepoint);
+				width += glyphs[characters].m_advance;
+				characters++;
+			}
+		}
+
+		if (horizontalAlignment == CEDAR_ALIGNMENT_CENTER)
+			nextPosX = -std::floor(static_cast<float>(width) * 0.5f);
+		else
+			nextPosX = -static_cast<float>(width);
+
+		for (unsigned int n = 0; n < characters; n++)
+		{
+			currentPosX = nextPosX + static_cast<float>(glyphs[n].m_bearing.x);
+
+			switch (verticalAlignment)
+			{
+				case CEDAR_ALIGNMENT_TOP:
+					nextPosY = -static_cast<float>(glyphs[n].m_bearing.y) + static_cast<float>(font->getSize());
+					break;
+
+				case CEDAR_ALIGNMENT_MIDDLE:
+					nextPosY = -static_cast<float>(glyphs[n].m_bearing.y) + (static_cast<float>(font->getSize()) * 0.5f);
+					break;
+
+				default:
+					nextPosY = -static_cast<float>(glyphs[n].m_bearing.y);
+					break;
+			}
+
+			quads[glyphCount++].set(
+					Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyphs[n].m_size.x), nextPosY + static_cast<float>(glyphs[n].m_size.y)),
+					Vector2f(0.0f, 0.0f), glyphs[n].m_uvs, *color
+			);
+
+			nextPosX += static_cast<float>(glyphs[n].m_advance);
+		}
+	}
+
+	return new TextBuffer(font->getGlyphAtlas()->getId(), glyphCount, quads);
+}
+
+void GuiRenderer::drawText(const float offsetX, const float offsetY, const float offsetZ, const TextBuffer *textBuffer)
+{
+	if (this->m_quadCount + textBuffer->getGlyphCount() > this->m_batchSize)
+	{
+		this->endBatch();
+		this->flush();
+		this->beginBatch();
+	}
+
+	float textureUnit = 0.0f;
+	for (unsigned int n = 0; n < this->m_textureUnitCount; n++)
+	{
+		if (this->m_textures[n] == textBuffer->getGlyphAtlas())
+		{
+			textureUnit = static_cast<float>(n);
+			break;
+		}
+		else if (this->m_textures[n] == 0)
+		{
+			this->m_textures[n] = textBuffer->getGlyphAtlas();
+			textureUnit = static_cast<float>(n);
+			this->m_textureCount++;
+			break;
+		}
+	}
+
+	if (textureUnit == 0.0f)
+	{
+		this->endBatch();
+		this->flush();
+		this->beginBatch();
+		textureUnit = 1.0f;
+		this->m_textures[1] = textBuffer->getGlyphAtlas();
+	}
+
+	for (int n = 0; n < textBuffer->getGlyphCount(); n++)
+	{
+		this->m_nextQuad->set(textBuffer->getQuads()[n].m_corners + Vector4f(offsetX, offsetY, offsetX, offsetY),
+				Vector2f(-offsetZ, textureUnit), textBuffer->getQuads()[n].m_uvs, textBuffer->getQuads()[n].m_tint);
+
+		this->m_nextQuad++;
+		this->m_quadCount++;
+	}
 }
