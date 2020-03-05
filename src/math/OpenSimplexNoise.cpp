@@ -6,7 +6,7 @@
 #include "cedar/Math.h"
 #include <cmath>
 
-using namespace cedar::math;
+using namespace cedar;
 
 OpenSimplexNoise::OpenSimplexNoise() : OpenSimplexNoise(DEFAULT_SEED)
 {}
@@ -79,8 +79,8 @@ double OpenSimplexNoise::eval(const double x, const double y) const
 	double ys = y + stretchOffset;
 
 	//Floor to get grid coordinates of rhombus (stretched square) super-cell origin.
-	int xsb = cedar::math::fastFloor(xs);
-	int ysb = cedar::math::fastFloor(ys);
+	int xsb = cedar::fastFloor(xs);
+	int ysb = cedar::fastFloor(ys);
 
 	//Skew out to get actual coordinates of rhombus origin. We'll need these later.
 	double squishOffset = (xsb + ysb) * SQUISH_CONSTANT_2D;
@@ -213,9 +213,9 @@ double OpenSimplexNoise::eval(const double x, const double y, const double z) co
 	double zs = z + stretchOffset;
 
 	//Floor to get simplectic honeycomb coordinates of rhombohedron (stretched cube) super-cell origin.
-	int xsb = cedar::math::fastFloor(xs);
-	int ysb = cedar::math::fastFloor(ys);
-	int zsb = cedar::math::fastFloor(zs);
+	int xsb = cedar::fastFloor(xs);
+	int ysb = cedar::fastFloor(ys);
+	int zsb = cedar::fastFloor(zs);
 
 	//Skew out to get actual coordinates of rhombohedron origin. We'll need these later.
 	double squishOffset = (xsb + ysb + zsb) * SQUISH_CONSTANT_3D;
@@ -770,10 +770,10 @@ double OpenSimplexNoise::eval(const double x, const double y, const double z, co
 	double ws = w + stretchOffset;
 
 	//Floor to get simplectic honeycomb coordinates of rhombo-hypercube super-cell origin.
-	int xsb = cedar::math::fastFloor(xs);
-	int ysb = cedar::math::fastFloor(ys);
-	int zsb = cedar::math::fastFloor(zs);
-	int wsb = cedar::math::fastFloor(ws);
+	int xsb = cedar::fastFloor(xs);
+	int ysb = cedar::fastFloor(ys);
+	int zsb = cedar::fastFloor(zs);
+	int wsb = cedar::fastFloor(ws);
 
 	//Skew out to get actual coordinates of stretched rhombo-hypercube origin. We'll need these later.
 	double squishOffset = (xsb + ysb + zsb + wsb) * SQUISH_CONSTANT_4D;

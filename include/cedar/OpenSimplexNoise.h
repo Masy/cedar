@@ -20,9 +20,9 @@
 #define PERMUTATION_LENGTH 256
 
 /**
- * Base namespace for mathematical functions.
+ * Base namespace of the cedar engine.
  */
-namespace cedar::math
+namespace cedar
 {
 	/**
 	 * OpenSimplex Noise in c++ based on Kurt Spencer's java implementation.

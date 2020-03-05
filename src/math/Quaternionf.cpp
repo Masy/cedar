@@ -51,7 +51,7 @@ void Quaternionf::identity()
 
 void Quaternionf::normalize()
 {
-	float invNorm = math::invSqrt(std::fmaf(this->x, this->x, std::fmaf(this->y, this->y, std::fmaf(this->z, this->z, this->w * this->w))));
+	float invNorm = cedar::invSqrt(std::fmaf(this->x, this->x, std::fmaf(this->y, this->y, std::fmaf(this->z, this->z, this->w * this->w))));
 	this->x *= invNorm;
 	this->y *= invNorm;
 	this->z *= invNorm;
@@ -60,7 +60,7 @@ void Quaternionf::normalize()
 
 void Quaternionf::invert()
 {
-	float invNorm = math::invSqrt(std::fmaf(this->x, this->x, std::fmaf(this->y, this->y, std::fmaf(this->z, this->z, this->w * this->w))));
+	float invNorm = cedar::invSqrt(std::fmaf(this->x, this->x, std::fmaf(this->y, this->y, std::fmaf(this->z, this->z, this->w * this->w))));
 	this->x = (0.0f - this->x) * invNorm;
 	this->y = (0.0f - this->y) * invNorm;
 	this->z = (0.0f - this->z) * invNorm;
@@ -266,7 +266,7 @@ void Quaternionf::rotateAxis(float angle, float axisX, float axisY, float axisZ)
 {
 	float halfAngle = angle * 0.5f;
 	float sinHalfAngle = std::sin(halfAngle);
-	float invAxisLength = math::invSqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
+	float invAxisLength = cedar::invSqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
 
 	float deltaX = axisX * invAxisLength * sinHalfAngle;
 	float deltaY = axisY * invAxisLength * sinHalfAngle;
@@ -293,7 +293,7 @@ void Quaternionf::rotationAxis(float angle, float axisX, float axisY, float axis
 {
 	float halfAngle = angle * 0.5f;
 	float sinHalfAngle = std::sin(halfAngle);
-	float invAxisLength = math::invSqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
+	float invAxisLength = cedar::invSqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
 
 	this->x = axisX * invAxisLength * sinHalfAngle;
 	this->y = axisY * invAxisLength * sinHalfAngle;
@@ -351,7 +351,7 @@ Quaternionf *Quaternionf::slerp(const Quaternionf *other, Quaternionf *dest, flo
 	if (1.0f - absCosom > 1E-6f)
 	{
 		float sinSqr = 1.0f - absCosom * absCosom;
-		float invSinSqr = math::invSqrt(sinSqr);
+		float invSinSqr = cedar::invSqrt(sinSqr);
 		float omega = std::atan2(sinSqr * invSinSqr, absCosom);
 		scale0 = static_cast<float>(std::sin((1.0 - t) * omega) * invSinSqr);
 		scale1 = static_cast<float>(std::sin(t * omega) * invSinSqr);
