@@ -2,8 +2,8 @@
 // Created by masy on 23.02.20.
 //
 
-#ifndef TALESOFCATVENTURE_TEXTURE_H
-#define TALESOFCATVENTURE_TEXTURE_H
+#ifndef CEDAR_TEXTURE_H
+#define CEDAR_TEXTURE_H
 
 #include "cedar/XException.h"
 #include "cedar/GLConstants.h"
@@ -302,4 +302,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_TEXTURE_H
+#endif //CEDAR_TEXTURE_H

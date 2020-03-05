@@ -7,9 +7,15 @@
 
 #include "Vector2i.h"
 
+/**
+ * Base namespace of the cedar engine.
+ */
 namespace cedar
 {
 
+	/**
+	 * 3 dimensional integer vector implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
+	 */
 	class Vector3i
 	{
 	public:

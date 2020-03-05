@@ -7,9 +7,15 @@
 
 #include "Vector2f.h"
 
+/**
+ * Base namespace of the cedar engine.
+ */
 namespace cedar
 {
 
+	/**
+	 * 3 dimensional float vector implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
+	 */
 	class Vector3f
 	{
 	public:

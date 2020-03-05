@@ -2,8 +2,8 @@
 // Created by masy on 23.02.20.
 //
 
-#ifndef TALESOFCATVENTURE_TEXTURE2D_H
-#define TALESOFCATVENTURE_TEXTURE2D_H
+#ifndef CEDAR_TEXTURE2D_H
+#define CEDAR_TEXTURE2D_H
 
 #include "cedar/Texture.h"
 
@@ -268,4 +268,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_TEXTURE2D_H
+#endif //CEDAR_TEXTURE2D_H

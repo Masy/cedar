@@ -2,8 +2,8 @@
 // Created by masy on 03.03.20.
 //
 
-#ifndef TALESOFCATVENTURE_GLYPH_H
-#define TALESOFCATVENTURE_GLYPH_H
+#ifndef CEDAR_GLYPH_H
+#define CEDAR_GLYPH_H
 
 #include "cedar/Vector2i.h"
 #include "cedar/Vector4f.h"
@@ -59,4 +59,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_GLYPH_H
+#endif //CEDAR_GLYPH_H

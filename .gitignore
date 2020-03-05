@@ -109,9 +109,12 @@ _deps
 
 # End of https://www.gitignore.io/api/cmake,clion
 
+.idea/
+
 logs/
 latex/
 html/
 
 libcedar.a
+cedar.cbp
 

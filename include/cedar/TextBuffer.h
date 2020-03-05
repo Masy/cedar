@@ -2,8 +2,8 @@
 // Created by masy on 05.03.20.
 //
 
-#ifndef TALESOFCATVENTURE_TEXTBUFFER_H
-#define TALESOFCATVENTURE_TEXTBUFFER_H
+#ifndef CEDAR_TEXTBUFFER_H
+#define CEDAR_TEXTBUFFER_H
 
 #include "cedar/Quad.h"
 
@@ -70,4 +70,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_TEXTBUFFER_H
+#endif //CEDAR_TEXTBUFFER_H

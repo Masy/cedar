@@ -9,11 +9,14 @@
 #include "Quaternionf.h"
 #include <ostream>
 
+/**
+ * Base namespace of the cedar engine.
+ */
 namespace cedar
 {
 
 	/**
-	 * Column Major 4x4 Matrix implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
+	 * Column major 4x4 float matrix implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
 	 *
 	 * Since OpenGL is column major this will make it easier to upload the data to the graphics card.
 	 */

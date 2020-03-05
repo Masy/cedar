@@ -76,9 +76,9 @@ float Vector3f::dot(const Vector3f &other) const
 
 Vector3f *Vector3f::lerp(const Vector3f *other, Vector3f *result, const float t) const
 {
-	result->x = math::lerp(this->x, other->x, t);
-	result->y = math::lerp(this->y, other->y, t);
-	result->z = math::lerp(this->z, other->z, t);
+	result->x = cedar::lerp(this->x, other->x, t);
+	result->y = cedar::lerp(this->y, other->y, t);
+	result->z = cedar::lerp(this->z, other->z, t);
 	return result;
 }
 

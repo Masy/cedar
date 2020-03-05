@@ -2,8 +2,8 @@
 // Created by masy on 23.02.20.
 //
 
-#ifndef TALESOFCATVENTURE_GUIRENDERER_H
-#define TALESOFCATVENTURE_GUIRENDERER_H
+#ifndef CEDAR_GUIRENDERER_H
+#define CEDAR_GUIRENDERER_H
 
 #include "cedar/Vector4f.h"
 #include "cedar/ShaderProgram.h"
@@ -271,4 +271,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_GUIRENDERER_H
+#endif //CEDAR_GUIRENDERER_H

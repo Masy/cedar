@@ -2,8 +2,8 @@
 // Created by masy on 03.03.20.
 //
 
-#ifndef TALESOFCATVENTURE_FONT_H
-#define TALESOFCATVENTURE_FONT_H
+#ifndef CEDAR_FONT_H
+#define CEDAR_FONT_H
 
 #include <map>
 #include "freetype2/ft2build.h"
@@ -272,4 +272,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_FONT_H
+#endif //CEDAR_FONT_H

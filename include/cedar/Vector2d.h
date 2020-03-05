@@ -5,9 +5,17 @@
 #ifndef CEDAR_VECTOR2D_H
 #define CEDAR_VECTOR2D_H
 
+/**
+ * Base namespace of the cedar engine.
+ */
 namespace cedar
 {
 
+	/**
+	 * Column Major 4x4 Matrix implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
+	 *
+	 * Since OpenGL is column major this will make it easier to upload the data to the graphics card.
+	 */
 	class Vector2d
 	{
 	public:

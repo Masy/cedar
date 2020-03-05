@@ -2,8 +2,8 @@
 // Created by masy on 02.03.20.
 //
 
-#ifndef TALESOFCATVENTURE_MODEL_H
-#define TALESOFCATVENTURE_MODEL_H
+#ifndef CEDAR_MODEL_H
+#define CEDAR_MODEL_H
 
 #include "cedar/GLConstants.h"
 #include "cedar/XException.h"
@@ -133,4 +133,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_MODEL_H
+#endif //CEDAR_MODEL_H

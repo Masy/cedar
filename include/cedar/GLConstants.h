@@ -4,8 +4,8 @@
 // Re-mappings of some OpenGL constants for Cedar so you don't need to include glad.h if you need some constants.
 //
 
-#ifndef TALESOFCATVENTURE_GLCONSTANTS_H
-#define TALESOFCATVENTURE_GLCONSTANTS_H
+#ifndef CEDAR_GLCONSTANTS_H
+#define CEDAR_GLCONSTANTS_H
 
 #define CEDAR_ZERO 0x0000
 #define CEDAR_NONE CEDAR_ZERO
@@ -247,4 +247,4 @@
 #define CEDAR_TRIANGLE_STRIP_ADJACENCY 0x000D
 #define CEDAR_PATCHES 0x000E
 
-#endif //TALESOFCATVENTURE_GLCONSTANTS_H
+#endif //CEDAR_GLCONSTANTS_H
