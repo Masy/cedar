@@ -13,6 +13,7 @@
 #include "cedar/Glyph.h"
 #include "cedar/GlyphData.h"
 #include "cedar/Vector4ui.h"
+#include "TextBuffer.h"
 
 #define CEDAR_RENDERING_SHARP 0x00
 #define CEDAR_RENDERING_SMOOTH 0x01
@@ -163,9 +164,11 @@ namespace cedar
 		 */
 		void stitchAtlas(unsigned int firstIndex, unsigned int lastIndex, const Vector4ui &region);
 
-
 	public:
 
+		/**
+		 *  Codepoint table used to calculate the correct UTF-8 codepoint.
+		 */
 		static constexpr uint8_t utf8d[] = {
 				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 00..1f
 				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 20..3f
@@ -260,6 +263,11 @@ namespace cedar
 		 */
 		[[nodiscard]] const Glyph *getGlyph(unsigned int unicode);
 
+		/**
+		 * Gets the glyph atlas of the font.
+		 *
+		 * @return A constant pointer to the glyph atlas of the font.
+		 */
 		[[nodiscard]] const Texture2D *getGlyphAtlas() const;
 	};
 }
