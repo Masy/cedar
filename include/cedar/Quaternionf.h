@@ -7,9 +7,15 @@
 
 #include "Vector3f.h"
 
+/**
+ * Base namespace of the cedar engine.
+ */
 namespace cedar
 {
 
+	/**
+	 * Float quaternion implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
+	 */
 	class Quaternionf
 	{
 	public:

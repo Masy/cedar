@@ -12,7 +12,13 @@
  */
 namespace cedar
 {
+	/**
+	 * A pointer to the core logger of cedar.
+	 */
 	extern Logger *CoreLogger;
+	/**
+	 * A pointer to the OpenGL logger of cedar.
+	 */
 	extern Logger *GLLogger;
 
 	/**

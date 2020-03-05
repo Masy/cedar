@@ -5,9 +5,15 @@
 #ifndef CEDAR_VECTOR2F_H
 #define CEDAR_VECTOR2F_H
 
+/**
+ * Base namespace of the cedar engine.
+ */
 namespace cedar
 {
 
+	/**
+	 * 2 dimensional float vector implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
+	 */
 	class Vector2f
 	{
 	public:
