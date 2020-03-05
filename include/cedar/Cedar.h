@@ -2,8 +2,8 @@
 // Created by masy on 02.03.20.
 //
 
-#ifndef TALESOFCATVENTURE_CEDAR_H
-#define TALESOFCATVENTURE_CEDAR_H
+#ifndef CEDAR_CEDAR_H
+#define CEDAR_CEDAR_H
 
 #include "cedar/LoggerFactory.h"
 
@@ -25,4 +25,4 @@ namespace cedar
 	void initEngine(QueueLogAppender *logAppender, int argc = 0, const char **args = nullptr);
 }
 
-#endif //TALESOFCATVENTURE_CEDAR_H
+#endif //CEDAR_CEDAR_H

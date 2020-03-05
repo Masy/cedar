@@ -2,8 +2,8 @@
 // Created by masy on 05.03.20.
 //
 
-#ifndef TALESOFCATVENTURE_QUAD_H
-#define TALESOFCATVENTURE_QUAD_H
+#ifndef CEDAR_QUAD_H
+#define CEDAR_QUAD_H
 
 #include "cedar/Vector4f.h"
 
@@ -94,4 +94,4 @@ namespace cedar
 	};
 };
 
-#endif //TALESOFCATVENTURE_QUAD_H
+#endif //CEDAR_QUAD_H

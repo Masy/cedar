@@ -2,8 +2,8 @@
 // Created by masy on 03.03.20.
 //
 
-#ifndef TALESOFCATVENTURE_GLYPHDATA_H
-#define TALESOFCATVENTURE_GLYPHDATA_H
+#ifndef CEDAR_GLYPHDATA_H
+#define CEDAR_GLYPHDATA_H
 
 #include "cedar/Vector2i.h"
 #include "cedar/Vector2ui.h"
@@ -73,4 +73,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_GLYPHDATA_H
+#endif //CEDAR_GLYPHDATA_H

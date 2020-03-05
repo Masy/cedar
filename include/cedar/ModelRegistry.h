@@ -2,8 +2,8 @@
 // Created by masy on 02.03.20.
 //
 
-#ifndef TALESOFCATVENTURE_MODELREGISTRY_H
-#define TALESOFCATVENTURE_MODELREGISTRY_H
+#ifndef CEDAR_MODELREGISTRY_H
+#define CEDAR_MODELREGISTRY_H
 
 #include <map>
 
@@ -69,4 +69,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_MODELREGISTRY_H
+#endif //CEDAR_MODELREGISTRY_H

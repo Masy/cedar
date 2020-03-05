@@ -2,8 +2,8 @@
 // Created by masy on 09.02.20.
 //
 
-#ifndef TALESOFCATVENTURE_INPUTHANDLER_H
-#define TALESOFCATVENTURE_INPUTHANDLER_H
+#ifndef CEDAR_INPUTHANDLER_H
+#define CEDAR_INPUTHANDLER_H
 
 #include "Window.h"
 #include <vector>
@@ -151,4 +151,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_INPUTHANDLER_H
+#endif //CEDAR_INPUTHANDLER_H
