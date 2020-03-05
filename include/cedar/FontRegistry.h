@@ -2,8 +2,8 @@
 // Created by masy on 03.03.20.
 //
 
-#ifndef TALESOFCATVENTURE_FONTREGISTRY_H
-#define TALESOFCATVENTURE_FONTREGISTRY_H
+#ifndef CEDAR_FONTREGISTRY_H
+#define CEDAR_FONTREGISTRY_H
 
 #include "cedar/Font.h"
 
@@ -62,4 +62,4 @@ namespace cedar
 	};
 }
 
-#endif //TALESOFCATVENTURE_FONTREGISTRY_H
+#endif //CEDAR_FONTREGISTRY_H
