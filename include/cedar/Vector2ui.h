@@ -5,9 +5,15 @@
 #ifndef CEDAR_VECTOR2UI_H
 #define CEDAR_VECTOR2UI_H
 
+/**
+ * Base namespace of the cedar engine.
+ */
 namespace cedar
 {
 
+	/**
+	 * 2 dimensional unsigned int vector implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
+	 */
 	class Vector2ui
 	{
 	public:

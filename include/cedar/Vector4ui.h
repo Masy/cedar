@@ -7,9 +7,15 @@
 
 #include "Vector3ui.h"
 
+/**
+ * Base namespace of the cedar engine.
+ */
 namespace cedar
 {
 
+	/**
+	 * 4 dimensional unsigned integer vector implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
+	 */
 	class Vector4ui
 	{
 	public:

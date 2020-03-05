@@ -7,9 +7,15 @@
 
 #include "Vector3d.h"
 
+/**
+ * Base namespace of the cedar engine.
+ */
 namespace cedar
 {
 
+	/**
+	 * 4 dimensional double vector implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
+	 */
 	class Vector4d
 	{
 	public:
