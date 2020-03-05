@@ -40,8 +40,9 @@ Font::Font(const std::string &name, const std::string &path, unsigned int size, 
 	this->m_name = name;
 	this->m_size = size;
 	this->m_renderingMode = renderingMode;
-	this->m_glyphAtlas = new Texture2D(4096, 1024, CEDAR_R8, CEDAR_TEXTURE_2D);
-	this->m_glyphAtlas->init();
+	this->m_atlasHeight = 128;
+	this->m_glyphAtlas = new Texture2D(CEDAR_FONT_ATLAS_WIDTH, this->m_atlasHeight, CEDAR_R8, CEDAR_TEXTURE_2D);
+	this->m_glyphAtlas->init(CEDAR_RED, CEDAR_UNSIGNED_BYTE, nullptr);
 	// Since the glyph image data basically only represents the alpha value we need to adjust the way the texture is swizzled
 	// The glyph atlas will therefore be set up to return it's RED component as alpha value, and RGB will return 1.0 (= 255).
 	int swizzle[] = {CEDAR_ONE, CEDAR_ONE, CEDAR_ONE, CEDAR_RED};
@@ -60,7 +61,6 @@ Font::Font(const std::string &name, const std::string &path, unsigned int size, 
 
 	this->m_currentOffsetX = 0;
 	this->m_currentOffsetY = 0;
-	this->m_atlasHeight = 1024;
 	this->m_tallestCharacterInRow = 0;
 	this->m_glyphs = std::map<unsigned int, Glyph*>();
 	this->m_glyphData = nullptr;
@@ -116,8 +116,8 @@ const Glyph *Font::generateGlyph(const unsigned int unicode)
 
 				// Check how many bits need to be read from the byte.
 				// Since the bits are stored left-to-right this is actually the lower boundary.
-				unsigned int boundary = std::max(8 - pixelLeft, 0);
-				for (unsigned int m = 7; m >= boundary; m--)
+				int boundary = std::max(8 - pixelLeft, 0);
+				for (int m = 7; m >= boundary; m--)
 				{
 					glyphImageData[dataIndex++] = ((byte >> m) & 0x1U) ? 255 : 0;
 				}
@@ -167,6 +167,7 @@ const Glyph *Font::generateGlyph(const unsigned int unicode)
 									  pixelHeight * static_cast<float>(this->m_currentOffsetY + static_cast<int>(glyphHeight))
 									 )
 							);
+
 	this->m_glyphAtlas->upload(this->m_currentOffsetX, this->m_currentOffsetY,
 							   static_cast<int>(glyphWidth), static_cast<int>(glyphHeight),
 							   CEDAR_RED, CEDAR_UNSIGNED_BYTE, glyphImageData);
@@ -180,7 +181,10 @@ void Font::resize()
 {
 	this->m_glyphAtlas->setSize(CEDAR_FONT_ATLAS_WIDTH, this->m_atlasHeight * 2);
 	for (auto pair : this->m_glyphs)
-		pair.second->m_uvs *= Vector4f(1.0f, 0.5f, 1.0f, 0.5f);
+	{
+		pair.second->m_uvs.y *= 0.5f;
+		pair.second->m_uvs.w *= 0.5f;
+	}
 }
 
 void Font::stitchAtlas(unsigned int firstIndex, unsigned int lastIndex, const cedar::Vector4ui &region)
@@ -188,11 +192,12 @@ void Font::stitchAtlas(unsigned int firstIndex, unsigned int lastIndex, const ce
 	float pixelWidth = 1.0f / CEDAR_FONT_ATLAS_WIDTH;
 	float pixelHeight = 1.0f / static_cast<float>(this->m_atlasHeight);
 
-	// allocate memory for the first region
+	// Calculate region length
 	unsigned int regionDataLength = region.z * region.w;
-	unsigned char *regionData = new unsigned char[regionDataLength];
+	// Allocate memory with calloc to avoid artifacts near the glyphs since we only write to the region where there are glyph images
+	unsigned char *regionData = reinterpret_cast<unsigned char*>(calloc(regionDataLength, 1));
 
-	// Stitch first region together
+	// Stitch region together
 	for (unsigned int n = firstIndex; n < lastIndex; n++)
 	{
 		GlyphData *glyphData = &this->m_glyphData[n];
@@ -225,7 +230,7 @@ void Font::stitchAtlas(unsigned int firstIndex, unsigned int lastIndex, const ce
 							   static_cast<int>(region.z), static_cast<int>(region.w),
 							   CEDAR_RED, CEDAR_UNSIGNED_BYTE, regionData);
 
-	delete[] regionData;
+	free(regionData);
 }
 
 void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int lastCharacter)
@@ -291,8 +296,8 @@ void Font::generateGlyphs(const unsigned int firstCharacter, const unsigned int 
 
 					// Check how many bits need to be read from the byte.
 					// Since the bits are stored left-to-right this is actually the lower boundary.
-					unsigned int boundary = std::max(8 - pixelLeft, 0);
-					for (unsigned int m = 7; m >= boundary; m--)
+					int boundary = std::max(8 - pixelLeft, 0);
+					for (int m = 7; m >= boundary; m--)
 					{
 						this->m_glyphData[glyphDataIndex].m_data[dataIndex++] = ((byte >> m) & 0x1U) ? 255 : 0;
 					}

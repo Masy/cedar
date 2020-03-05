@@ -79,7 +79,7 @@ add_library(cedar
 		src/math/Vector2ui.cpp
 		src/math/Vector2i.cpp
 		src/math/Vector4ui.cpp
-		stb/include/stb_image_write.h)
+		stb/include/stb_image_write.h include/cedar/TextBuffer.h include/cedar/Quad.h src/graphics/model/Quad.cpp src/graphics/model/TextBuffer.cpp)
 
 target_include_directories(cedar PUBLIC
 		glad/include

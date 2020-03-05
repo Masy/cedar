@@ -277,6 +277,9 @@
 		<Unit filename="/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/OpenSimplexNoise.h">
 			<Option target="cedar"/>
 		</Unit>
+		<Unit filename="/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Quad.h">
+			<Option target="cedar"/>
+		</Unit>
 		<Unit filename="/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Quaternionf.h">
 			<Option target="cedar"/>
 		</Unit>
@@ -284,6 +287,9 @@
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/ShaderProgram.h">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/TextBuffer.h">
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/include/cedar/Texture.h">
@@ -359,6 +365,12 @@
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/model/ModelRegistry.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/model/Quad.cpp">
+			<Option target="cedar"/>
+		</Unit>
+		<Unit filename="/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/model/TextBuffer.cpp">
 			<Option target="cedar"/>
 		</Unit>
 		<Unit filename="/Daten/Dokumente/Projekte/TalesOfCatventure/cedar/src/graphics/renderer/GuiRenderer.cpp">
