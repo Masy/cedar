@@ -2,8 +2,8 @@
 // Created by masy on 23.02.20.
 //
 
-#ifndef CEDAR_GUIRENDERER_H
-#define CEDAR_GUIRENDERER_H
+#ifndef CEDAR_RENDERER2D_H
+#define CEDAR_RENDERER2D_H
 
 #include "cedar/Vector4f.h"
 #include "cedar/ShaderProgram.h"
@@ -44,9 +44,9 @@ namespace cedar
 {
 
 	/**
-	 * Class for rendering 2 dimensional GUI elements.
+	 * Class for rendering 2 dimensional elements.
 	 */
-	class GuiRenderer
+	class Renderer2D
 	{
 	private:
 		/**
@@ -125,25 +125,27 @@ namespace cedar
 		/**
 		 * Initializes the shader program.
 		 *
+		 * @param maxTextureUnits The maximum number of texture units.
+		 *
 		 * @throws ShaderCreationException if the vertex or fragment shader could not be created.
 		 * @throws ShaderLinkException if the shader program could not be linked.
 		 * @throws ShaderUniformException if one or more uniforms could not be created.
 		 */
-		void initShader();
+		void initShader(int maxTextureUnits);
 
 	public:
 		/**
-		 * Creates a new gui renderer.
+		 * Creates a new 2D renderer.
 		 */
-		GuiRenderer();
+		Renderer2D();
 
 		/**
-		 * Destroys the gui renderer.
+		 * Destroys the 2D renderer.
 		 */
-		~GuiRenderer();
+		~Renderer2D();
 
 		/**
-		 * Initializes the gui renderer.
+		 * Initializes the 2D renderer.
 		 *
 		 * @param batchSize The size of the batch.
 		 *                  <p>If the quad count exceeds the size of the batch before the batch is flushed it will flush automatically and reset
@@ -271,4 +273,4 @@ namespace cedar
 	};
 }
 
-#endif //CEDAR_GUIRENDERER_H
+#endif //CEDAR_RENDERER2D_H

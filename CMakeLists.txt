@@ -53,8 +53,8 @@ add_library(cedar
 		include/cedar/InputHandler.h
 		src/input/InputHandler.cpp
 		src/math/Vector2d.cpp
-		include/cedar/GuiRenderer.h
-		src/graphics/renderer/GuiRenderer.cpp
+		include/cedar/Renderer2D.h
+		src/graphics/renderer/Renderer2D.cpp
 		include/cedar/Texture.h
 		src/graphics/texture/Texture.cpp
 		include/cedar/Texture2D.h
