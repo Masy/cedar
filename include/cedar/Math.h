@@ -10,9 +10,9 @@
 #define PI_2f32 __f32(6.283185307179586231995926937088370323)
 
 /**
- * Base namespace for mathematical functions.
+ * Base namespace of the cedar engine.
  */
-namespace cedar::math
+namespace cedar
 {
 
 	/**
