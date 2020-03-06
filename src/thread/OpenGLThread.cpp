@@ -7,7 +7,8 @@
 
 using namespace cedar;
 
-OpenGLThread::OpenGLThread() : Thread("OpenGLThread", 60, QUEUE_BEFORE_TICK, 256)
+OpenGLThread::OpenGLThread() : Thread("OpenGLThread", static_cast<float>(Cedar::getConfig()->getFPSLimit()),
+		QUEUE_BEFORE_TICK, 256)
 {
 	this->m_window = nullptr;
 	this->m_masterRenderer = nullptr;
@@ -15,7 +16,7 @@ OpenGLThread::OpenGLThread() : Thread("OpenGLThread", 60, QUEUE_BEFORE_TICK, 256
 	this->m_preTickCallback = nullptr;
 	this->m_postTickCallback = nullptr;
 	this->m_stopCallback = nullptr;
-	this->m_fps = 60.0f;
+	this->m_fps = static_cast<float>(Cedar::getConfig()->getFPSLimit());
 	this->m_frameTimes = 0.0;
 	this->m_frameCount = 0;
 	this->m_nextSecond = 0;
@@ -29,8 +30,9 @@ OpenGLThread *OpenGLThread::getInstance()
 
 void OpenGLThread::onStart()
 {
-	this->m_window = new Window("Cedar", 1280, 720, false);
-	this->m_window->init(-1);
+	const Config *config = Cedar::getConfig();
+	this->m_window = new Window("", config->getWindowWidth(), config->getWindowHeight(), config->isFullscreen());
+	this->m_window->init(config->getSelectedMonitor());
 
 	this->m_window->setCloseCallback([]() {
 		Cedar::getInstance()->stop();

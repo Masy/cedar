@@ -12,6 +12,7 @@ using namespace cedar;
 Cedar *Cedar::instance = nullptr;
 Logger *Cedar::CoreLogger = nullptr;
 Logger *Cedar::GLLogger = nullptr;
+Config *Cedar::config = nullptr;
 
 Cedar *Cedar::getInstance()
 {
@@ -55,4 +56,9 @@ const Logger *Cedar::getCoreLogger()
 const Logger *Cedar::getGLLogger()
 {
 	return GLLogger;
+}
+
+Config *Cedar::getConfig()
+{
+	return config;
 }

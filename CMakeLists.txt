@@ -25,30 +25,33 @@ add_library(cedar
 		src/logging/LoggerFactory.cpp
 		include/cedar/QueueLogAppender.h
 		src/logging/QueueLogAppender.cpp
-		include/cedar/Vector2f.h
-		src/math/Vector2f.cpp
-		include/cedar/Vector3f.h
-		src/math/Vector3f.cpp
-		include/cedar/Vector4f.h
-		src/math/Vector4f.cpp
-		include/cedar/Matrix4f.h
-		src/math/Matrix4f.cpp
-		include/cedar/Quaternionf.h
-		src/math/Quaternionf.cpp
 		include/cedar/Math.h
 		include/cedar/Window.h
 		src/graphics/window/Window.cpp
 		include/cedar/ShaderProgram.h
 		src/graphics/shader/ShaderProgram.cpp
 		include/cedar/Vector2i.h
+		src/math/Vector2i.cpp
 		include/cedar/Vector2ui.h
+		src/math/Vector2ui.cpp
 		include/cedar/Vector2d.h
+		include/cedar/Vector2f.h
+		src/math/Vector2f.cpp
 		include/cedar/Vector3i.h
 		include/cedar/Vector3ui.h
 		include/cedar/Vector3d.h
+		include/cedar/Vector3f.h
+		src/math/Vector3f.cpp
 		include/cedar/Vector4i.h
 		include/cedar/Vector4d.h
+		include/cedar/Vector4f.h
+		src/math/Vector4f.cpp
 		include/cedar/Vector4ui.h
+		src/math/Vector4ui.cpp
+		include/cedar/Matrix4f.h
+		src/math/Matrix4f.cpp
+		include/cedar/Quaternionf.h
+		src/math/Quaternionf.cpp
 		include/cedar/Input.h
 		include/cedar/InputHandler.h
 		src/input/InputHandler.cpp
@@ -76,10 +79,25 @@ add_library(cedar
 		src/graphics/font/GlyphData.cpp
 		include/cedar/FontRegistry.h
 		src/graphics/font/FontRegistry.cpp
-		src/math/Vector2ui.cpp
-		src/math/Vector2i.cpp
-		src/math/Vector4ui.cpp
-		stb/include/stb_image_write.h include/cedar/TextBuffer.h include/cedar/Quad.h src/graphics/model/Quad.cpp src/graphics/model/TextBuffer.cpp include/cedar/OpenGLThread.h src/thread/OpenGLThread.cpp include/cedar/MasterRenderer.h src/graphics/renderer/MasterRenderer.cpp include/cedar/Renderer.h src/graphics/renderer/Renderer.cpp include/cedar/EngineThread.h src/thread/EngineThread.cpp include/cedar/Camera.h src/entity/camera/Camera.cpp include/cedar/InputThread.h src/thread/InputThread.cpp)
+		stb/include/stb_image_write.h
+		include/cedar/Quad.h
+		src/graphics/model/Quad.cpp
+		include/cedar/TextBuffer.h
+		src/graphics/model/TextBuffer.cpp
+		include/cedar/OpenGLThread.h
+		src/thread/OpenGLThread.cpp
+		include/cedar/EngineThread.h
+		src/thread/EngineThread.cpp
+		include/cedar/InputThread.h
+		src/thread/InputThread.cpp
+		include/cedar/MasterRenderer.h
+		src/graphics/renderer/MasterRenderer.cpp
+		include/cedar/Renderer.h
+		src/graphics/renderer/Renderer.cpp
+		include/cedar/Camera.h
+		src/entity/camera/Camera.cpp
+		include/cedar/Config.h
+		src/core/Config.cpp)
 
 target_include_directories(cedar PUBLIC
 		glad/include
