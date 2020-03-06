@@ -57,7 +57,7 @@ namespace cedar
 		 */
 		std::function<void()> m_stopCallback;
 		/**
-		 * The achieved frames per second of the last second.
+		 * The actually achieved frames per second of the last second.
 		 */
 		float m_fps;
 		/**
