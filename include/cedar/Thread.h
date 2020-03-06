@@ -124,17 +124,17 @@ namespace cedar
 		 *
 		 * <p>Note: This does not necessarily mean the Thread is running. It might be waiting for other XThreads to start first.</p>
 		 */
-		std::atomic_bool m_started;
+		std::atomic_bool m_started{};
 		/**
 		 * Whether the Thread is running or not.
 		 */
-		std::atomic_bool m_running;
+		std::atomic_bool m_running{};
 		/**
 		 * Whether the Thread is currently trying to stop or not.
 		 *
 		 * <p>Note: This does not mean the thread has stopped already, it is just trying to.</p>
 		 */
-		std::atomic_bool m_stopping;
+		std::atomic_bool m_stopping{};
 
 		/**
 		 * Method which is called by the {@link start()} method, but from the newly created thread.

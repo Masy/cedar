@@ -4,19 +4,14 @@
 
 #include "cedar/Thread.h"
 #include "cedar/LoggerFactory.h"
-#include <iostream>
 
-// Normally i wouldn't do this, but i guess in the implementation file of a class that's ok.
 using namespace cedar;
 
-// Bereich der Schande
-// Die ganzen Initialisierungen können exceptions werfen, aber ich geh einfach mal davon aus, dass sie das nicht tun werden
 const std::chrono::duration<long, std::micro> MAX_OVERHEAD = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::microseconds(2000));
 const std::chrono::duration<long, std::micro> MIN_OVERHEAD = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::microseconds(-2000));
 
 std::vector<Thread *> *Thread::THREADS = new std::vector<Thread *>();
 std::mutex *Thread::THREAD_MUTEX = new std::mutex();
-// Ende
 
 Thread::Thread(const std::string &threadName, const double ticksPerSecond, const QueueExecutionOrder taskQueueExecutionOrder,
 			   const unsigned int taskThreshold)
@@ -125,9 +120,8 @@ void Thread::executeTasks()
 {
 	this->m_taskQueueMutex.lock();
 	// Check if the threshold was exceeded and print warning if so.
-	if (this->m_backTaskQueue->size() > this->m_taskThreshold) // TODO: log this
-		std::cout << "[" << this->m_name << "][WARNING]: Task queue has more tasks than the threshold! " << this->m_backTaskQueue->size() << "/"
-				  << this->m_taskThreshold << std::endl;
+	if (this->m_backTaskQueue->size() > this->m_taskThreshold)
+		this->m_logger->warn("Task queue has more tasks than threshold! %d/%d", this->m_backTaskQueue->size(), this->m_taskThreshold);
 
 	// Swap front and back queue so new tasks can already be added while the queue is being processed.
 	// That way other threads don't freeze when trying to add a task while the task queue is processed.
@@ -212,12 +206,18 @@ void Thread::removeFromWaitingQueue(const Thread *thread)
 
 void Thread::addTask(const std::function<void()> &task)
 {
-	//TODO: log error
-	if (this->m_running && this->m_queueExecutionOrder != QUEUE_DISABLED)
+	if (this->m_running)
 	{
-		this->m_taskQueueMutex.lock();
-		this->m_backTaskQueue->push(task);
-		this->m_taskQueueMutex.unlock();
+		if (this->m_queueExecutionOrder != QUEUE_DISABLED)
+		{
+			this->m_taskQueueMutex.lock();
+			this->m_backTaskQueue->push(task);
+			this->m_taskQueueMutex.unlock();
+		}
+		else
+		{
+			this->m_logger->warn("Received a task but the task queue is disabled!");
+		}
 	}
 }
 

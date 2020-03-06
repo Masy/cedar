@@ -18,7 +18,7 @@ add_library(cedar
 		include/cedar/XException.h
 		src/core/XException.cpp
 		include/cedar/Thread.h
-		src/multithreading/Thread.cpp
+		src/thread/Thread.cpp
 		include/cedar/Logger.h
 		src/logging/Logger.cpp
 		include/cedar/LoggerFactory.h
@@ -79,7 +79,7 @@ add_library(cedar
 		src/math/Vector2ui.cpp
 		src/math/Vector2i.cpp
 		src/math/Vector4ui.cpp
-		stb/include/stb_image_write.h include/cedar/TextBuffer.h include/cedar/Quad.h src/graphics/model/Quad.cpp src/graphics/model/TextBuffer.cpp)
+		stb/include/stb_image_write.h include/cedar/TextBuffer.h include/cedar/Quad.h src/graphics/model/Quad.cpp src/graphics/model/TextBuffer.cpp include/cedar/OpenGLThread.h src/thread/OpenGLThread.cpp include/cedar/MasterRenderer.h src/graphics/renderer/MasterRenderer.cpp include/cedar/Renderer.h src/graphics/renderer/Renderer.cpp include/cedar/EngineThread.h src/thread/EngineThread.cpp include/cedar/Camera.h src/entity/camera/Camera.cpp include/cedar/InputThread.h src/thread/InputThread.cpp)
 
 target_include_directories(cedar PUBLIC
 		glad/include
