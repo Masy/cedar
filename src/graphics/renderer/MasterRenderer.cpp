@@ -6,6 +6,7 @@
 #include "cedar/Renderer2D.h"
 #include "cedar/Math.h"
 #include "cedar/EngineThread.h"
+#include "cedar/Cedar.h"
 
 using namespace cedar;
 
@@ -31,7 +32,7 @@ void MasterRenderer::init()
 {
 	this->m_perspectiveProjectionMatrix->perspective(
 			static_cast<float>(this->m_window->getRatio()),
-			cedar::toRadians(90.0f),
+			cedar::toRadians(Cedar::getConfig()->getFOV()),
 			1E-2f,
 			4096.0f);
 

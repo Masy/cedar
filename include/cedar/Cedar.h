@@ -5,12 +5,13 @@
 #ifndef CEDAR_CEDAR_H
 #define CEDAR_CEDAR_H
 
+#include "cedar/Config.h"
 #include "cedar/LoggerFactory.h"
 
 using namespace cedar;
 
 /**
- * Base namespace of the cedar engine.
+ * Main class of the cedar engine.
  */
 class Cedar
 {
@@ -27,6 +28,10 @@ protected:
 	 * A pointer to the OpenGL logger of cedar.
 	 */
 	static Logger *GLLogger;
+	/**
+	 * A pointer to the configuration of the engine.
+	 */
+	static Config *config;
 
 public:
 
@@ -75,6 +80,13 @@ public:
 	 * @return A constant pointer to the OpenGL logger of the engine.
 	 */
 	[[nodiscard]] static const Logger *getGLLogger();
+
+	/**
+	 * Gets the configuration of the engine.
+	 *
+	 * @return A pointer to the configuration of the engine.
+	 */
+	[[nodiscard]] static Config *getConfig();
 };
 
 #endif //CEDAR_CEDAR_H
