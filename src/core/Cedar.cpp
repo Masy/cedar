@@ -3,17 +3,56 @@
 //
 
 #include "cedar/Cedar.h"
+#include "cedar/EngineThread.h"
+#include "cedar/OpenGLThread.h"
+#include "cedar/InputThread.h"
 
 using namespace cedar;
 
-Logger *cedar::CoreLogger = nullptr;
-Logger *cedar::GLLogger = nullptr;
+Cedar *Cedar::instance = nullptr;
+Logger *Cedar::CoreLogger = nullptr;
+Logger *Cedar::GLLogger = nullptr;
 
-void cedar::initEngine(QueueLogAppender *logAppender, const int argc, const char **args)
+Cedar *Cedar::getInstance()
 {
-	LoggerFactory::setQueueLogAppender(logAppender);
-	logAppender->start();
+	return instance;
+}
 
-	cedar::CoreLogger = LoggerFactory::getLogger("Cedar::Core");
-	cedar::GLLogger = LoggerFactory::getLogger("Cedar::GL");
+void Cedar::start(const int argc, const char **args)
+{
+	instance = this;
+
+	this->preStart();
+
+	CoreLogger = LoggerFactory::getLogger("Cedar::Core");
+	GLLogger = LoggerFactory::getLogger("Cedar::GL");
+
+	Thread *glWaitFor[1] = {EngineThread::getInstance()};
+	Thread *inputWaitFor[1] = {OpenGLThread::getInstance()};
+
+	InputThread::getInstance()->start(1, inputWaitFor);
+	OpenGLThread::getInstance()->start(1, glWaitFor);
+	std::thread *engine = EngineThread::getInstance()->start();
+
+	this->onStart();
+	engine->join();
+}
+
+void Cedar::stop()
+{
+	InputThread::getInstance()->stop();
+	OpenGLThread::getInstance()->stop();
+	EngineThread::getInstance()->stop();
+
+	this->onStop();
+}
+
+const Logger *Cedar::getCoreLogger()
+{
+	return CoreLogger;
+}
+
+const Logger *Cedar::getGLLogger()
+{
+	return GLLogger;
 }
