@@ -10,34 +10,38 @@
 
 using namespace cedar;
 
-Renderer2D::Renderer2D()
-{
-	this->m_shader = nullptr;
-	this->m_uniformLocations = nullptr;
-	this->m_projectionMatrix = nullptr;
-	this->m_batch = nullptr;
-	this->m_nextQuad = nullptr;
-	this->m_quadCount = 0;
-	this->m_batchSize = 0;
-	this->m_textureUnitCount = 0;
-	this->m_textures = nullptr;
-	this->m_textureCount = 1;
-	this->m_vaoId = 0;
-	this->m_quadVboId = 0;
-	this->m_instanceVboId = 0;
-}
+ShaderProgram *Renderer2D::shader = nullptr;
+int *Renderer2D::uniformLocations = nullptr;
+Matrix4f *Renderer2D::projectionMatrix = nullptr;
+Texture2D *Renderer2D::defaultTexture = nullptr;
 
-Renderer2D::~Renderer2D()
-{
-	delete[] this->m_batch;
-	delete[] this->m_textures;
-	delete[] this->m_textureUnits;
-	delete this->m_defaultTexture;
-	delete this->m_shader;
-	delete[] this->m_uniformLocations;
+Quad *Renderer2D::batch = nullptr;
+Quad *Renderer2D::nextQuad = nullptr;
+unsigned int Renderer2D::quadCount = 0;
+unsigned int Renderer2D::batchSize = 0;
+unsigned int Renderer2D::textureUnitCount = 0;
+int *Renderer2D::textureUnits = nullptr;
+unsigned int *Renderer2D::textures = nullptr;
+unsigned int Renderer2D::textureCount = 0;
+
+unsigned int Renderer2D::vaoId = 0;
+unsigned int Renderer2D::quadVboId = 0;
+unsigned int Renderer2D::instanceVboId = 0;
+
+
+Renderer2D::Renderer2D()
+= default;
+
+void Renderer2D::cleanup() {
+	delete[] batch;
+	delete[] textures;
+	delete[] textureUnits;
+	delete defaultTexture;
+	delete shader;
+	delete[] uniformLocations;
 	// don't delete projection matrix as it is handled by the master renderer
-	glDeleteBuffers(2, &this->m_quadVboId);
-	glDeleteVertexArrays(1, &this->m_vaoId);
+	glDeleteBuffers(2, &quadVboId);
+	glDeleteVertexArrays(1, &vaoId);
 }
 
 void Renderer2D::initShader(const int maxTextureUnits)
@@ -92,49 +96,49 @@ void main()
 	std::regex pattern(R"(\$\{MAX_TEXTURE_UNITS\})");
 	std::string guiFragmentShader = std::regex_replace(guiFragmentShaderTemplate, pattern, std::to_string(maxTextureUnits));
 
-	this->m_shader = new cedar::ShaderProgram();
-	this->m_shader->createVertexShader(guiVertexShader);
-	this->m_shader->createFragmentShader(guiFragmentShader);
-	this->m_shader->link();
+	shader = new cedar::ShaderProgram();
+	shader->createVertexShader(guiVertexShader);
+	shader->createFragmentShader(guiFragmentShader);
+	shader->link();
 
 	const char *guiUniformNames[] = {"u_projectionMatrix", "u_samplers"};
-	this->m_uniformLocations = new int[2];
-	this->m_shader->createUniforms(2, guiUniformNames, this->m_uniformLocations);
+	uniformLocations = new int[2];
+	shader->createUniforms(2, guiUniformNames, uniformLocations);
 }
 
-void Renderer2D::init(const unsigned int batchSize, Matrix4f *projectionMatrix)
+void Renderer2D::init(const unsigned int _batchSize, Matrix4f *_projectionMatrix)
 {
-	this->m_projectionMatrix = projectionMatrix;
+	projectionMatrix = _projectionMatrix;
 	int maxTextures;
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextures);
-	this->initShader(maxTextures);
+	initShader(maxTextures);
 
-	this->m_batch = new Quad[batchSize];
-	this->m_nextQuad = this->m_batch;
-	this->m_batchSize = batchSize;
+	batch = new Quad[_batchSize];
+	nextQuad = batch;
+	batchSize = _batchSize;
 
-	this->m_textureUnitCount = static_cast<unsigned int>(maxTextures);
-	this->m_textures = new unsigned int[this->m_textureUnitCount];
-	this->m_textureUnits = new int[this->m_textureUnitCount];
-	for (unsigned int n = 0; n < this->m_textureUnitCount; n++)
-		this->m_textureUnits[n] = static_cast<int>(n);
+	textureUnitCount = static_cast<unsigned int>(maxTextures);
+	textures = new unsigned int[textureUnitCount];
+	textureUnits = new int[textureUnitCount];
+	for (unsigned int n = 0; n < textureUnitCount; n++)
+		textureUnits[n] = static_cast<int>(n);
 
-	this->m_defaultTexture = new Texture2D(1, 1);
+	defaultTexture = new Texture2D(1, 1);
 	unsigned char pixel[] = {255, 255, 255, 255};
-	this->m_defaultTexture->init(CEDAR_RGBA, CEDAR_UNSIGNED_BYTE, pixel);
-	this->m_textures[0] = this->m_defaultTexture->getId();
+	defaultTexture->init(CEDAR_RGBA, CEDAR_UNSIGNED_BYTE, pixel);
+	textures[0] = defaultTexture->getId();
 
-	glGenVertexArrays(1, &this->m_vaoId);
-	glBindVertexArray(this->m_vaoId);
+	glGenVertexArrays(1, &vaoId);
+	glBindVertexArray(vaoId);
 
-	glGenBuffers(2, &this->m_quadVboId);
+	glGenBuffers(2, &quadVboId);
 
-	glBindBuffer(GL_ARRAY_BUFFER, this->m_quadVboId);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVboId);
 	float data[8] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f};
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, sizeof(float) * 2, nullptr);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 8, data, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, this->m_instanceVboId);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVboId);
 
 	glVertexAttribPointer(1, 4, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_corners)));
 	glVertexAttribDivisor(1, 1);
@@ -146,7 +150,7 @@ void Renderer2D::init(const unsigned int batchSize, Matrix4f *projectionMatrix)
 	glVertexAttribDivisor(4, 1);
 	glVertexAttribPointer(5, 4, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_tint)));
 	glVertexAttribDivisor(5, 1);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Quad) * this->m_batchSize, nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Quad) * _batchSize, nullptr, GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -154,37 +158,37 @@ void Renderer2D::init(const unsigned int batchSize, Matrix4f *projectionMatrix)
 
 void Renderer2D::beginBatch()
 {
-	this->m_nextQuad = this->m_batch;
-	this->m_quadCount = 0;
-	this->m_textureCount = 1;
-	for (unsigned int n = 1; n < this->m_textureUnitCount; n++)
-		this->m_textures[n] = 0;
+	nextQuad = batch;
+	quadCount = 0;
+	textureCount = 1;
+	for (unsigned int n = 1; n < textureUnitCount; n++)
+		textures[n] = 0;
 }
 
 void Renderer2D::endBatch()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, this->m_instanceVboId);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Quad) * this->m_quadCount, this->m_batch);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVboId);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Quad) * quadCount, batch);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Renderer2D::flush()
 {
-	for (unsigned int n = 0; n < this->m_textureCount; n++)
-		glBindTextureUnit(n, this->m_textures[n]);
+	for (unsigned int n = 0; n < textureCount; n++)
+		glBindTextureUnit(n, textures[n]);
 
-	this->m_shader->bind();
-	this->m_shader->setUniform4x4f(this->m_uniformLocations[0], *this->m_projectionMatrix);
-	this->m_shader->setUniform1iv(this->m_uniformLocations[1], this->m_textureCount, this->m_textureUnits);
+	shader->bind();
+	shader->setUniform4x4f(uniformLocations[0], *projectionMatrix);
+	shader->setUniform1iv(uniformLocations[1], textureCount, textureUnits);
 
-	glBindVertexArray(this->m_vaoId);
+	glBindVertexArray(vaoId);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 	glEnableVertexAttribArray(4);
 	glEnableVertexAttribArray(5);
-	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, this->m_quadCount);
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, quadCount);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
@@ -193,102 +197,102 @@ void Renderer2D::flush()
 	glDisableVertexAttribArray(5);
 	glBindVertexArray(0);
 
-	this->m_shader->unbind();
+	shader->unbind();
 }
 
 void Renderer2D::drawRect(const float posX, const float posY, const float posZ, const float width, const float height, const Vector4f *color)
 {
-	if (this->m_quadCount == this->m_batchSize)
+	if (quadCount == batchSize)
 	{
-		this->endBatch();
-		this->flush();
-		this->beginBatch();
+		endBatch();
+		flush();
+		beginBatch();
 	}
 
-	this->m_nextQuad->set(posX, posY, posX + width, posY + height, -posZ, 0,
-					  0.0f, 0.0f, 1.0f, 1.0f, color->x, color->y, color->z, color->w);
+	nextQuad->set(posX, posY, posX + width, posY + height, -posZ, 0,
+				  0.0f, 0.0f, 1.0f, 1.0f, color->x, color->y, color->z, color->w);
 
-	this->m_nextQuad++;
-	this->m_quadCount++;
+	nextQuad++;
+	quadCount++;
 }
 
 void Renderer2D::drawTexturedRect(float posX, float posY, float posZ, float width, float height, float uvX1, float uvY1, float uvX2, float uvY2,
 								  const Texture2D *texture)
 {
-	if (this->m_quadCount == this->m_batchSize)
+	if (quadCount == batchSize)
 	{
-		this->endBatch();
-		this->flush();
-		this->beginBatch();
+		endBatch();
+		flush();
+		beginBatch();
 	}
 
 	int textureUnit = 0;
-	for (unsigned int n = 0; n < this->m_textureUnitCount; n++)
+	for (unsigned int n = 0; n < textureUnitCount; n++)
 	{
-		if (this->m_textures[n] == texture->getId())
+		if (textures[n] == texture->getId())
 		{
 			textureUnit = static_cast<int>(n);
 			break;
 		}
-		else if (this->m_textures[n] == 0)
+		else if (textures[n] == 0)
 		{
-			this->m_textures[n] = texture->getId();
+			textures[n] = texture->getId();
 			textureUnit = static_cast<int>(n);
-			this->m_textureCount++;
+			textureCount++;
 			break;
 		}
 	}
 
 	if (textureUnit == 0)
 	{
-		this->endBatch();
-		this->flush();
-		this->beginBatch();
+		endBatch();
+		flush();
+		beginBatch();
 		textureUnit = 1.0f;
-		this->m_textures[1] = texture->getId();
+		textures[1] = texture->getId();
 	}
 
-	this->m_nextQuad->set(posX, posY, posX + width, posY + height, -posZ, textureUnit,
-						 uvX1, uvY1, uvX2, uvY2, 1.0f, 1.0f, 1.0f, 1.0f);
+	nextQuad->set(posX, posY, posX + width, posY + height, -posZ, textureUnit,
+				  uvX1, uvY1, uvX2, uvY2, 1.0f, 1.0f, 1.0f, 1.0f);
 
-	this->m_nextQuad++;
-	this->m_quadCount++;
+	nextQuad++;
+	quadCount++;
 }
 
 void Renderer2D::drawText(const float posX, const float posY, const float posZ, const std::string &text, Font *font, const Vector4f *color,
 						  const unsigned int alignment)
 {
-	if (this->m_quadCount + text.length() > this->m_batchSize)
+	if (quadCount + text.length() > batchSize)
 	{
-		this->endBatch();
-		this->flush();
-		this->beginBatch();
+		endBatch();
+		flush();
+		beginBatch();
 	}
 
 	int textureUnit = 0;
-	for (unsigned int n = 0; n < this->m_textureUnitCount; n++)
+	for (unsigned int n = 0; n < textureUnitCount; n++)
 	{
-		if (this->m_textures[n] == font->getGlyphAtlas()->getId())
+		if (textures[n] == font->getGlyphAtlas()->getId())
 		{
 			textureUnit = static_cast<int>(n);
 			break;
 		}
-		else if (this->m_textures[n] == 0)
+		else if (textures[n] == 0)
 		{
-			this->m_textures[n] = font->getGlyphAtlas()->getId();
+			textures[n] = font->getGlyphAtlas()->getId();
 			textureUnit = static_cast<int>(n);
-			this->m_textureCount++;
+			textureCount++;
 			break;
 		}
 	}
 
 	if (textureUnit == 0)
 	{
-		this->endBatch();
-		this->flush();
-		this->beginBatch();
+		endBatch();
+		flush();
+		beginBatch();
 		textureUnit = 1.0f;
-		this->m_textures[1] = font->getGlyphAtlas()->getId();
+		textures[1] = font->getGlyphAtlas()->getId();
 	}
 
 	float nextPosX = posX;
@@ -324,13 +328,13 @@ void Renderer2D::drawText(const float posX, const float posY, const float posZ, 
 						break;
 				}
 
-				this->m_nextQuad->set(
+				nextQuad->set(
 						Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyph->m_size.x), nextPosY + static_cast<float>(glyph->m_size.y)),
 						-posZ, textureUnit, glyph->m_uvs, *color
-						);
+							 );
 
-				this->m_nextQuad++;
-				this->m_quadCount++;
+				nextQuad++;
+				quadCount++;
 
 				nextPosX += static_cast<float>(glyph->m_advance);
 			}
@@ -375,13 +379,13 @@ void Renderer2D::drawText(const float posX, const float posY, const float posZ, 
 					break;
 			}
 
-			this->m_nextQuad->set(
+			nextQuad->set(
 					Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyphs[n].m_size.x), nextPosY + static_cast<float>(glyphs[n].m_size.y)),
 					-posZ, textureUnit, glyphs[n].m_uvs, *color
-					);
+						 );
 
-			this->m_nextQuad++;
-			this->m_quadCount++;
+			nextQuad++;
+			quadCount++;
 
 			nextPosX += static_cast<float>(glyphs[n].m_advance);
 		}
@@ -488,45 +492,45 @@ TextBuffer *Renderer2D::generateTextBuffer(const std::string &text, Font *font, 
 
 void Renderer2D::drawText(const float offsetX, const float offsetY, const float offsetZ, const TextBuffer *textBuffer)
 {
-	if (this->m_quadCount + textBuffer->getGlyphCount() > this->m_batchSize)
+	if (quadCount + textBuffer->getGlyphCount() > batchSize)
 	{
-		this->endBatch();
-		this->flush();
-		this->beginBatch();
+		endBatch();
+		flush();
+		beginBatch();
 	}
 
 	int textureUnit = 0;
-	for (unsigned int n = 0; n < this->m_textureUnitCount; n++)
+	for (unsigned int n = 0; n < textureUnitCount; n++)
 	{
-		if (this->m_textures[n] == textBuffer->getGlyphAtlas())
+		if (textures[n] == textBuffer->getGlyphAtlas())
 		{
 			textureUnit = static_cast<int>(n);
 			break;
 		}
-		else if (this->m_textures[n] == 0)
+		else if (textures[n] == 0)
 		{
-			this->m_textures[n] = textBuffer->getGlyphAtlas();
+			textures[n] = textBuffer->getGlyphAtlas();
 			textureUnit = static_cast<int>(n);
-			this->m_textureCount++;
+			textureCount++;
 			break;
 		}
 	}
 
 	if (textureUnit == 0)
 	{
-		this->endBatch();
-		this->flush();
-		this->beginBatch();
+		endBatch();
+		flush();
+		beginBatch();
 		textureUnit = 1.0f;
-		this->m_textures[1] = textBuffer->getGlyphAtlas();
+		textures[1] = textBuffer->getGlyphAtlas();
 	}
 
 	for (int n = 0; n < textBuffer->getGlyphCount(); n++)
 	{
-		this->m_nextQuad->set(textBuffer->getQuads()[n].m_corners + Vector4f(offsetX, offsetY, offsetX, offsetY),
-				-offsetZ, textureUnit, textBuffer->getQuads()[n].m_uvs, textBuffer->getQuads()[n].m_tint);
+		nextQuad->set(textBuffer->getQuads()[n].m_corners + Vector4f(offsetX, offsetY, offsetX, offsetY),
+					  -offsetZ, textureUnit, textBuffer->getQuads()[n].m_uvs, textBuffer->getQuads()[n].m_tint);
 
-		this->m_nextQuad++;
-		this->m_quadCount++;
+		nextQuad++;
+		quadCount++;
 	}
 }
