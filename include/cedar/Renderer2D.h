@@ -13,31 +13,6 @@
 #include "cedar/Font.h"
 
 /**
- * Defines the horizontal alignment to be left.
- */
-#define CEDAR_ALIGNMENT_LEFT 0x00
-/**
- * Defines the horizontal alignment to be center.
- */
-#define CEDAR_ALIGNMENT_CENTER 0x01
-/**
- * Defines the horizontal alignment to be right.
- */
-#define CEDAR_ALIGNMENT_RIGHT 0x02
-/**
- * Defines the vertical alignment to be top.
- */
-#define CEDAR_ALIGNMENT_TOP 0x00
-/**
- * Defines the vertical alignment to be middle
- */
-#define CEDAR_ALIGNMENT_MIDDLE 0x04
-/**
- * Defines the vertical alignment to be bottom.
- */
-#define CEDAR_ALIGNMENT_BOTTOM 0x08
-
-/**
  * Base namespace of the cedar engine.
  */
 namespace cedar
@@ -231,9 +206,10 @@ namespace cedar
 		 * @param font A pointer to the font of the text.
 		 * @param color A pointer to the color of the text.
 		 * @param alignment The alignment of the text.
+		 * @param size A pointer to a vector where the size of the text will be stored if it is not <code>nullptr</code>.
 		 */
 		static void drawText(float posX, float posY, float posZ, const std::string &text, Font *font, const Vector4f *color,
-					  unsigned int alignment = CEDAR_ALIGNMENT_TOP | CEDAR_ALIGNMENT_LEFT);
+					  unsigned int alignment = CEDAR_ALIGNMENT_TOP | CEDAR_ALIGNMENT_LEFT, Vector2f *size = nullptr);
 
 		/**
 		 * Generates a text buffer that can be rendered many times.
@@ -255,11 +231,10 @@ namespace cedar
 		 *
 		 * @param text The string of the text.
 		 * @param font A pointer to the font of the text.
-		 * @param color A pointer to the color of the text.
 		 * @param alignment The alignment of the text.
 		 * @return A pointer to the generated text buffer.
 		 */
-		static TextBuffer *generateTextBuffer(const std::string &text, Font *font, const Vector4f *color, unsigned int alignment = CEDAR_ALIGNMENT_TOP | CEDAR_ALIGNMENT_LEFT);
+		static TextBuffer *generateTextBuffer(const std::string &text, Font *font, unsigned int alignment = CEDAR_ALIGNMENT_TOP | CEDAR_ALIGNMENT_LEFT);
 
 		/**
 		 * Draws the text stored in the text buffer.
@@ -268,8 +243,9 @@ namespace cedar
 		 * @param offsetY The offset applied to the text buffer on the x axis.
 		 * @param offsetZ The z index of the text.
 		 * @param textBuffer A pointer to the text buffer that will be drawn.
+		 * @param color A pointer to the color of the text.
 		 */
-		static void drawText(float offsetX, float offsetY, float offsetZ, const TextBuffer *textBuffer);
+		static void drawText(float offsetX, float offsetY, float offsetZ, const TextBuffer *textBuffer, const Vector4f *color);
 	};
 }
 

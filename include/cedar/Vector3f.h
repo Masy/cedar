@@ -39,6 +39,10 @@ namespace cedar
 
 		void normalize();
 
+		void zero();
+
+		void negate();
+
 		[[nodiscard]] float distance(const Vector3f &other) const;
 
 		[[nodiscard]] float distanceSquared(const Vector3f &other) const;
