@@ -39,6 +39,20 @@ namespace cedar
 		 */
 		[[nodiscard]] const char *what() const noexcept override;
 	};
+
+	/**
+	 * Exception which is thrown when an operation is not supported.
+	 */
+	class UnsupportedOperationException : public XException
+	{
+	public:
+		/**
+		 * Creates a new unsupported operation exception.
+		 *
+		 * @param message The message of the exception.
+		 */
+		explicit UnsupportedOperationException(const std::string &message);
+	};
 }
 
 #endif //CEDAR_XEXCEPTION_H

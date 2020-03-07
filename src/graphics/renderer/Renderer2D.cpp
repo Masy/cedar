@@ -142,7 +142,7 @@ void Renderer2D::init(const unsigned int _batchSize, Matrix4f *_projectionMatrix
 
 	glVertexAttribPointer(1, 4, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_corners)));
 	glVertexAttribDivisor(1, 1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_zIndex)));
+	glVertexAttribPointer(2, 1, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_zIndex)));
 	glVertexAttribDivisor(2, 1);
 	glVertexAttribIPointer(3, 1, GL_INT, sizeof(Quad), (const void*) (offsetof(Quad, m_textureUnit)));
 	glVertexAttribDivisor(3, 1);
@@ -260,7 +260,7 @@ void Renderer2D::drawTexturedRect(float posX, float posY, float posZ, float widt
 }
 
 void Renderer2D::drawText(const float posX, const float posY, const float posZ, const std::string &text, Font *font, const Vector4f *color,
-						  const unsigned int alignment)
+						  const unsigned int alignment, Vector2f *size)
 {
 	if (quadCount + text.length() > batchSize)
 	{
@@ -295,6 +295,8 @@ void Renderer2D::drawText(const float posX, const float posY, const float posZ, 
 		textures[1] = font->getGlyphAtlas()->getId();
 	}
 
+	float width = 0.0f;
+	float height = 0.0f;
 	float nextPosX = posX;
 	float currentPosX;
 	float nextPosY;
@@ -337,28 +339,30 @@ void Renderer2D::drawText(const float posX, const float posY, const float posZ, 
 				quadCount++;
 
 				nextPosX += static_cast<float>(glyph->m_advance);
+				width += static_cast<float>(glyph->m_advance);
+				height = std::max(height, static_cast<float>(glyph->m_size.y));
 			}
 		}
 	}
 	else
 	{
 		Glyph glyphs[text.length()];
-		unsigned int width = 0;
 		unsigned int characters = 0;
 		for (const uint8_t *s = (uint8_t *) text.c_str(); *s; ++s)
 		{
 			if (!Font::decode(&state, &codepoint, *s))
 			{
 				glyphs[characters] = *font->getGlyph(codepoint);
-				width += glyphs[characters].m_advance;
+				width += static_cast<float>(glyphs[characters].m_advance);
+				height = std::max(height, static_cast<float>(glyphs[characters].m_size.y));
 				characters++;
 			}
 		}
 
 		if (horizontalAlignment == CEDAR_ALIGNMENT_CENTER)
-			nextPosX = posX - std::floor(static_cast<float>(width) * 0.5f);
+			nextPosX = posX - std::floor(width * 0.5f);
 		else
-			nextPosX = posX - static_cast<float>(width);
+			nextPosX = posX - width;
 
 		for (unsigned int n = 0; n < characters; n++)
 		{
@@ -390,12 +394,17 @@ void Renderer2D::drawText(const float posX, const float posY, const float posZ, 
 			nextPosX += static_cast<float>(glyphs[n].m_advance);
 		}
 	}
+
+	if (size)
+		*size = Vector2f(width, height);
 }
 
-TextBuffer *Renderer2D::generateTextBuffer(const std::string &text, Font *font, const Vector4f *color, const unsigned int alignment)
+TextBuffer *Renderer2D::generateTextBuffer(const std::string &text, Font *font, const unsigned int alignment)
 {
 	Quad *quads = new Quad[text.length()];
 
+	float width = 0.0f;
+	float height = 0.0f;
 	unsigned int glyphCount = 0;
 	float nextPosX = 0.0f;
 	float currentPosX;
@@ -432,32 +441,33 @@ TextBuffer *Renderer2D::generateTextBuffer(const std::string &text, Font *font, 
 
 				quads[glyphCount++].set(
 						Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyph->m_size.x), nextPosY + static_cast<float>(glyph->m_size.y)),
-						0.0f, 0, glyph->m_uvs, *color
-									   );
+						0.0f, 0, glyph->m_uvs, Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
 				nextPosX += static_cast<float>(glyph->m_advance);
+				width += static_cast<float>(glyph->m_advance);
+				height = std::max(height, static_cast<float>(glyph->m_size.y));
 			}
 		}
 	}
 	else
 	{
 		Glyph glyphs[text.length()];
-		unsigned int width = 0;
 		unsigned int characters = 0;
 		for (const uint8_t *s = (uint8_t *) text.c_str(); *s; ++s)
 		{
 			if (!Font::decode(&state, &codepoint, *s))
 			{
 				glyphs[characters] = *font->getGlyph(codepoint);
-				width += glyphs[characters].m_advance;
+				width += static_cast<float>(glyphs[characters].m_advance);
+				height = std::max(height, static_cast<float>(glyphs[characters].m_size.y));
 				characters++;
 			}
 		}
 
 		if (horizontalAlignment == CEDAR_ALIGNMENT_CENTER)
-			nextPosX = -std::floor(static_cast<float>(width) * 0.5f);
+			nextPosX = -std::floor(width * 0.5f);
 		else
-			nextPosX = -static_cast<float>(width);
+			nextPosX = -width;
 
 		for (unsigned int n = 0; n < characters; n++)
 		{
@@ -480,17 +490,17 @@ TextBuffer *Renderer2D::generateTextBuffer(const std::string &text, Font *font, 
 
 			quads[glyphCount++].set(
 					Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyphs[n].m_size.x), nextPosY + static_cast<float>(glyphs[n].m_size.y)),
-					0.0f, 0, glyphs[n].m_uvs, *color
+					0.0f, 0, glyphs[n].m_uvs, Vector4f(1.0f, 1.0f, 1.0f, 1.0f)
 			);
 
 			nextPosX += static_cast<float>(glyphs[n].m_advance);
 		}
 	}
 
-	return new TextBuffer(font->getGlyphAtlas()->getId(), glyphCount, quads);
+	return new TextBuffer(font->getGlyphAtlas()->getId(), glyphCount, quads, Vector2f(width, height));
 }
 
-void Renderer2D::drawText(const float offsetX, const float offsetY, const float offsetZ, const TextBuffer *textBuffer)
+void Renderer2D::drawText(const float offsetX, const float offsetY, const float offsetZ, const TextBuffer *textBuffer, const Vector4f *color)
 {
 	if (quadCount + textBuffer->getGlyphCount() > batchSize)
 	{
@@ -528,7 +538,7 @@ void Renderer2D::drawText(const float offsetX, const float offsetY, const float 
 	for (int n = 0; n < textBuffer->getGlyphCount(); n++)
 	{
 		nextQuad->set(textBuffer->getQuads()[n].m_corners + Vector4f(offsetX, offsetY, offsetX, offsetY),
-					  -offsetZ, textureUnit, textBuffer->getQuads()[n].m_uvs, textBuffer->getQuads()[n].m_tint);
+					  -offsetZ, textureUnit, textBuffer->getQuads()[n].m_uvs, *color);
 
 		nextQuad++;
 		quadCount++;

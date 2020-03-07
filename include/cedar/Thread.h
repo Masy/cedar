@@ -28,19 +28,19 @@ namespace cedar
 		/**
 		 * The thread will not accept tasks from other threads.
 		 */
-				QUEUE_DISABLED,
+		QUEUE_DISABLED,
 		/**
 		 * The task queue is processed before the onTick() method will be called.
 		 */
-				QUEUE_BEFORE_TICK,
+		QUEUE_BEFORE_TICK,
 		/**
 		 * The task queue is processed after the onTick() method was called.
 		 */
-				QUEUE_AFTER_TICK,
+		QUEUE_AFTER_TICK,
 		/**
 		 * The thread will only process the task queue and sleep until new tasks are added
 		 */
-				QUEUE_ONLY
+		QUEUE_ONLY
 	};
 
 	/**
@@ -82,7 +82,7 @@ namespace cedar
 		/**
 		 * The sleep duration of the Thread in microseconds.
 		 */
-		std::chrono::duration<long, std::micro> m_sleepTime{};
+		std::chrono::duration<long, std::micro> m_sleepTime;
 		/**
 		 * A list of XThreads this thread is waiting for before starting.
 		 */
@@ -255,6 +255,13 @@ namespace cedar
 		 * @return the {@link Logger} of the Thread.
 		 */
 		[[nodiscard]] const Logger *getLogger() const;
+
+		/**
+		 * Gets the ticks per second this Thread tries to achieve.
+		 *
+		 * @return The ticks per second this Thread tries to achieve.
+		 */
+		[[nodiscard]] double getTPS() const;
 
 		/**
 		 * Gets the frame time of the last tick of the Thread.

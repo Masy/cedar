@@ -53,6 +53,19 @@ void Vector3f::normalize()
 	}
 }
 
+void Vector3f::zero()
+{
+	this->x = 0.0f;
+	this->y = 0.0f;
+	this->z = 0.0f;
+}
+
+void Vector3f::negate() {
+	this->x = -this->x;
+	this->y = -this->y;
+	this->z = -this->z;
+}
+
 float Vector3f::distance(const Vector3f &other) const
 {
 	float _x = other.x - this->x;

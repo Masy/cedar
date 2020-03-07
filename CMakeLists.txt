@@ -88,8 +88,6 @@ add_library(cedar
 		src/thread/OpenGLThread.cpp
 		include/cedar/EngineThread.h
 		src/thread/EngineThread.cpp
-		include/cedar/InputThread.h
-		src/thread/InputThread.cpp
 		include/cedar/MasterRenderer.h
 		src/graphics/renderer/MasterRenderer.cpp
 		include/cedar/Renderer.h
@@ -97,7 +95,19 @@ add_library(cedar
 		include/cedar/Camera.h
 		src/entity/camera/Camera.cpp
 		include/cedar/Config.h
-		src/core/Config.cpp)
+		src/core/Config.cpp
+		include/cedar/Element.h
+		src/graphics/gui/elements/Element.cpp
+		include/cedar/Screen.h
+		src/graphics/gui/Screen.cpp
+		include/cedar/ScreenRegistry.h
+		src/graphics/gui/ScreenRegistry.cpp
+		include/cedar/Intersection.h
+		include/cedar/GUIConstants.h
+		include/cedar/Button.h
+		src/graphics/gui/elements/Button.cpp
+		include/cedar/Label.h
+		src/graphics/gui/elements/Label.cpp)
 
 target_include_directories(cedar PUBLIC
 		glad/include

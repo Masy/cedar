@@ -3,7 +3,9 @@
 //
 
 #include "cedar/Window.h"
-#include <iostream>
+#include "cedar/ScreenRegistry.h"
+#include "cedar/Cedar.h"
+#include "cedar/Input.h"
 
 using namespace cedar;
 
@@ -21,6 +23,7 @@ Window::Window(const std::string &title, const int width, const int height, cons
 	if (width <= 0 || height <= 0)
 		throw WindowCreationException("Could not create window. Width and height must be greater than 0!");
 
+	this->m_inputHandler = new InputHandler();
 	this->m_title = title;
 	this->m_posX = 0;
 	this->m_posY = 0;
@@ -31,14 +34,9 @@ Window::Window(const std::string &title, const int width, const int height, cons
 	this->m_windowedHeight = height;
 	this->m_halfHeight = height * 0.5;
 	this->m_ratio = width / (double) height;
-	this->m_cursorPosX = this->m_halfWidth;
-	this->m_cursorPosY = this->m_halfHeight;
-	this->m_cursorDistX = 0.0;
-	this->m_cursorDistY = 0.0;
 	this->m_closing = false;
 	this->m_fullscreen = fullscreen;
 	this->m_initialized = false;
-	this->m_cursorLocked = false;
 	this->m_windowHandle = nullptr;
 	this->m_monitor = nullptr;
 	this->m_vidMode = nullptr;
@@ -73,7 +71,7 @@ void Window::init(const int selectedMonitor)
 
 		if (selectedMonitor >= monitorCount)
 		{
-			std::cout << "couldn't find selected monitor, using primary monitor!" << std::endl;
+			Cedar::getGLLogger()->warn("Couldn't find selected monitor %d, using primary monitor instead!", selectedMonitor);
 		}
 		else
 		{
@@ -94,6 +92,9 @@ void Window::init(const int selectedMonitor)
 
 	glfwSetWindowSizeCallback(this->m_windowHandle, [](GLFWwindow *glfwWindow, int width, int height) {
 		Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfwWindow));
+		int deltaWidth = width - window->m_width;
+		int deltaHeight = height - window->m_height;
+
 		window->m_width = width;
 		window->m_height = height;
 		window->m_halfWidth = width * 0.5;
@@ -104,30 +105,111 @@ void Window::init(const int selectedMonitor)
 			window->m_windowedHeight = height;
 		}
 		window->m_ratio = width / (double) height;
-		glViewport(0, 0, width, height);
+
 		if (window->m_resizeCallback)
 			window->m_resizeCallback(width, height);
+
+		for (Screen *screen : *ScreenRegistry::getLoadedScreens())
+		{
+			screen->onResize(width, height, deltaWidth, deltaHeight);
+		}
+
 	});
 
 	glfwSetCursorPosCallback(this->m_windowHandle, [](GLFWwindow *glfwWindow, double cursorX, double cursorY) {
 		Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfwWindow));
 
-
-		window->m_cursorDistX += cursorX - window->m_cursorPosX;
-		window->m_cursorDistY += cursorY - window->m_cursorPosY;
-		window->m_cursorPosX = cursorX;
-		window->m_cursorPosY = cursorY;
-
-		if (window->m_cursorLocked)
+		if (window->m_inputHandler->isCursorLocked())
 		{
-			glfwSetCursorPos(glfwWindow, window->m_cursorPosX, window->m_cursorPosY);
+			window->m_inputHandler->addCursorOffset(cursorX - window->m_inputHandler->getCursorX(), cursorY - window->m_inputHandler->getCursorY());
+			glfwSetCursorPos(glfwWindow, window->m_inputHandler->getCursorX(), window->m_inputHandler->getCursorY());
 		}
+		else
+		{
+			window->m_inputHandler->setCursorPos(cursorX, cursorY);
+		}
+
+		for (Screen *screen : *ScreenRegistry::getLoadedScreens())
+		{
+			if (screen->isVisible() && screen->isEnabled() && screen->onMouseMove(static_cast<float>(cursorX), static_cast<float>(cursorY)))
+				break;
+		}
+	});
+
+	glfwSetMouseButtonCallback(this->m_windowHandle, [](GLFWwindow *glfwWindow, int mouseButton, int state, int modifier) {
+		Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfwWindow));
+		window->m_inputHandler->setState(static_cast<unsigned int>(mouseButton), static_cast<unsigned char>(state));
+
+		if (state == GLFW_PRESS)
+			for (Screen *screen : *ScreenRegistry::getLoadedScreens())
+			{
+				if (screen->isVisible() && screen->isEnabled() && screen->onMousePress(window->m_inputHandler->getCursorX(), window->m_inputHandler->getCursorY(), mouseButton, modifier))
+					break;
+			}
+		else
+			for (Screen *screen : *ScreenRegistry::getLoadedScreens())
+			{
+				if (screen->isVisible() && screen->isEnabled() && screen->onMouseRelease(window->m_inputHandler->getCursorX(), window->m_inputHandler->getCursorY(), mouseButton, modifier))
+					break;
+			}
+	});
+
+	glfwSetCursorEnterCallback(this->m_windowHandle, [](GLFWwindow *glfwWindow, int entered) {
+		if (!entered && Screen::HOVERED_ELEMENT)
+		{
+			Screen::HOVERED_ELEMENT->setHovered(false);
+			if (Screen::HOVERED_ELEMENT->getMouseEnterCallback())
+				Screen::HOVERED_ELEMENT->getMouseEnterCallback()(Screen::HOVERED_ELEMENT, false);
+		}
+	});
+
+	glfwSetKeyCallback(this->m_windowHandle, [](GLFWwindow *glfwWindow, int keyCode, int scanCode, int state, int modifier) {
+		Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfwWindow));
+		if (state != GLFW_REPEAT)
+			window->m_inputHandler->setState(static_cast<unsigned int>(keyCode), static_cast<unsigned char>(state));
+
+		if (state == GLFW_PRESS)
+		{
+			if (Screen::FOCUSED_ELEMENT && Screen::FOCUSED_ELEMENT->isVisible() && Screen::FOCUSED_ELEMENT->isEnabled() && Screen::FOCUSED_ELEMENT->getKeyPressCallback())
+				Screen::FOCUSED_ELEMENT->getKeyPressCallback()(Screen::FOCUSED_ELEMENT, keyCode, modifier);
+		}
+		else if (state == GLFW_RELEASE)
+		{
+			if (Screen::FOCUSED_ELEMENT && Screen::FOCUSED_ELEMENT->isVisible() && Screen::FOCUSED_ELEMENT->isEnabled() && Screen::FOCUSED_ELEMENT->getKeyReleaseCallback())
+				Screen::FOCUSED_ELEMENT->getKeyReleaseCallback()(Screen::FOCUSED_ELEMENT, keyCode, modifier);
+		}
+	});
+
+	glfwSetCharCallback(this->m_windowHandle, [](GLFWwindow *glfWwindow, unsigned int codePoint) {
+		if (Screen::FOCUSED_ELEMENT && Screen::FOCUSED_ELEMENT->isVisible() && Screen::FOCUSED_ELEMENT->isEnabled() && Screen::FOCUSED_ELEMENT->getCharCallback())
+			Screen::FOCUSED_ELEMENT->getCharCallback()(Screen::FOCUSED_ELEMENT, codePoint);
 	});
 
 	glfwSetScrollCallback(this->m_windowHandle, [](GLFWwindow *glfwWindow, double offsetX, double offsetY) {
 		Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfwWindow));
-		window->m_scrollOffsetX += offsetX;
-		window->m_scrollOffsetY += offsetY;
+
+		InputHandler *inputHandler = window->m_inputHandler;
+		inputHandler->addScrollOffset(offsetX, offsetY);
+
+		unsigned int modifiers = 0;
+		if (inputHandler->isKeyDown(CEDAR_KEY_LEFT_SHIFT) || inputHandler->isKeyDown(GLFW_KEY_RIGHT_SHIFT))
+			modifiers |= CEDAR_MOD_SHIFT;
+
+		if (inputHandler->isKeyDown(CEDAR_KEY_LEFT_CONTROL) || inputHandler->isKeyDown(CEDAR_KEY_RIGHT_CONTROL))
+			modifiers |= CEDAR_MOD_CONTROL;
+
+		if (inputHandler->isKeyDown(CEDAR_KEY_LEFT_ALT) || inputHandler->isKeyDown(CEDAR_KEY_RIGHT_ALT))
+			modifiers |= CEDAR_MOD_ALT;
+
+		if (inputHandler->isKeyDown(CEDAR_KEY_LEFT_SUPER) || inputHandler->isKeyDown(CEDAR_KEY_RIGHT_SUPER))
+			modifiers |= CEDAR_MOD_SUPER;
+
+		for (Screen *screen : *ScreenRegistry::getLoadedScreens())
+		{
+			if (screen->isVisible() && screen->isEnabled() && screen->onScroll(static_cast<float>(inputHandler->getCursorX()), static_cast<float>(inputHandler->getCursorY()),
+																			   static_cast<float>(offsetX), static_cast<float>(offsetY), modifiers))
+				break;
+		}
 	});
 
 	glfwMakeContextCurrent(this->m_windowHandle);
@@ -203,12 +285,10 @@ void Window::centerCursor()
 
 void Window::showCursor(const bool center)
 {
-	if (this->m_initialized && this->m_cursorLocked)
+	if (this->m_initialized && this->m_inputHandler->isCursorLocked())
 	{
 		glfwSetInputMode(this->m_windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		this->m_cursorLocked = false;
-		this->m_cursorDistX = 0.0;
-		this->m_cursorDistY = 0.0;
+		this->m_inputHandler->setCursorLocked(false);
 		if (center)
 			this->centerCursor();
 	}
@@ -216,12 +296,10 @@ void Window::showCursor(const bool center)
 
 void Window::hideCursor(const bool center)
 {
-	if (this->m_initialized && !this->m_cursorLocked)
+	if (this->m_initialized && !this->m_inputHandler->isCursorLocked())
 	{
 		glfwSetInputMode(this->m_windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		this->m_cursorLocked = true;
-		this->m_cursorDistX = 0.0;
-		this->m_cursorDistY = 0.0;
+		this->m_inputHandler->setCursorLocked(true);
 		if (center)
 			this->centerCursor();
 	}
@@ -239,11 +317,17 @@ void Window::hide()
 		glfwHideWindow(this->m_windowHandle);
 }
 
-void Window::update()
+void Window::update(const unsigned long currentTime, const unsigned long tickCount)
 {
 	if (this->m_initialized && !this->m_closing)
 	{
 		glfwSwapBuffers(this->m_windowHandle);
+		for (Screen *screen : *ScreenRegistry::getLoadedScreens())
+		{
+			if (screen->isVisible() && screen->isEnabled())
+				screen->onUpdate(currentTime, tickCount);
+		}
+		this->m_inputHandler->reset();
 		glfwPollEvents();
 	}
 }
@@ -265,25 +349,25 @@ void Window::setCloseCallback(const std::function<void()> &callback)
 	});
 }
 
-void Window::setResizeCallback(const std::function<void (int, int)> &callback) {
+void Window::setResizeCallback(const std::function<void(int, int)> &callback)
+{
 	this->m_resizeCallback = callback;
 }
 
-std::string Window::getTitle() const {
+std::string Window::getTitle() const
+{
 	return this->m_title;
 }
 
-void Window::setTitle(const std::string &newTitle) {
+void Window::setTitle(const std::string &newTitle)
+{
 	this->m_title = newTitle;
 	glfwSetWindowTitle(this->m_windowHandle, newTitle.c_str());
 }
 
-bool Window::isKeyPressed(const int keyCode) const
+const InputHandler *Window::getInputHandler() const
 {
-	if (keyCode < 8)
-		return glfwGetMouseButton(this->m_windowHandle, keyCode) == GLFW_PRESS;
-	else
-		return glfwGetKey(this->m_windowHandle, keyCode) == GLFW_PRESS;
+	return this->m_inputHandler;
 }
 
 int Window::getWidth() const
@@ -309,29 +393,4 @@ bool Window::isFullscreen() const
 bool Window::isClosing() const
 {
 	return this->m_closing;
-}
-
-bool Window::isCursorLocked() const
-{
-	return this->m_cursorLocked;
-}
-
-void Window::getCursorDistance(Vector2d *dest) {
-	dest->x = this->m_cursorDistX;
-	dest->y = this->m_cursorDistY;
-
-	this->m_cursorDistX = 0.0;
-	this->m_cursorDistY = 0.0;
-}
-
-double Window::getScrollOffsetX() {
-	double old = this->m_scrollOffsetX;
-	this->m_scrollOffsetX = 0.0;
-	return old;
-}
-
-double Window::getScrollOffsetY() {
-	double old = this->m_scrollOffsetY;
-	this->m_scrollOffsetY = 0.0;
-	return old;
 }

@@ -5,7 +5,12 @@
 #ifndef CEDAR_INPUT_H
 #define CEDAR_CEDAR_INPUT_H
 
-
+#define CEDAR_KEY_COUNT 350
+#define CEDAR_STATE_RELEASE 0x0
+#define CEDAR_STATE_PRESS 0x1
+#define CEDAR_STATE_REPEAT 0x2
+#define CEDAR_STATE_DOWN 0x3
+#define CEDAR_STATE_UNPRESSED 0x4
 
 // Mouse buttons
 
@@ -148,12 +153,12 @@
 
 // Modifier Bits
 
-#define CEDAR_MOD_NONE 0x00
-#define CEDAR_MOD_SHIFT 0x01
-#define CEDAR_MOD_CONTROL 0x02
-#define CEDAR_MOD_ALT 0x04
-#define CEDAR_MOD_SUPER 0x08
-#define CEDAR_MOD_CAPS_LOCK 0x10
-#define CEDAR_MOD_NUM_LOCK 0x20
+#define CEDAR_MOD_NONE 0x00u
+#define CEDAR_MOD_SHIFT 0x01u
+#define CEDAR_MOD_CONTROL 0x02u
+#define CEDAR_MOD_ALT 0x04u
+#define CEDAR_MOD_SUPER 0x08u
+#define CEDAR_MOD_CAPS_LOCK 0x10u
+#define CEDAR_MOD_NUM_LOCK 0x20u
 
 #endif //CEDAR_INPUT_H

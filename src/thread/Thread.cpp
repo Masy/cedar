@@ -246,6 +246,11 @@ const Logger *Thread::getLogger() const
 	return this->m_logger;
 }
 
+double Thread::getTPS() const
+{
+	return this->m_tps;
+}
+
 double Thread::getLastFrameTime() const
 {
 	return this->m_frameTime;
