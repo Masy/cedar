@@ -318,19 +318,11 @@ void Quaternionf::transform(const float vecX, const float vecY, const float vecZ
 	float yz = this->y * this->z;
 	float yw = this->y * this->w;
 	float zw = this->z * this->w;
-	float m00 = wSquared + xSquared - zSquared - ySquared;
-	float m01 = xy + zw + zw + xy;
-	float m02 = xz - yw + xz - yw;
-	float m10 = -zw + xy - zw + xy;
-	float m11 = ySquared - zSquared + wSquared - xSquared;
-	float m12 = yz + yz + xw + xw;
-	float m20 = yw + xz + xz + yw;
-	float m21 = yz + yz - xw - xw;
-	float m22 = zSquared - ySquared - xSquared + wSquared;
+	float k = 1.0f / (xSquared + ySquared + zSquared + wSquared);
 
-	dest->x = std::fmaf(m00, vecX, std::fmaf(m10, vecY, m20 * vecZ));
-	dest->y = std::fmaf(m01, vecX, std::fmaf(m11, vecY, m21 * vecZ));
-	dest->z = std::fmaf(m02, vecX, std::fmaf(m12, vecY, m22 * vecZ));
+	dest->x = std::fmaf((xSquared - ySquared - zSquared + wSquared) * k, vecX, std::fmaf(2 * (xy - zw) * k, vecY, (2 * (xz + yw) * k) * vecZ));
+	dest->y = std::fmaf(2 * (xy + zw) * k, vecX, std::fmaf((ySquared - xSquared - zSquared + wSquared) * k, vecY, (2 * (yz - zw) * k) * vecZ));
+	dest->z = std::fmaf(2 * (xz - yw) * k, vecX, std::fmaf(2 * (yz + xw) * k, vecY, ((zSquared - xSquared - ySquared + wSquared) * k) * vecZ));
 }
 
 Vector3f *Quaternionf::getEulerAngles(Vector3f *result)

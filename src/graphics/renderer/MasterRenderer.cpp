@@ -7,6 +7,7 @@
 #include "cedar/Math.h"
 #include "cedar/EngineThread.h"
 #include "cedar/Cedar.h"
+#include "cedar/ScreenRegistry.h"
 
 using namespace cedar;
 
@@ -24,6 +25,7 @@ MasterRenderer::~MasterRenderer()
 	delete this->m_orthographicProjectionMatrix;
 	delete this->m_viewMatrix;
 	Renderer2D::cleanup();
+	ScreenRegistry::cleanup();
 	for (Renderer *renderer : this->m_renderers)
 		delete renderer;
 }
@@ -52,6 +54,7 @@ void MasterRenderer::init()
 
 void MasterRenderer::onResize()
 {
+	glViewport(0, 0, this->m_window->getWidth(), this->m_window->getHeight());
 	this->m_perspectiveProjectionMatrix->perspective(
 			static_cast<float>(this->m_window->getRatio()),
 			cedar::toRadians(90.0f),
@@ -69,13 +72,11 @@ void MasterRenderer::render(unsigned long currentTime, unsigned long tickCount)
 	Camera *camera = EngineThread::getInstance()->getCamera();
 	if (camera)
 	{
-		cedar::Vector3f lerpedPosition;
-		cedar::Quaternionf lerpedRotation;
-		camera->getLerpedPosition(currentTime, &lerpedPosition);
-		camera->getSlerpedRotation(currentTime, &lerpedRotation);
-		this->m_viewMatrix->translation(0, 0, -(camera->getLerpedZoomLevel(currentTime)));
-		this->m_viewMatrix->rotate(&lerpedRotation);
-		this->m_viewMatrix->translate(-lerpedPosition.x, -lerpedPosition.y, -lerpedPosition.z);
+		Vector3f position = Vector3f(*camera->getPosition());
+		position.negate();
+		this->m_viewMatrix->translation(0, 0, -camera->getZoomLevel());
+		this->m_viewMatrix->rotate(camera->getRotation());
+		this->m_viewMatrix->translate(&position);
 	}
 	else
 	{
@@ -83,8 +84,23 @@ void MasterRenderer::render(unsigned long currentTime, unsigned long tickCount)
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
 	for (Renderer *renderer : this->m_renderers)
 		renderer->render(currentTime, tickCount);
+
+	Renderer2D::beginBatch();
+	for (Screen *screen : *ScreenRegistry::getLoadedScreens())
+	{
+		if (screen->isVisible())
+			screen->render(currentTime);
+	}
+	Renderer2D::endBatch();
+
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	Renderer2D::flush();
 }
 
 void MasterRenderer::addRenderer(Renderer *renderer) {

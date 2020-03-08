@@ -5,8 +5,7 @@
 #ifndef CEDAR_INPUTHANDLER_H
 #define CEDAR_INPUTHANDLER_H
 
-#include "Window.h"
-#include <vector>
+#include "cedar/Vector2d.h"
 
 /**
  * Base namespace of the cedar engine.
@@ -14,140 +13,198 @@
 namespace cedar
 {
 	/**
-	 * Class for mapping multiple keys into one key combination.
-	 */
-	class KeyCombination
-	{
-	private:
-		/**
-		 * The number of keys of the key combination.
-		 */
-		unsigned int m_keyCount;
-		/**
-		 * A pointer to the key codes of the key combination.
-		 */
-		int *m_keys;
-		/**
-		 * Whether the key combination was pressed.
-		 */
-		bool m_pressed;
-		/**
-		 * Whether the key combination was released.
-		 */
-		bool m_released;
-		/**
-		 * Whether the key combination was held down.
-		 */
-		bool m_down;
-
-	public:
-		/**
-		 * Creates a new empty key combination.
-		 */
-		KeyCombination();
-		/**
-		 * Creates a new key combination.
-		 *
-		 * @param count The number of the keys of the key combination.
-		 * @param keyCodes A pointer to the array of key codes.
-		 */
-		explicit KeyCombination(unsigned int count, int *keyCodes);
-		/**
-		 * Destroys the key combination.
-		 */
-		~KeyCombination();
-
-		/**
-		 * Gets the number of keys of the key combination.
-		 *
-		 * @return the number of keys of the key combination.
-		 */
-		[[nodiscard]] unsigned int getKeyCount() const;
-		/**
-		 * Gets the key codes of the key combination.
-		 *
-		 * @return a constant pointer to the key codes of the key combination.
-		 */
-		[[nodiscard]] const int *getKeys() const;
-		/**
-		 * Checks whether the key combination was pressed.
-		 *
-		 * @return <code>true</code> if the key combination was just pressed down.
-		 */
-		[[nodiscard]] bool isPressed();
-		/**
-		 * Checks whether the key combination was released.
-		 *
-		 * <p>Don't mix this up with the key not being pressed. This will only return <code>true</code> if a pressed key combination was released
-		 * and then return false again after the state has been polled.</p>
-		 *
-		 * @return <code>true</code> if the key combination was just released.
-		 */
-		[[nodiscard]] bool isReleased();
-		/**
-		 * Checks whether the key combination is held down.
-		 *
-		 * @return <code>true</code> if the key combination is held down.
-		 */
-		[[nodiscard]] bool isDown() const;
-
-		friend class InputHandler;
-	};
-
-	/**
-	 * Class for handling the states of key combinations.
+	 * Class for handling the states of keys.
 	 */
 	class InputHandler
 	{
 	private:
 		/**
-		 * A pointer to the window.
+		 * The array where the state of each key is stored.
 		 */
-		Window *m_window;
+		unsigned char *m_keyStates;
 		/**
-		 * A vector storing all key combinations that are updated.
+		 * Whether the cursor is currently locked.
 		 */
-		std::vector<KeyCombination*> m_combinations;
+		bool m_cursorLocked;
+		/**
+		 * The x coordinate of the cursor.
+		 */
+		double m_cursorX;
+		/**
+		 * The y coordinate of the cursor.
+		 */
+		double m_cursorY;
+		/**
+		 * The offset of the cursors last x coordinate to the current x coordinate.
+		 */
+		double m_cursorOffsetX;
+		/**
+		 * The offset of the cursors last y coordinate to the current y coordinate.
+		 */
+		double m_cursorOffsetY;
+		/**
+		 * The scroll offset on the x axis.
+		 */
+		double m_scrollOffsetX;
+		/**
+		 * The scroll offset on the y axis.
+		 */
+		double m_scrollOffsetY;
 
-		/**
-		 * Updates the states of the given key combination.
-		 *
-		 * @param combination A pointer to the key combination that will be updated.
-		 */
-		void updateCombination(KeyCombination *combination);
 	public:
 		/**
 		 * Creates a new input handler.
-		 *
-		 * @param window A pointer to the window.
 		 */
-		explicit InputHandler(Window *window);
+		InputHandler();
 
 		/**
-		 * Updates all currently registered key combinations.
+		 * Deletes the input handler.
 		 */
-		void update();
+		~InputHandler();
 
 		/**
-		 * Registers a new key combination.
+		 * Checks if the key with the given key code was released.
 		 *
-		 * @param combination A pointer to the key combination that will be registered.
-		 * @return <code>true</code> if the key combination was successfully registered.
+		 * @param keyCode The key code of the key that is checked.
+		 * @return <code>true</code> if the key was released.
 		 */
-		bool registerKeyCombination(KeyCombination *combination);
+		[[nodiscard]] bool isKeyReleased(unsigned int keyCode) const;
+
 		/**
-		 * Registers multiple key combinations at once.
+		 * Checks if the key with the given key code was pressed.
 		 *
-		 * @param count The number of key combinations in the provided array.
-		 * @param combinations A pointer to the array of key combinations that will be registered.
+		 * @param keyCode The key code of the key that is checked.
+		 * @return <code>true</code> if the key was pressed.
 		 */
-		void registerKeyCombinations(unsigned int count, KeyCombination *combinations);
+		[[nodiscard]] bool isKeyPressed(unsigned int keyCode) const;
+
 		/**
-		 * Unregisters a key combinations.
+		 * Checks if the key with the given key code was either pressed or is held down.
 		 *
-		 * @param combination A pointer to the key combination that will be unregistered.
+		 * @param keyCode The key code of the key that is checked.
+		 * @return <code>true</code> if the key was either pressed or is held down.
 		 */
-		void unregisterKeyCombination(const KeyCombination *combination);
+		[[nodiscard]] bool isKeyDown(unsigned int keyCode) const;
+
+		/**
+		 * Sets the state of the key with the given key code.
+		 *
+		 * @param keyCode The key code of the key that is updated.
+		 * @param state The new state of the key.
+		 */
+		void setState(unsigned int keyCode, unsigned char state);
+
+		/**
+		 * Checks whether the cursor is locked or not.
+		 *
+		 * @return Whether the cursor is locked or not.
+		 */
+		[[nodiscard]] bool isCursorLocked() const;
+
+		/**
+		 * Sets whether the cursor is locked or not.
+		 *
+		 * @param locked Whether the cursor is locked or not.
+		 */
+		void setCursorLocked(bool locked);
+
+		/**
+		 * Gets the x coordinate of the cursor.
+		 *
+		 * @return The x coordinate of the cursor.
+		 */
+		[[nodiscard]] double getCursorX() const;
+
+		/**
+		 * Gets the y coordinate of the cursor.
+		 *
+		 * @return The y coordinate of the cursor.
+		 */
+		[[nodiscard]] double getCursorY() const;
+
+		/**
+		 * Gets the position of the cursor.
+		 *
+		 * @param storage A pointer to the vector the cursor position is stored in.
+		 * @return A pointer to the storage vector.
+		 */
+		Vector2d *getCursorPos(Vector2d *storage) const;
+
+		/**
+		 * Sets the cursor position.
+		 *
+		 * @param cursorX The new x coordinate of the cursor.
+		 * @param cursorY The new y coordinate of the cursor.
+		 */
+		void setCursorPos(double cursorX, double cursorY);
+
+		/**
+		 * Gets the offset of the cursor on the x axis.
+		 *
+		 * @return The offset of the cursor on the x axis.
+		 */
+		[[nodiscard]] double getCursorOffsetX() const;
+
+		/**
+		 * Gets the offset of the cursor on the y axis.
+		 *
+		 * @return The offset of the cursor on the y axis.
+		 */
+		[[nodiscard]] double getCursorOffsetY() const;
+
+		/**
+		 * Gets the offset of the cursor.
+		 *
+		 * @param storage A pointer to the vector where the offset is stored in.
+		 * @return A pointer to the storage vector.
+		 */
+		Vector2d *getCursorOffset(Vector2d *storage) const;
+
+		/**
+		 * Adds the given offset the offset of the cursor.
+		 *
+		 * <p>This method is needed, because when the mouse is locked the cursor position does not change but we still
+		 * need an offset to calculate camera rotation for example.</p>
+		 *
+		 * @param cursorOffsetX The offset which is added to the x axis.
+		 * @param cursorOffsetY The offset which is added to the y axis.
+		 */
+		void addCursorOffset(double cursorOffsetX, double cursorOffsetY);
+
+		/**
+		 * Gets the scroll offset on the x axis.
+		 *
+		 * @return The scroll offset on the x axis.
+		 */
+		[[nodiscard]] double getScrollOffsetX() const;
+
+		/**
+		 * Gets the scroll offset on the y axis.
+		 *
+		 * @return The scroll offset on the y axis.
+		 */
+		[[nodiscard]] double getScrollOffsetY() const;
+
+		/**
+		 * Gets the scroll offset.
+		 *
+		 * @param storage A pointer to the vector where the scroll offset is stored in.
+		 * @return A pointer to the storage vector.
+		 */
+		Vector2d *getScrollOffset(Vector2d *storage) const;
+
+		/**
+		 * Adds the given offset to the scroll offset.
+		 *
+		 * @param scrollOffsetX The offset which is added to the x axis.
+		 * @param scrollOffsetY The offset which is added to the y axis.
+		 */
+		void addScrollOffset(double scrollOffsetX, double scrollOffsetY);
+
+		/**
+		 * Resets the cursor offset and scroll offset to 0.0 and all .
+		 */
+		void reset();
 	};
 }
 

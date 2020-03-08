@@ -5,12 +5,14 @@
 #ifndef CEDAR_WINDOW_H
 #define CEDAR_WINDOW_H
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-#include "XException.h"
-#include "Vector2d.h"
 #include <functional>
 #include <string>
+
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+#include "cedar/XException.h"
+#include "cedar/Vector2d.h"
+#include "cedar/InputHandler.h"
 
 /**
  * Base namespace of the cedar engine.
@@ -77,9 +79,13 @@ namespace cedar
 		/**
 		 * A pointer the the video mode which stores information about the monitor.
 		 *
-		 * <p>Note: I don't know why this isn't stored in the monitor itself, but that's GLFW</p>
+		 * <p>Note: I don't know why this isn't stored in the monitor itself, but that's GLFW.</p>
 		 */
 		const GLFWvidmode *m_vidMode;
+		/**
+		 * A pointer to the input handler of the window.
+		 */
+		InputHandler *m_inputHandler;
 		/**
 		 * The title of the window.
 		 */
@@ -128,31 +134,6 @@ namespace cedar
 		 * The aspect ratio of the window.
 		 */
 		double m_ratio;
-
-		/**
-		 * The x coordinate of the cursor relative to the top left corner of the content area of the window.
-		 */
-		double m_cursorPosX;
-		/**
-		 * The y coordinate of the cursor relative to the top left corner of the content area of the window.
-		 */
-		double m_cursorPosY;
-		/**
-		 * The distance the cursor moved on the x axis since the last time it has been polled in pixel.
-		 */
-		double m_cursorDistX;
-		/**
-		 * The distance the cursor moved on the y axis since the last time it has been polled in pixel.
-		 */
-		double m_cursorDistY;
-		/**
-		 * The amount that has been scrolled on the x axis since the last time is has been polled.
-		 */
-		double m_scrollOffsetX;
-		/**
-		 * The amount that has been scrolled on the y axis since the last time is has been polled.
-		 */
-		double m_scrollOffsetY;
 		/**
 		 * Whether the window is currently closing or not.
 		 */
@@ -165,10 +146,6 @@ namespace cedar
 		 * Whether the window is initialized or not.
 		 */
 		bool m_initialized;
-		/**
-		 * Whether the cursor is locked in the center of the content area or not.
-		 */
-		bool m_cursorLocked;
 
 		/**
 		 * The close callback of the window.
@@ -259,8 +236,11 @@ namespace cedar
 
 		/**
 		 * Swaps the back buffer with the front buffer and polls events.
+		 *
+		 * @param currentTime The current time in microseconds.
+		 * @param tickCount The tick count of the thread.
 		 */
-		void update();
+		void update(unsigned long currentTime, unsigned long tickCount);
 
 		/**
 		 * Initiates the closure of the window.
@@ -300,12 +280,11 @@ namespace cedar
 		void setTitle(const std::string &newTitle);
 
 		/**
-		 * Checks whether the given key is pressed.
+		 * Gets the input handler of the window.
 		 *
-		 * @param keyCode The key code that will be checked.
-		 * @return <code>true</code> if the key is pressed.
+		 * @return A constant pointer to the input handler of the window.
 		 */
-		[[nodiscard]] bool isKeyPressed(int keyCode) const;
+		[[nodiscard]] const InputHandler *getInputHandler() const;
 
 		/**
 		 * Gets the width of the window.
@@ -341,34 +320,6 @@ namespace cedar
 		 * @return <code>true</code> if the window is about to close.
 		 */
 		[[nodiscard]] bool isClosing() const;
-
-		/**
-		 * Checks if the cursor is locked.
-		 *
-		 * @return <code>true</code> if the cursor is locked.
-		 */
-		[[nodiscard]] bool isCursorLocked() const;
-
-		/**
-		 * Gets the distance the cursor has moved since the last time this method has been called.
-		 *
-		 * @param dest A pointer to the vector the distance is stored in.
-		 */
-		void getCursorDistance(Vector2d *dest);
-
-		/**
-		 * Gets the scroll amount on the x axis since the last time this method has been called.
-		 *
-		 * @return the scroll amount on the x axis.
-		 */
-		[[nodiscard]] double getScrollOffsetX();
-
-		/**
-		 * Gets the scroll amount on the y axis since the last time this method has been called.
-		 *
-		 * @return the scroll amount on the y axis.
-		 */
-		[[nodiscard]] double getScrollOffsetY();
 	};
 
 }

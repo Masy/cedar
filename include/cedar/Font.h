@@ -13,10 +13,8 @@
 #include "cedar/Glyph.h"
 #include "cedar/GlyphData.h"
 #include "cedar/Vector4ui.h"
-#include "TextBuffer.h"
-
-#define CEDAR_RENDERING_SHARP 0x00
-#define CEDAR_RENDERING_SMOOTH 0x01
+#include "cedar/TextBuffer.h"
+#include "cedar/GUIConstants.h"
 
 #define CEDAR_FONT_ATLAS_WIDTH 4096
 

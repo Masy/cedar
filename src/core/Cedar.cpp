@@ -5,7 +5,6 @@
 #include "cedar/Cedar.h"
 #include "cedar/EngineThread.h"
 #include "cedar/OpenGLThread.h"
-#include "cedar/InputThread.h"
 
 using namespace cedar;
 
@@ -29,9 +28,7 @@ void Cedar::start(const int argc, const char **args)
 	GLLogger = LoggerFactory::getLogger("Cedar::GL");
 
 	Thread *glWaitFor[1] = {EngineThread::getInstance()};
-	Thread *inputWaitFor[1] = {OpenGLThread::getInstance()};
 
-	InputThread::getInstance()->start(1, inputWaitFor);
 	OpenGLThread::getInstance()->start(1, glWaitFor);
 	std::thread *engine = EngineThread::getInstance()->start();
 
@@ -41,7 +38,6 @@ void Cedar::start(const int argc, const char **args)
 
 void Cedar::stop()
 {
-	InputThread::getInstance()->stop();
 	OpenGLThread::getInstance()->stop();
 	EngineThread::getInstance()->stop();
 

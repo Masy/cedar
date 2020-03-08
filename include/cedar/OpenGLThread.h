@@ -29,6 +29,10 @@ namespace cedar
 		 */
 		Window *m_window;
 		/**
+		 * A constant pointer to the input handler of the game.
+		 */
+		const InputHandler *m_inputHandler;
+		/**
 		 * A pointer to the master renderer of the game.
 		 */
 		MasterRenderer *m_masterRenderer;
@@ -43,13 +47,13 @@ namespace cedar
 		 *
 		 * <p>This is called before anything is rendered.</p>
 		 */
-		std::function<void(unsigned long, unsigned long)> m_preTickCallback;
+		std::function<void(unsigned long, unsigned long, const InputHandler *)> m_inputCallback;
 		/**
-		 * The post tick callback of the OpenGL thread.
+		 * The post render callback of the OpenGL thread.
 		 *
 		 * <p>This is called after everything has rendered.</p>
 		 */
-		std::function<void(unsigned long, unsigned long)> m_postTickCallback;
+		std::function<void(unsigned long, unsigned long)> m_postRenderCallback;
 		/**
 		 * The stop callback of the OpenGL thread.
 		 *
@@ -139,18 +143,18 @@ namespace cedar
 		void setInitCallback(const std::function<void(MasterRenderer *)> &initCallback);
 
 		/**
-		 * Sets the pre tick callback of the OpenGL thread.
+		 * Sets the input callback of the OpenGL thread.
 		 *
-		 * @param preTickCallback The new pre tick callback.
+		 * @param inputCallback The new input callback.
 		 */
-		void setPreTickCallback(const std::function<void(unsigned long, unsigned long)> &preTickCallback);
+		void setInputCallback(const std::function<void(unsigned long, unsigned long, const InputHandler *)> &inputCallback);
 
 		/**
-		 * Sets the post tick callback of the OpenGL thread.
+		 * Sets the post render callback of the OpenGL thread.
 		 *
-		 * @param postTickCallback The new post tick callback.
+		 * @param postRenderCallback The new post render callback.
 		 */
-		void setPostTickCallback(const std::function<void(unsigned long, unsigned long)> &postTickCallback);
+		void setPostRenderCallback(const std::function<void(unsigned long, unsigned long)> &postRenderCallback);
 
 		/**
 		 * Sets the stop callback of the OpenGL thread.

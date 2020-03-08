@@ -3,125 +3,140 @@
 //
 
 #include "cedar/InputHandler.h"
+#include "cedar/Input.h"
 
 using namespace cedar;
 
-//---------------------------------------------------------------------------//
-//                          Combination State Class                          //
-//---------------------------------------------------------------------------//
-
-KeyCombination::KeyCombination() : KeyCombination(0, nullptr)
-{}
-
-KeyCombination::KeyCombination(const unsigned int count, int *keyCodes)
+InputHandler::InputHandler()
 {
-	this->m_keyCount = count;
-	this->m_keys = keyCodes;
-	this->m_pressed = false;
-	this->m_released = false;
-	this->m_down = false;
+	this->m_keyStates = new unsigned char[CEDAR_KEY_COUNT];
+	for (unsigned int n = 0; n < CEDAR_KEY_COUNT; n++)
+		this->m_keyStates[n] = CEDAR_STATE_UNPRESSED;
+
+	this->m_cursorLocked = false;
+	this->m_cursorX = 0.0;
+	this->m_cursorY = 0.0;
+	this->m_cursorOffsetX = 0.0;
+	this->m_cursorOffsetY = 0.0;
+	this->m_scrollOffsetX = 0.0;
+	this->m_scrollOffsetY = 0.0;
 }
 
-KeyCombination::~KeyCombination()
+InputHandler::~InputHandler()
 {
-	delete[] this->m_keys;
+	delete this->m_keyStates;
 }
 
-unsigned int KeyCombination::getKeyCount() const
+bool InputHandler::isKeyReleased(const unsigned int keyCode) const
 {
-	return this->m_keyCount;
+	return keyCode < CEDAR_KEY_COUNT ? this->m_keyStates[keyCode] == CEDAR_STATE_RELEASE : false;
 }
 
-const int *KeyCombination::getKeys() const
+bool InputHandler::isKeyPressed(unsigned int keyCode) const
 {
-	return this->m_keys;
+	return keyCode < CEDAR_KEY_COUNT ? this->m_keyStates[keyCode] == CEDAR_STATE_PRESS : false;
 }
 
-bool KeyCombination::isPressed()
+bool InputHandler::isKeyDown(const unsigned int keyCode) const
 {
-	return this->m_pressed;
+	return keyCode < CEDAR_KEY_COUNT ? this->m_keyStates[keyCode] == CEDAR_STATE_PRESS || this->m_keyStates[keyCode] == CEDAR_STATE_DOWN : false;
 }
 
-bool KeyCombination::isReleased()
+void InputHandler::setState(const unsigned int keyCode, const unsigned char state)
 {
-	return this->m_released;
+	if (keyCode < CEDAR_KEY_COUNT)
+		this->m_keyStates[keyCode] = state;
 }
 
-bool KeyCombination::isDown() const
+bool InputHandler::isCursorLocked() const
 {
-	return this->m_down;
+	return this->m_cursorLocked;
 }
 
-
-//---------------------------------------------------------------------------//
-//                            Input Handler Class                            //
-//---------------------------------------------------------------------------//
-
-InputHandler::InputHandler(Window *window)
+void InputHandler::setCursorLocked(const bool locked)
 {
-	this->m_window = window;
-	this->m_combinations = std::vector<KeyCombination *>();
+	this->m_cursorLocked = locked;
 }
 
-void InputHandler::update()
+double InputHandler::getCursorX() const
 {
-	for (KeyCombination *combination : this->m_combinations)
+	return this->m_cursorX;
+}
+
+double InputHandler::getCursorY() const
+{
+	return this->m_cursorY;
+}
+
+Vector2d *InputHandler::getCursorPos(Vector2d *storage) const
+{
+	*storage = Vector2d(this->m_cursorX, this->m_cursorY);
+	return storage;
+}
+
+void InputHandler::setCursorPos(const double cursorX, const double cursorY)
+{
+	this->m_cursorOffsetX += cursorX - this->m_cursorX;
+	this->m_cursorOffsetY += cursorY - this->m_cursorY;
+	this->m_cursorX = cursorX;
+	this->m_cursorY = cursorY;
+}
+
+double InputHandler::getCursorOffsetX() const
+{
+	return this->m_cursorOffsetX;
+}
+
+double InputHandler::getCursorOffsetY() const
+{
+	return this->m_cursorOffsetY;
+}
+
+Vector2d *InputHandler::getCursorOffset(Vector2d *storage) const
+{
+	*storage = Vector2d(this->m_cursorOffsetX, this->m_cursorOffsetY);
+	return storage;
+}
+
+void InputHandler::addCursorOffset(const double cursorOffsetX, const double cursorOffsetY) {
+	this->m_cursorOffsetX += cursorOffsetX;
+	this->m_cursorOffsetY += cursorOffsetY;
+}
+
+double InputHandler::getScrollOffsetX() const
+{
+	return this->m_scrollOffsetX;
+}
+
+double InputHandler::getScrollOffsetY() const
+{
+	return this->m_scrollOffsetY;
+}
+
+Vector2d *InputHandler::getScrollOffset(cedar::Vector2d *storage) const
+{
+	*storage = Vector2d(this->m_scrollOffsetX, this->m_scrollOffsetY);
+	return storage;
+}
+
+void InputHandler::addScrollOffset(const double scrollOffsetX, const double scrollOffsetY)
+{
+	this->m_scrollOffsetX += scrollOffsetX;
+	this->m_scrollOffsetY += scrollOffsetY;
+}
+
+void InputHandler::reset()
+{
+	this->m_cursorOffsetX = 0.0;
+	this->m_cursorOffsetY = 0.0;
+	this->m_scrollOffsetX = 0.0;
+	this->m_scrollOffsetY = 0.0;
+
+	for (unsigned int n = 0; n < CEDAR_KEY_COUNT; n++)
 	{
-		this->updateCombination(combination);
-	}
-}
-
-void InputHandler::updateCombination(cedar::KeyCombination *combination)
-{
-	for (unsigned int n = 0; n < combination->getKeyCount(); n++)
-	{
-		if (!this->m_window->isKeyPressed(combination->m_keys[n]))
-		{
-			combination->m_pressed = false;
-			if (combination->m_down)
-				combination->m_released = true;
-
-			combination->m_down = false;
-			return;
-		}
-	}
-
-	if (!combination->isDown())
-	{
-		combination->m_pressed = true;
-		combination->m_released = false;
-		combination->m_down = true;
-	}
-}
-
-bool InputHandler::registerKeyCombination(KeyCombination *combination)
-{
-	for (KeyCombination *comb : this->m_combinations)
-	{
-		if (comb == combination)
-		{
-			return false;
-		}
-	}
-
-	this->m_combinations.push_back(combination);
-	return true;
-}
-
-void InputHandler::registerKeyCombinations(const unsigned int count, KeyCombination *combinations)
-{
-	for (unsigned int n = 0; n < count; n++)
-		this->registerKeyCombination(combinations++);
-}
-
-void InputHandler::unregisterKeyCombination(const KeyCombination *combination)
-{
-	for (auto it = this->m_combinations.begin(); it != this->m_combinations.end(); it++)
-	{
-		if (*it == combination)
-		{
-			this->m_combinations.erase(it);
-			return;
-		}
+		if (this->m_keyStates[n] == CEDAR_STATE_PRESS)
+			this->m_keyStates[n] = static_cast<unsigned char>(CEDAR_STATE_DOWN);
+		else if (this->m_keyStates[n] == CEDAR_STATE_RELEASE)
+			this->m_keyStates[n] = static_cast<unsigned char>(CEDAR_STATE_UNPRESSED);
 	}
 }

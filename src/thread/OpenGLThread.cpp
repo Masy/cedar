@@ -8,13 +8,14 @@
 using namespace cedar;
 
 OpenGLThread::OpenGLThread() : Thread("OpenGLThread", static_cast<float>(Cedar::getConfig()->getFPSLimit()),
-		QUEUE_BEFORE_TICK, 256)
+									  QUEUE_BEFORE_TICK, 256)
 {
 	this->m_window = nullptr;
+	this->m_inputHandler = nullptr;
 	this->m_masterRenderer = nullptr;
 	this->m_initCallback = nullptr;
-	this->m_preTickCallback = nullptr;
-	this->m_postTickCallback = nullptr;
+	this->m_inputCallback = nullptr;
+	this->m_postRenderCallback = nullptr;
 	this->m_stopCallback = nullptr;
 	this->m_fps = static_cast<float>(Cedar::getConfig()->getFPSLimit());
 	this->m_frameTimes = 0.0;
@@ -33,12 +34,16 @@ void OpenGLThread::onStart()
 	const Config *config = Cedar::getConfig();
 	this->m_window = new Window("", config->getWindowWidth(), config->getWindowHeight(), config->isFullscreen());
 	this->m_window->init(config->getSelectedMonitor());
+	this->m_inputHandler = this->m_window->getInputHandler();
 
 	this->m_window->setCloseCallback([]() {
 		Cedar::getInstance()->stop();
 	});
 
 	this->m_masterRenderer = new MasterRenderer(this->m_window);
+	this->m_window->setResizeCallback([=](int newWidth, int newHeight) {
+		this->m_masterRenderer->onResize();
+	});
 
 	if (this->m_initCallback)
 		this->m_initCallback(this->m_masterRenderer);
@@ -50,15 +55,15 @@ void OpenGLThread::onStart()
 
 void OpenGLThread::onTick(unsigned long currentTime, unsigned long tickCount)
 {
-	if (this->m_preTickCallback)
-		this->m_preTickCallback(currentTime, tickCount);
+	if (this->m_inputCallback)
+		this->m_inputCallback(currentTime, tickCount, this->m_inputHandler);
 
 	this->m_masterRenderer->render(currentTime, tickCount);
 
-	if (this->m_postTickCallback)
-		this->m_postTickCallback(currentTime, tickCount);
+	if (this->m_postRenderCallback)
+		this->m_postRenderCallback(currentTime, tickCount);
 
-	this->m_window->update();
+	this->m_window->update(currentTime, tickCount);
 
 	this->m_frameCount++;
 	this->m_frameTimes += this->m_frameTime;
@@ -74,8 +79,10 @@ void OpenGLThread::onTick(unsigned long currentTime, unsigned long tickCount)
 void OpenGLThread::onStop()
 {
 	this->m_window->close();
-	delete this->m_window;
+	// First delete the master renderer and then the window because the window will destroy the context causing segfaults
+	// when trying to delete GL objects.
 	delete this->m_masterRenderer;
+	delete this->m_window;
 
 	if (this->m_stopCallback)
 		this->m_stopCallback();
@@ -101,14 +108,14 @@ void OpenGLThread::setInitCallback(const std::function<void(MasterRenderer *)> &
 	this->m_initCallback = initCallback;
 }
 
-void OpenGLThread::setPreTickCallback(const std::function<void(unsigned long, unsigned long)> &preTickCallback)
+void OpenGLThread::setInputCallback(const std::function<void(unsigned long, unsigned long, const InputHandler *)> &inputCallback)
 {
-	this->m_preTickCallback = preTickCallback;
+	this->m_inputCallback = inputCallback;
 }
 
-void OpenGLThread::setPostTickCallback(const std::function<void(unsigned long, unsigned long)> &postTickCallback)
+void OpenGLThread::setPostRenderCallback(const std::function<void(unsigned long, unsigned long)> &postRenderCallback)
 {
-	this->m_postTickCallback = postTickCallback;
+	this->m_postRenderCallback = postRenderCallback;
 }
 
 void OpenGLThread::setStopCallback(const std::function<void()> &stopCallback)
