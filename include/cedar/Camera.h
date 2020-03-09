@@ -5,6 +5,7 @@
 #ifndef CEDAR_CAMERA_H
 #define CEDAR_CAMERA_H
 
+#include <math.h>
 #include "cedar/Vector3f.h"
 #include "cedar/Quaternionf.h"
 
@@ -32,6 +33,14 @@ namespace cedar
 		 */
 		Vector3f m_rotationEuler;
 		/**
+		 * The minimum pitch of the camera in radians.
+		 */
+		float m_minPitch;
+		/**
+		 * The maximum pitch of the camera in radians.
+		 */
+		float m_maxPitch;
+		/**
 		 * The old rotation of the camera.
 		 */
 		Quaternionf m_oldRotation;
@@ -39,11 +48,11 @@ namespace cedar
 		 * The current rotation of the camera.
 		 */
 		Quaternionf m_rotation;
+
 		/**
 		 * The current zoom level of the camera
 		 */
 		float m_zoomLevel;
-
 		/**
 		 * The timestamp of when the camera was updated the last time.
 		 */
@@ -57,8 +66,11 @@ namespace cedar
 	public:
 		/**
 		 * Creates a new camera.
+		 *
+		 * @param minPitch The minimum pitch of the camera in radians.
+		 * @param maxPitch The maximum pitch of the camera in radians.
 		 */
-		Camera();
+		Camera(float minPitch = -M_PI_2f32, float maxPitch = M_PI_2f32);
 
 		/**
 		 * Moves the camera in the given direction.
@@ -156,6 +168,34 @@ namespace cedar
 		 * @return a constant pointer to the current rotation of the camera.
 		 */
 		[[nodiscard]] const Vector3f *getRotationEuler() const;
+
+		/**
+		 * Gets the minimum pitch the camera is allowed to have.
+		 *
+		 * @return The minimum pitch the camera is allowed to have in radians.
+		 */
+		[[nodiscard]] float getMinPitch() const;
+
+		/**
+		 * Sets the minimum pitch the camera is allowed to have.
+		 *
+		 * @param newMinPitch The new minimum pitch the camera is allowed to have in radians.
+		 */
+		void setMinPitch(float newMinPitch);
+
+		/**
+		 * Gets the maximum pitch the camera is allowed to have.
+		 *
+		 * @return The maximum pitch the camera is allowed to have in radians.
+		 */
+		[[nodiscard]] float getMaxPitch() const;
+
+		/**
+		 * Sets the maximum pitch the camera is allowed to have.
+		 *
+		 * @param newMaxPitch The new maximum pitch the camera is allowed to have in radians.
+		 */
+		void setMaxPitch(float newMaxPitch);
 
 		/**
 		 * Gets the zoom level of the camera.
