@@ -7,13 +7,16 @@
 
 using namespace cedar;
 
-Camera::Camera()
+Camera::Camera(const float minPitch, const float maxPitch)
 {
 	this->m_oldPosition = Vector3f();
 	this->m_position = Vector3f();
-	this->m_rotationEuler = Vector3f();
+	this->m_rotationEuler = Vector3f(clamp(0.0f, minPitch, maxPitch), 0.0f, 0.0f);
+	this->m_minPitch = minPitch;
+	this->m_maxPitch = maxPitch;
 	this->m_oldRotation = Quaternionf();
-	this->m_rotation = Quaternionf();
+	this->m_oldRotation.rotation(this->m_rotationEuler.x, this->m_rotationEuler.y, this->m_rotationEuler.z);
+	this->m_rotation = this->m_oldRotation;
 	this->m_zoomLevel = 10.0f;
 	this->m_lastUpdate = 0;
 }
@@ -23,15 +26,18 @@ void Camera::move(const float deltaX, const float deltaY, const float deltaZ)
 	this->m_position += Vector3f(deltaX, deltaY, deltaZ);
 }
 
-void Camera::moveX(const float deltaX) {
+void Camera::moveX(const float deltaX)
+{
 	this->m_position.x = deltaX;
 }
 
-void Camera::moveY(const float deltaY) {
+void Camera::moveY(const float deltaY)
+{
 	this->m_position.y = deltaY;
 }
 
-void Camera::moveZ(const float deltaZ) {
+void Camera::moveZ(const float deltaZ)
+{
 	this->m_position.z = deltaZ;
 }
 
@@ -44,7 +50,7 @@ void Camera::moveLocal(const float deltaX, const float deltaY, const float delta
 
 void Camera::fixRotation()
 {
-	this->m_rotationEuler.x = cedar::clamp(this->m_rotationEuler.x, -M_PI_2f32, M_PI_2f32);
+	this->m_rotationEuler.x = cedar::clamp(this->m_rotationEuler.x, this->m_minPitch, this->m_maxPitch);
 
 	if (this->m_rotationEuler.y < -M_PIf32)
 		this->m_rotationEuler.y += PI_2f32;
@@ -71,12 +77,14 @@ void Camera::rotateX(const float pitch)
 	this->fixRotation();
 }
 
-void Camera::rotateY(const float yaw) {
+void Camera::rotateY(const float yaw)
+{
 	this->m_rotationEuler.y += yaw;
 	this->fixRotation();
 }
 
-void Camera::rotateZ(const float roll) {
+void Camera::rotateZ(const float roll)
+{
 	this->m_rotationEuler.z += roll;
 	this->fixRotation();
 }
@@ -94,13 +102,34 @@ const Vector3f *Camera::getPosition() const
 	return &this->m_position;
 }
 
-const Quaternionf *Camera::getRotation() const {
+const Quaternionf *Camera::getRotation() const
+{
 	return &this->m_rotation;
 }
 
 const cedar::Vector3f *Camera::getRotationEuler() const
 {
 	return &this->m_rotationEuler;
+}
+
+float Camera::getMinPitch() const
+{
+	return this->m_minPitch;
+}
+
+void Camera::setMinPitch(const float newMinPitch)
+{
+	this->m_minPitch = newMinPitch;
+}
+
+float Camera::getMaxPitch() const
+{
+	return this->m_maxPitch;
+}
+
+void Camera::setMaxPitch(const float newMaxPitch)
+{
+	this->m_maxPitch = newMaxPitch;
 }
 
 float Camera::getZoomLevel() const
