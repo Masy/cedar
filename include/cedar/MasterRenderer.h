@@ -10,6 +10,7 @@
 #include "cedar/Window.h"
 #include "cedar/Matrix4f.h"
 #include "cedar/Renderer.h"
+#include "cedar/FrustumRayBuilder.h"
 
 /**
  * Base namespace of the cedar engine.
@@ -42,6 +43,18 @@ namespace cedar
 		 * <p>If there currently is no camera this will be a unit matrix.</p>
 		 */
 		Matrix4f *m_viewMatrix;
+		/**
+		 * A pointer to the perspective projection view matrix.
+		 */
+		Matrix4f *m_projectionViewMatrix;
+		/**
+		 * A pointer to the inverse of the the {@link #m_projectionViewMatrix perspective projection view matrix}.
+		 */
+		Matrix4f *m_invProjectionViewMatrix;
+		/**
+		 * A pointer to the frustum ray builder of the master renderer.
+		 */
+		FrustumRayBuilder *m_frustumRayBuilder;
 
 		/**
 		 * A list with all renderers.
@@ -108,6 +121,28 @@ namespace cedar
 		 * @return A constant pointer to the view matrix of the camera.
 		 */
 		[[nodiscard]] const Matrix4f *getViewMatrix() const;
+
+		/**
+		 * Gets the perspective projection view matrix of the game.
+		 *
+		 * @return A constant pointer to the perspective projection view matrix of the game.
+		 */
+		[[nodiscard]] const Matrix4f *getProjectionViewMatrix() const;
+
+		/**
+		 * Gets the inverse perspective projection view matrix of the game.
+		 *
+		 * @return A constant pointer to the inverse perspective projection view matrix of the game.
+		 */
+		[[nodiscard]] const Matrix4f *getInvProjectionViewMatrix() const;
+
+		/**
+		 * Gets the origin of the camera and a ray pointing in the direction where the cursor currently points.
+		 *
+		 * @param origin A pointer to the vector where the origin of the camera is stored.
+		 * @param rayDir A pointer to the vector where the normalized mouse ray direction will be stored.
+		 */
+		void getMouseRay(Vector3f *origin, Vector3f *rayDir) const;
 	};
 }
 

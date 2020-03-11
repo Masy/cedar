@@ -107,7 +107,13 @@ add_library(cedar
 		include/cedar/Button.h
 		src/graphics/gui/elements/Button.cpp
 		include/cedar/Label.h
-		src/graphics/gui/elements/Label.cpp)
+		src/graphics/gui/elements/Label.cpp
+		include/cedar/FrustumRayBuilder.h
+		src/math/FrustumRayBuilder.cpp
+		include/cedar/Scene.h
+		src/scene/Scene.cpp
+		include/cedar/MeshCollider2D.h
+		src/math/collision/MeshCollider2D.cpp)
 
 target_include_directories(cedar PUBLIC
 		glad/include
