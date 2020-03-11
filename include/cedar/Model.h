@@ -29,6 +29,20 @@ namespace cedar
 	};
 
 	/**
+	 * Exception which is thrown when a model could not be created.
+	 */
+	class ModelCreationException : public ModelException
+	{
+	public:
+		/**
+		 * Creates a new model creation exception.
+		 *
+		 * @param message The message of the exception.
+		 */
+		explicit ModelCreationException(const std::string &message);
+	};
+
+	/**
 	 * Exception which is thrown when a model could not be uploaded.
 	 */
 	class ModelUploadException : public ModelException
@@ -40,6 +54,20 @@ namespace cedar
 		 * @param message The message of the exception.
 		 */
 		explicit ModelUploadException(const std::string &message);
+	};
+
+	/**
+	 * Exception which is thrown when a model could not be updated.
+	 */
+	class ModelUpdateException : public ModelException
+	{
+	public:
+		/**
+		 * Creates a new model update exception.
+		 *
+		 * @param message The message of the exception.
+		 */
+		explicit ModelUpdateException(const std::string &message);
 	};
 
 	/**
@@ -74,6 +102,10 @@ namespace cedar
 		 * <p>Has to be one of the following data types:
 		 */
 		unsigned int m_indexType;
+		/**
+		 * The number of vertex attributes.
+		 */
+		unsigned int m_vertexAttribCount;
 
 	public:
 		/**
@@ -96,8 +128,11 @@ namespace cedar
 		 * </ul></p>
 		 *
 		 * @param drawingMode The drawing mode of the model.
+		 * @param vertexAttribCount The number of vertex attribute arrays.
+		 *
+		 * @throws ModelCreationException if <code>vertexAttribCount</code> is 0 or greater than the number of supported vertex attribute arrays.
 		 */
-		explicit Model(unsigned int drawingMode = CEDAR_TRIANGLES);
+		explicit Model(unsigned int drawingMode = CEDAR_TRIANGLES, unsigned int vertexAttribCount = 1);
 		/**
 		 * Destroys the model.
 		 *
@@ -127,9 +162,65 @@ namespace cedar
 					unsigned int indexType = CEDAR_UNSIGNED_INT);
 
 		/**
+		 * Updates the vertex buffer of the model.
+		 *
+		 * @param offset The offset in bytes of where the new data will be uploaded.
+		 * @param vertexDataSize The size of the data that will be uploaded in bytes.
+		 * @param vertexData A pointer to the data that will be uploaded.
+		 *
+		 * @throws ModelUpdateException if the model is not initialized yet.
+		 */
+		void update(unsigned int offset, unsigned int vertexDataSize, const void *vertexData);
+
+		/**
 		 * Renders the model if there is vertex data on the graphics card.
 		 */
 		void render() const;
+
+		/**
+		 * Gets the id of the vertex array object on the graphics card.
+		 *
+		 * @return The id of the vertex array object on the graphics card.
+		 */
+		[[nodiscard]] unsigned int getVertexArrayId() const;
+
+		/**
+		 * Gets the id of the vertex buffer object on the graphics card.
+		 *
+		 * @return The id of the vertex buffer object on the graphics card.
+		 */
+		[[nodiscard]] unsigned int getVertexBufferId() const;
+
+		/**
+		 * Gets the id of the index buffer object on the graphics card.
+		 *
+		 * @return The id of the index buffer object on the graphics card.
+		 */
+		[[nodiscard]] unsigned int getIndexBufferId() const;
+
+		/**
+		 * Gets the number of vertex attributes the vertex array object has.
+		 *
+		 * @return The number of vertex attributes the vertex array object has.
+		 */
+		[[nodiscard]] unsigned int getVertexAttribCount() const;
+
+		/**
+		 * Set the number of vertex attributes the vertex array object has.
+		 *
+		 * @param newVertexAttribCount The new number of vertex attributes.
+		 *
+		 * @throws ModelUpdateException if <code>newVertexAttribCount</code> is 0;
+		 */
+		void setVertexAttribCount(unsigned int newVertexAttribCount);
+
+		/**
+		 * Checks if the model is equal to the other model.
+		 *
+		 * @param rhs The other model.
+		 * @return <code>true</code> if the {@link #m_vaoId vertex array object ids} are the same.
+		 */
+		bool operator==(const Model &rhs);
 	};
 }
 

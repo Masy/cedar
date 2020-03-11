@@ -35,13 +35,15 @@ namespace cedar
 
 		[[nodiscard]] float length() const;
 
+		[[nodiscard]] float invLength() const;
+
 		[[nodiscard]] float lengthSquared() const;
 
-		void normalize();
+		Vector3f *normalize();
 
-		void zero();
+		Vector3f *zero();
 
-		void negate();
+		Vector3f *negate();
 
 		[[nodiscard]] float distance(const Vector3f &other) const;
 
@@ -82,19 +84,44 @@ namespace cedar
 			return Vector3f(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
 		};
 
+		inline friend Vector3f operator+(const Vector3f &lhs, const float rhs)
+		{
+			return Vector3f(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs);
+		};
+
 		inline friend Vector3f operator-(const Vector3f &lhs, const Vector3f &rhs)
 		{
 			return Vector3f(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
 		};
 
+		inline friend Vector3f operator-(const Vector3f &rhs)
+		{
+			return Vector3f(-rhs.x, -rhs.y, -rhs.z);
+		}
+
+		inline friend Vector3f operator-(const Vector3f &lhs, const float rhs)
+		{
+			return Vector3f(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs);
+		};
+
 		inline friend Vector3f operator*(const Vector3f &lhs, const Vector3f &rhs)
 		{
-			return Vector3f(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * lhs.z);
+			return Vector3f(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z);
+		};
+
+		inline friend Vector3f operator*(const Vector3f &lhs, const float rhs)
+		{
+			return Vector3f(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs);
 		};
 
 		inline friend Vector3f operator/(const Vector3f &lhs, const Vector3f &rhs)
 		{
 			return Vector3f(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z);
+		};
+
+		inline friend Vector3f operator/(const Vector3f &lhs, const float rhs)
+		{
+			return Vector3f(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs);
 		};
 
 		inline friend bool operator==(const Vector3f &lhs, const Vector3f &rhs)

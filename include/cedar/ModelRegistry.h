@@ -35,17 +35,19 @@ namespace cedar
 	class ModelRegistry
 	{
 	public:
+		static bool registerModel(const std::string &name, Model* model);
 		/**
 		 * Loads a model from the given file.
 		 *
 		 * @param name The unique name of the model.
 		 * @param path The path to the file.
 		 * @param drawingMode The drawing mode of the model.
+		 * @param bitMask A pointer to an unsigned char where the bit mask of the bmf model will be stored.
 		 * @return A pointer to the loaded model.
 		 *
 		 * @throws ModelLoadException when the model could not be loaded.
 		 */
-		static Model *loadModel(const std::string &name, const std::string &path, unsigned int drawingMode = CEDAR_TRIANGLES);
+		static Model *loadBMFModel(const std::string &name, const std::string &path, unsigned char *bitMask);
 
 		/**
 		 * Gets the loaded model with the given name.

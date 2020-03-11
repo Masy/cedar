@@ -9,6 +9,7 @@ using namespace cedar;
 EngineThread::EngineThread() : Thread("EngineThread", 20, QUEUE_BEFORE_TICK, 256)
 {
 	this->m_camera = nullptr;
+	this->m_loadedScene = nullptr;
 }
 
 EngineThread *EngineThread::getInstance() {
@@ -27,6 +28,9 @@ void EngineThread::onTick(const unsigned long currentTime, const unsigned long t
 
 	if (this->m_camera)
 		this->m_camera->update(currentTime);
+
+	if (this->m_loadedScene)
+		this->m_loadedScene->update(currentTime, tickCount);
 
 	if (this->m_postTickCallback)
 		this->m_postTickCallback(currentTime, tickCount);
@@ -64,4 +68,14 @@ void EngineThread::setCamera(Camera *camera) {
 		delete this->m_camera;
 
 	this->m_camera = camera;
+}
+
+Scene *EngineThread::getLoadedScene() const {
+	return this->m_loadedScene;
+}
+
+Scene *EngineThread::loadScene(Scene *scene) {
+	Scene *old = this->m_loadedScene;
+	this->m_loadedScene = scene;
+	return old;
 }

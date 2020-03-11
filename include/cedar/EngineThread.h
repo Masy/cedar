@@ -7,6 +7,7 @@
 
 #include "cedar/Thread.h"
 #include "cedar/Camera.h"
+#include "cedar/Scene.h"
 
 /**
  * Base namespace of the cedar engine.
@@ -51,6 +52,10 @@ namespace cedar
 		 * </p>This is called after all entities have been deleted.</p>
 		 */
 		std::function<void()> m_stopCallback;
+		/**
+		 * A pointer to the currently loaded scene.
+		 */
+		Scene *m_loadedScene;
 
 		/**
 		 * Creates a new engine thread.
@@ -130,6 +135,21 @@ namespace cedar
 		 * @param camera A pointer to the new camera.
 		 */
 		void setCamera(Camera *camera);
+
+		/**
+		 * Gets the currently loaded scene.
+		 *
+		 * @return A pointer to the currently loaded scene.
+		 */
+		[[nodiscard]] Scene *getLoadedScene() const;
+
+		/**
+		 * Loads the given scene.
+		 *
+		 * @param scene A pointer to the new scene that will be loaded.
+		 * @return A pointer to the old loaded scene.
+		 */
+		Scene *loadScene(Scene *scene);
 	};
 }
 

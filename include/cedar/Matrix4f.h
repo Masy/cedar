@@ -5,9 +5,10 @@
 #ifndef CEDAR_MATRIX4F_H
 #define CEDAR_MATRIX4F_H
 
-#include "Vector3f.h"
+#include "Vector4f.h"
 #include "Quaternionf.h"
 #include <ostream>
+#include <cmath>
 
 /**
  * Base namespace of the cedar engine.
@@ -54,9 +55,14 @@ namespace cedar
 
 		Matrix4f(const Matrix4f &copy);
 
+		Matrix4f(float nm00, float nm01, float nm02, float nm03, float nm10, float nm11, float nm12, float nm13,
+				 float nm20, float nm21, float nm22, float nm23, float nm30, float nm31, float nm32, float nm33);
+
 		void zero();
 
 		void identity();
+
+		void invert();
 
 		void perspective(float aspectRatio, float fov, float near, float far);
 
@@ -114,6 +120,119 @@ namespace cedar
 		void scaling(float scaleX, float scaleY, float scaleZ);
 
 		void scaling(const Vector3f *scaling);
+
+		Matrix4f &operator=(const Matrix4f &rhs);
+
+		Matrix4f &operator+=(const Matrix4f &rhs);
+
+		Matrix4f &operator-=(const Matrix4f &rhs);
+
+		Matrix4f &operator*=(const Matrix4f &rhs);
+
+		inline friend Matrix4f operator+(const Matrix4f &lhs, const Matrix4f &rhs)
+		{
+			return Matrix4f(
+					lhs.m_00 + rhs.m_00,
+					lhs.m_01 + rhs.m_01,
+					lhs.m_02 + rhs.m_02,
+					lhs.m_03 + rhs.m_03,
+					lhs.m_10 + rhs.m_10,
+					lhs.m_11 + rhs.m_11,
+					lhs.m_12 + rhs.m_12,
+					lhs.m_13 + rhs.m_13,
+					lhs.m_20 + rhs.m_20,
+					lhs.m_21 + rhs.m_21,
+					lhs.m_22 + rhs.m_22,
+					lhs.m_23 + rhs.m_23,
+					lhs.m_30 + rhs.m_30,
+					lhs.m_31 + rhs.m_31,
+					lhs.m_32 + rhs.m_32,
+					lhs.m_33 + rhs.m_33
+					);
+		}
+
+		inline friend Matrix4f operator-(const Matrix4f &lhs, const Matrix4f &rhs)
+		{
+			return Matrix4f(
+					lhs.m_00 - rhs.m_00,
+					lhs.m_01 - rhs.m_01,
+					lhs.m_02 - rhs.m_02,
+					lhs.m_03 - rhs.m_03,
+					lhs.m_10 - rhs.m_10,
+					lhs.m_11 - rhs.m_11,
+					lhs.m_12 - rhs.m_12,
+					lhs.m_13 - rhs.m_13,
+					lhs.m_20 - rhs.m_20,
+					lhs.m_21 - rhs.m_21,
+					lhs.m_22 - rhs.m_22,
+					lhs.m_23 - rhs.m_23,
+					lhs.m_30 - rhs.m_30,
+					lhs.m_31 - rhs.m_31,
+					lhs.m_32 - rhs.m_32,
+					lhs.m_33 - rhs.m_33
+						   );
+		}
+
+		inline friend Matrix4f operator*(const Matrix4f &lhs, const Matrix4f &rhs)
+		{
+			return Matrix4f(
+					std::fmaf(lhs.m_00, rhs.m_00, std::fmaf(lhs.m_10, rhs.m_01, std::fmaf(lhs.m_20, rhs.m_02, lhs.m_30 * rhs.m_03))),
+					std::fmaf(lhs.m_01, rhs.m_00, std::fmaf(lhs.m_11, rhs.m_01, std::fmaf(lhs.m_21, rhs.m_02, lhs.m_31 * rhs.m_03))),
+					std::fmaf(lhs.m_02, rhs.m_00, std::fmaf(lhs.m_12, rhs.m_01, std::fmaf(lhs.m_22, rhs.m_02, lhs.m_32 * rhs.m_03))),
+					std::fmaf(lhs.m_03, rhs.m_00, std::fmaf(lhs.m_13, rhs.m_01, std::fmaf(lhs.m_23, rhs.m_02, lhs.m_33 * rhs.m_03))),
+					std::fmaf(lhs.m_00, rhs.m_10, std::fmaf(lhs.m_10, rhs.m_11, std::fmaf(lhs.m_20, rhs.m_12, lhs.m_30 * rhs.m_13))),
+					std::fmaf(lhs.m_01, rhs.m_10, std::fmaf(lhs.m_11, rhs.m_11, std::fmaf(lhs.m_21, rhs.m_12, lhs.m_31 * rhs.m_13))),
+					std::fmaf(lhs.m_02, rhs.m_10, std::fmaf(lhs.m_12, rhs.m_11, std::fmaf(lhs.m_22, rhs.m_12, lhs.m_32 * rhs.m_13))),
+					std::fmaf(lhs.m_03, rhs.m_10, std::fmaf(lhs.m_13, rhs.m_11, std::fmaf(lhs.m_23, rhs.m_12, lhs.m_33 * rhs.m_13))),
+					std::fmaf(lhs.m_00, rhs.m_20, std::fmaf(lhs.m_10, rhs.m_21, std::fmaf(lhs.m_20, rhs.m_22, lhs.m_30 * rhs.m_23))),
+					std::fmaf(lhs.m_01, rhs.m_20, std::fmaf(lhs.m_11, rhs.m_21, std::fmaf(lhs.m_21, rhs.m_22, lhs.m_31 * rhs.m_23))),
+					std::fmaf(lhs.m_02, rhs.m_20, std::fmaf(lhs.m_12, rhs.m_21, std::fmaf(lhs.m_22, rhs.m_22, lhs.m_32 * rhs.m_23))),
+					std::fmaf(lhs.m_03, rhs.m_20, std::fmaf(lhs.m_13, rhs.m_21, std::fmaf(lhs.m_23, rhs.m_22, lhs.m_33 * rhs.m_23))),
+					std::fmaf(lhs.m_00, rhs.m_30, std::fmaf(lhs.m_10, rhs.m_31, std::fmaf(lhs.m_20, rhs.m_32, lhs.m_30 * rhs.m_33))),
+					std::fmaf(lhs.m_01, rhs.m_30, std::fmaf(lhs.m_11, rhs.m_31, std::fmaf(lhs.m_21, rhs.m_32, lhs.m_31 * rhs.m_33))),
+					std::fmaf(lhs.m_02, rhs.m_30, std::fmaf(lhs.m_12, rhs.m_31, std::fmaf(lhs.m_22, rhs.m_32, lhs.m_32 * rhs.m_33))),
+					std::fmaf(lhs.m_03, rhs.m_30, std::fmaf(lhs.m_13, rhs.m_31, std::fmaf(lhs.m_23, rhs.m_32, lhs.m_33 * rhs.m_33)))
+					);
+		}
+
+		inline friend Vector3f operator*(const Matrix4f &lhs, const Vector3f &rhs)
+		{
+			return Vector3f(
+					std::fmaf(lhs.m_00, rhs.x, std::fmaf(lhs.m_10, rhs.y, lhs.m_20 * rhs.z)),
+					std::fmaf(lhs.m_01, rhs.x, std::fmaf(lhs.m_11, rhs.y, lhs.m_21 * rhs.z)),
+					std::fmaf(lhs.m_02, rhs.x, std::fmaf(lhs.m_12, rhs.y, lhs.m_22 * rhs.z))
+					);
+		}
+
+		inline friend Vector4f operator*(const Matrix4f &lhs, const Vector4f &rhs)
+		{
+			return Vector4f(
+					std::fmaf(lhs.m_00, rhs.x, std::fmaf(lhs.m_10, rhs.y, std::fmaf(lhs.m_20, rhs.z, lhs.m_30 * rhs.w))),
+					std::fmaf(lhs.m_01, rhs.x, std::fmaf(lhs.m_11, rhs.y, std::fmaf(lhs.m_21, rhs.z, lhs.m_31 * rhs.w))),
+					std::fmaf(lhs.m_02, rhs.x, std::fmaf(lhs.m_12, rhs.y, std::fmaf(lhs.m_22, rhs.z, lhs.m_32 * rhs.w))),
+					std::fmaf(lhs.m_03, rhs.x, std::fmaf(lhs.m_13, rhs.y, std::fmaf(lhs.m_23, rhs.z, lhs.m_33 * rhs.w)))
+					);
+		}
+
+		inline friend bool operator==(const Matrix4f &lhs, const Matrix4f &rhs)
+		{
+			return lhs.m_00 == rhs.m_00
+				   && lhs.m_01 == rhs.m_01
+				   && lhs.m_03 == rhs.m_02
+				   && lhs.m_03 == rhs.m_03
+				   && lhs.m_10 == rhs.m_10
+				   && lhs.m_11 == rhs.m_11
+				   && lhs.m_12 == rhs.m_12
+				   && lhs.m_13 == rhs.m_13
+				   && lhs.m_20 == rhs.m_20
+				   && lhs.m_21 == rhs.m_21
+				   && lhs.m_22 == rhs.m_22
+				   && lhs.m_23 == rhs.m_23
+				   && lhs.m_30 == rhs.m_30
+				   && lhs.m_31 == rhs.m_31
+				   && lhs.m_32 == rhs.m_32
+				   && lhs.m_33 == rhs.m_33;
+		}
 
 		friend std::ostream &operator<<(std::ostream &os, const Matrix4f &matrix)
 		{

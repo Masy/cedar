@@ -3,7 +3,6 @@
 //
 
 #include "cedar/Matrix4f.h"
-#include <cmath>
 
 // Normally i wouldn't do this, but i guess in the implementation file of a class its's ok.
 using namespace cedar;
@@ -116,6 +115,29 @@ Matrix4f::Matrix4f(const Matrix4f &copy)
 	this->m_33 = copy.m_33;
 }
 
+Matrix4f::Matrix4f(const float nm00, const float nm01, const float nm02, const float nm03,
+				   const float nm10, const float nm11, const float nm12, const float nm13,
+				   const float nm20, const float nm21, const float nm22, const float nm23,
+				   const float nm30, const float nm31, const float nm32, const float nm33)
+{
+	this->m_00 = nm00;
+	this->m_01 = nm01;
+	this->m_02 = nm02;
+	this->m_03 = nm03;
+	this->m_10 = nm10;
+	this->m_11 = nm11;
+	this->m_12 = nm12;
+	this->m_13 = nm13;
+	this->m_20 = nm20;
+	this->m_21 = nm21;
+	this->m_22 = nm22;
+	this->m_23 = nm23;
+	this->m_30 = nm30;
+	this->m_31 = nm31;
+	this->m_32 = nm32;
+	this->m_33 = nm33;
+}
+
 void Matrix4f::zero()
 {
 	// first column
@@ -168,6 +190,57 @@ void Matrix4f::identity()
 	this->m_31 = 0.0f;
 	this->m_32 = 0.0f;
 	this->m_33 = 1.0f;
+}
+
+void Matrix4f::invert()
+{
+	float a = this->m_00 * this->m_11 - this->m_01 * this->m_10;
+	float b = this->m_00 * this->m_12 - this->m_02 * this->m_10;
+	float c = this->m_00 * this->m_13 - this->m_03 * this->m_10;
+	float d = this->m_01 * this->m_12 - this->m_02 * this->m_11;
+	float e = this->m_01 * this->m_13 - this->m_03 * this->m_11;
+	float f = this->m_02 * this->m_13 - this->m_03 * this->m_12;
+	float g = this->m_20 * this->m_31 - this->m_21 * this->m_30;
+	float h = this->m_20 * this->m_32 - this->m_22 * this->m_30;
+	float i = this->m_20 * this->m_33 - this->m_23 * this->m_30;
+	float j = this->m_21 * this->m_32 - this->m_22 * this->m_31;
+	float k = this->m_21 * this->m_33 - this->m_23 * this->m_31;
+	float l = this->m_22 * this->m_33 - this->m_23 * this->m_32;
+	float det = a * l - b * k + c * j + d * i - e * h + f * g;
+	det = 1.0f / det;
+	float nm00 = ( m_11 * l - m_12 * k + m_13 * j) * det;
+	float nm01 = (-m_01 * l + m_02 * k - m_03 * j) * det;
+	float nm02 = ( m_31 * f - m_32 * e + m_33 * d) * det;
+	float nm03 = (-m_21 * f + m_22 * e - m_23 * d) * det;
+	float nm10 = (-m_10 * l + m_12 * i - m_13 * h) * det;
+	float nm11 = ( m_00 * l - m_02 * i + m_03 * h) * det;
+	float nm12 = (-m_30 * f + m_32 * c - m_33 * b) * det;
+	float nm13 = ( m_20 * f - m_22 * c + m_23 * b) * det;
+	float nm20 = ( m_10 * k - m_11 * i + m_13 * g) * det;
+	float nm21 = (-m_00 * k + m_01 * i - m_03 * g) * det;
+	float nm22 = ( m_30 * e - m_31 * c + m_33 * a) * det;
+	float nm23 = (-m_20 * e + m_21 * c - m_23 * a) * det;
+	float nm30 = (-m_10 * j + m_11 * h - m_12 * g) * det;
+	float nm31 = ( m_00 * j - m_01 * h + m_02 * g) * det;
+	float nm32 = (-m_30 * d + m_31 * b - m_32 * a) * det;
+	float nm33 = ( m_20 * d - m_21 * b + m_22 * a) * det;
+
+	this->m_00 = nm00;
+	this->m_01 = nm01;
+	this->m_02 = nm02;
+	this->m_03 = nm03;
+	this->m_10 = nm10;
+	this->m_11 = nm11;
+	this->m_12 = nm12;
+	this->m_13 = nm13;
+	this->m_20 = nm20;
+	this->m_21 = nm21;
+	this->m_22 = nm22;
+	this->m_23 = nm23;
+	this->m_30 = nm30;
+	this->m_31 = nm31;
+	this->m_32 = nm32;
+	this->m_33 = nm33;
 }
 
 void Matrix4f::perspective(const float aspectRatio, const float fov, const float near, const float far)
@@ -368,7 +441,7 @@ void Matrix4f::rotate(const Quaternionf *rotation)
 	float rm11 = ySquared - zSquared + wSquared - xSquared;
 	float rm12 = yz + yz + xw + xw;
 	float rm20 = yw + xz + xz + yw;
-	float rm21 = yz + yz - xw - xw ;
+	float rm21 = yz + yz - xw - xw;
 	float rm22 = zSquared - ySquared - xSquared + wSquared;
 	float nm00 = this->m_00 * rm00 + this->m_10 * rm01 + this->m_20 * rm02;
 	float nm01 = this->m_01 * rm00 + this->m_11 * rm01 + this->m_21 * rm02;
@@ -412,12 +485,6 @@ void Matrix4f::rotation(const Quaternionf *rotation)
 	float yw = rotation->y * rotation->w;
 	float yz = rotation->y * rotation->z;
 	float xw = rotation->x * rotation->w;
-	float dzw = zw + zw;
-	float dxy = xy + xy;
-	float dxz = xz + xz;
-	float dyw = yw + yw;
-	float dyz = yz + yz;
-	float dxw = xw + xw;
 
 	this->m_00 = wSquared + xSquared - zSquared - ySquared;
 	this->m_01 = xy + zw + zw + xy;
@@ -493,4 +560,91 @@ void Matrix4f::scaling(const float scaleX, const float scaleY, const float scale
 void Matrix4f::scaling(const Vector3f *scaling)
 {
 	this->scaling(scaling->x, scaling->y, scaling->z);
+}
+
+Matrix4f &Matrix4f::operator=(const Matrix4f &rhs)
+= default;
+
+Matrix4f &Matrix4f::operator+=(const Matrix4f &rhs)
+{
+	this->m_00 += rhs.m_00;
+	this->m_01 += rhs.m_01;
+	this->m_02 += rhs.m_02;
+	this->m_03 += rhs.m_03;
+	this->m_10 += rhs.m_10;
+	this->m_11 += rhs.m_11;
+	this->m_12 += rhs.m_12;
+	this->m_13 += rhs.m_13;
+	this->m_20 += rhs.m_20;
+	this->m_21 += rhs.m_21;
+	this->m_22 += rhs.m_22;
+	this->m_23 += rhs.m_23;
+	this->m_30 += rhs.m_30;
+	this->m_31 += rhs.m_31;
+	this->m_32 += rhs.m_32;
+	this->m_33 += rhs.m_33;
+
+	return *this;
+}
+
+Matrix4f &Matrix4f::operator-=(const Matrix4f &rhs)
+{
+	this->m_00 -= rhs.m_00;
+	this->m_01 -= rhs.m_01;
+	this->m_02 -= rhs.m_02;
+	this->m_03 -= rhs.m_03;
+	this->m_10 -= rhs.m_10;
+	this->m_11 -= rhs.m_11;
+	this->m_12 -= rhs.m_12;
+	this->m_13 -= rhs.m_13;
+	this->m_20 -= rhs.m_20;
+	this->m_21 -= rhs.m_21;
+	this->m_22 -= rhs.m_22;
+	this->m_23 -= rhs.m_23;
+	this->m_30 -= rhs.m_30;
+	this->m_31 -= rhs.m_31;
+	this->m_32 -= rhs.m_32;
+	this->m_33 -= rhs.m_33;
+	return *this;
+}
+
+Matrix4f &Matrix4f::operator*=(const Matrix4f &rhs)
+{
+	float nm00 = std::fmaf(this->m_00, rhs.m_00, std::fmaf(this->m_10, rhs.m_01, std::fmaf(this->m_20, rhs.m_02, this->m_30 * rhs.m_03)));
+	float nm01 = std::fmaf(this->m_01, rhs.m_00, std::fmaf(this->m_11, rhs.m_01, std::fmaf(this->m_21, rhs.m_02, this->m_31 * rhs.m_03)));
+	float nm02 = std::fmaf(this->m_02, rhs.m_00, std::fmaf(this->m_12, rhs.m_01, std::fmaf(this->m_22, rhs.m_02, this->m_32 * rhs.m_03)));
+	float nm03 = std::fmaf(this->m_03, rhs.m_00, std::fmaf(this->m_13, rhs.m_01, std::fmaf(this->m_23, rhs.m_02, this->m_33 * rhs.m_03)));
+
+	float nm10 = std::fmaf(this->m_00, rhs.m_10, std::fmaf(this->m_10, rhs.m_11, std::fmaf(this->m_20, rhs.m_12, this->m_30 * rhs.m_13)));
+	float nm11 = std::fmaf(this->m_01, rhs.m_10, std::fmaf(this->m_11, rhs.m_11, std::fmaf(this->m_21, rhs.m_12, this->m_31 * rhs.m_13)));
+	float nm12 = std::fmaf(this->m_02, rhs.m_10, std::fmaf(this->m_12, rhs.m_11, std::fmaf(this->m_22, rhs.m_12, this->m_32 * rhs.m_13)));
+	float nm13 = std::fmaf(this->m_03, rhs.m_10, std::fmaf(this->m_13, rhs.m_11, std::fmaf(this->m_23, rhs.m_12, this->m_33 * rhs.m_13)));
+
+	float nm20 = std::fmaf(this->m_00, rhs.m_20, std::fmaf(this->m_10, rhs.m_21, std::fmaf(this->m_20, rhs.m_22, this->m_30 * rhs.m_23)));
+	float nm21 = std::fmaf(this->m_01, rhs.m_20, std::fmaf(this->m_11, rhs.m_21, std::fmaf(this->m_21, rhs.m_22, this->m_31 * rhs.m_23)));
+	float nm22 = std::fmaf(this->m_02, rhs.m_20, std::fmaf(this->m_12, rhs.m_21, std::fmaf(this->m_22, rhs.m_22, this->m_32 * rhs.m_23)));
+	float nm23 = std::fmaf(this->m_03, rhs.m_20, std::fmaf(this->m_13, rhs.m_21, std::fmaf(this->m_23, rhs.m_22, this->m_33 * rhs.m_23)));
+
+	float nm30 = std::fmaf(this->m_00, rhs.m_30, std::fmaf(this->m_10, rhs.m_31, std::fmaf(this->m_20, rhs.m_32, this->m_30 * rhs.m_33)));
+	float nm31 = std::fmaf(this->m_01, rhs.m_30, std::fmaf(this->m_11, rhs.m_31, std::fmaf(this->m_21, rhs.m_32, this->m_31 * rhs.m_33)));
+	float nm32 = std::fmaf(this->m_02, rhs.m_30, std::fmaf(this->m_12, rhs.m_31, std::fmaf(this->m_22, rhs.m_32, this->m_32 * rhs.m_33)));
+	float nm33 = std::fmaf(this->m_03, rhs.m_30, std::fmaf(this->m_13, rhs.m_31, std::fmaf(this->m_23, rhs.m_32, this->m_33 * rhs.m_33)));
+
+	this->m_00 = nm00;
+	this->m_01 = nm01;
+	this->m_02 = nm02;
+	this->m_03 = nm03;
+	this->m_10 = nm10;
+	this->m_11 = nm11;
+	this->m_12 = nm12;
+	this->m_13 = nm13;
+	this->m_20 = nm20;
+	this->m_21 = nm21;
+	this->m_22 = nm22;
+	this->m_23 = nm23;
+	this->m_30 = nm30;
+	this->m_31 = nm31;
+	this->m_32 = nm32;
+	this->m_33 = nm33;
+	return *this;
 }
