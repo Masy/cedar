@@ -12,9 +12,7 @@ namespace cedar
 {
 
 	/**
-	 * Column Major 4x4 Matrix implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
-	 *
-	 * Since OpenGL is column major this will make it easier to upload the data to the graphics card.
+	 * 2 dimensional double vector implementation based on <a href="https://github.com/JOML-CI/JOML">JOML</a>.
 	 */
 	class Vector2d
 	{
