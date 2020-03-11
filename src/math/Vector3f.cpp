@@ -37,12 +37,17 @@ float Vector3f::length() const
 	return std::sqrt(std::fmaf(this->x, this->x, std::fmaf(this->y, this->y, this->z * this->z)));
 }
 
+float Vector3f::invLength() const
+{
+	return invSqrt(std::fmaf(this->x, this->x, std::fmaf(this->y, this->y, this->z * this->z)));
+}
+
 float Vector3f::lengthSquared() const
 {
 	return std::fmaf(this->x, this->x, std::fmaf(this->y, this->y, this->z * this->z));
 }
 
-void Vector3f::normalize()
+Vector3f *Vector3f::normalize()
 {
 	float length = this->length();
 	if (length != 0.0)
@@ -51,19 +56,23 @@ void Vector3f::normalize()
 		this->y /= length;
 		this->z /= length;
 	}
+
+	return this;
 }
 
-void Vector3f::zero()
+Vector3f *Vector3f::zero()
 {
 	this->x = 0.0f;
 	this->y = 0.0f;
 	this->z = 0.0f;
+	return this;
 }
 
-void Vector3f::negate() {
+Vector3f *Vector3f::negate() {
 	this->x = -this->x;
 	this->y = -this->y;
 	this->z = -this->z;
+	return this;
 }
 
 float Vector3f::distance(const Vector3f &other) const

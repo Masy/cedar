@@ -2,6 +2,8 @@
 // Created by masy on 06.03.20.
 //
 
+#include <iostream>
+
 #include "cedar/MasterRenderer.h"
 #include "cedar/Renderer2D.h"
 #include "cedar/Math.h"
@@ -16,7 +18,10 @@ MasterRenderer::MasterRenderer(Window *window)
 	this->m_window = window;
 	this->m_perspectiveProjectionMatrix = new Matrix4f();
 	this->m_orthographicProjectionMatrix = new Matrix4f();
+	this->m_projectionViewMatrix = new Matrix4f();
+	this->m_invProjectionViewMatrix = new Matrix4f();
 	this->m_viewMatrix = new Matrix4f();
+	this->m_frustumRayBuilder = new FrustumRayBuilder();
 }
 
 MasterRenderer::~MasterRenderer()
@@ -24,6 +29,9 @@ MasterRenderer::~MasterRenderer()
 	delete this->m_perspectiveProjectionMatrix;
 	delete this->m_orthographicProjectionMatrix;
 	delete this->m_viewMatrix;
+	delete this->m_projectionViewMatrix;
+	delete this->m_invProjectionViewMatrix;
+	delete this->m_frustumRayBuilder;
 	Renderer2D::cleanup();
 	ScreenRegistry::cleanup();
 	for (Renderer *renderer : this->m_renderers)
@@ -36,7 +44,7 @@ void MasterRenderer::init()
 			static_cast<float>(this->m_window->getRatio()),
 			cedar::toRadians(Cedar::getConfig()->getFOV()),
 			1E-2f,
-			4096.0f);
+			512.0f);
 
 	this->m_orthographicProjectionMatrix->orthographic(0.0f, static_cast<float>(this->m_window->getWidth()), static_cast<float>(this->m_window->getHeight()), 0.0f, 1E-6f, 4096);
 
@@ -59,7 +67,7 @@ void MasterRenderer::onResize()
 			static_cast<float>(this->m_window->getRatio()),
 			cedar::toRadians(90.0f),
 			1E-2f,
-			4096.0f);
+			512.0f);
 
 	this->m_orthographicProjectionMatrix->orthographic(0.0f, static_cast<float>(this->m_window->getWidth()), static_cast<float>(this->m_window->getHeight()), 0.0f, 1E-6f, 4096);
 
@@ -83,6 +91,11 @@ void MasterRenderer::render(unsigned long currentTime, unsigned long tickCount)
 		this->m_viewMatrix->identity();
 	}
 
+	*this->m_projectionViewMatrix = *this->m_perspectiveProjectionMatrix * *this->m_viewMatrix;
+	*this->m_invProjectionViewMatrix = *this->m_projectionViewMatrix;
+	this->m_invProjectionViewMatrix->invert();
+	this->m_frustumRayBuilder->set(*this->m_projectionViewMatrix);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
@@ -103,7 +116,8 @@ void MasterRenderer::render(unsigned long currentTime, unsigned long tickCount)
 	Renderer2D::flush();
 }
 
-void MasterRenderer::addRenderer(Renderer *renderer) {
+void MasterRenderer::addRenderer(Renderer *renderer)
+{
 	this->m_renderers.push_back(renderer);
 }
 
@@ -120,4 +134,26 @@ const Matrix4f *MasterRenderer::getOrthographicProjectionMatrix() const
 const Matrix4f *MasterRenderer::getViewMatrix() const
 {
 	return this->m_viewMatrix;
+}
+
+const Matrix4f *MasterRenderer::getProjectionViewMatrix() const
+{
+	return this->m_projectionViewMatrix;
+}
+
+const Matrix4f *MasterRenderer::getInvProjectionViewMatrix() const
+{
+	return this->m_invProjectionViewMatrix;
+}
+
+void MasterRenderer::getMouseRay(Vector3f *origin, Vector3f *rayDir) const {
+		float cursorX = static_cast<float>(this->m_window->getInputHandler()->getCursorX());
+		float cursorY = static_cast<float>(this->m_window->getInputHandler()->getCursorY());
+
+		float winX = cursorX / static_cast<float>(this->m_window->getWidth());
+		float winY = 1.0f - cursorY / static_cast<float>(this->m_window->getHeight());
+
+		this->m_frustumRayBuilder->getOrigin(origin);
+		this->m_frustumRayBuilder->getRayDir(winX, winY, rayDir);
+		*origin += (*rayDir * 1E-2f);
 }
