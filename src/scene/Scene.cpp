@@ -23,7 +23,7 @@ void Scene::update(const unsigned long currentTime, const unsigned long tickCoun
 	this->m_entityManager->update(currentTime, tickCount);
 }
 
-void Scene::render(const unsigned long currentTime, const unsigned long tickCount)
+void Scene::render(const unsigned long currentTime, const unsigned long tickCount, const ShaderProgram *shader)
 {
 	for (Model *model : this->m_models)
 	{
