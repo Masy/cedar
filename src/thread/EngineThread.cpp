@@ -10,6 +10,7 @@ EngineThread::EngineThread() : Thread("EngineThread", 20, QUEUE_BEFORE_TICK, 256
 {
 	this->m_camera = nullptr;
 	this->m_loadedScene = nullptr;
+	this->m_gameState = CEDAR_STATE_OFF;
 }
 
 EngineThread *EngineThread::getInstance()
@@ -20,8 +21,10 @@ EngineThread *EngineThread::getInstance()
 
 void EngineThread::onStart()
 {
+	this->m_gameState = CEDAR_STATE_INITIALIZATION;
 	if (this->m_initCallback)
 		this->m_initCallback();
+	this->m_gameState = CEDAR_STATE_RUNNING;
 }
 
 void EngineThread::onTick(const unsigned long currentTime, const unsigned long tickCount)
@@ -87,4 +90,14 @@ Scene *EngineThread::loadScene(Scene *scene)
 	Scene *old = this->m_loadedScene;
 	this->m_loadedScene = scene;
 	return old;
+}
+
+unsigned int EngineThread::getGameState() const
+{
+	return this->m_gameState;
+}
+
+void EngineThread::setGameState(const unsigned int newGameState)
+{
+	this->m_gameState = newGameState;
 }
