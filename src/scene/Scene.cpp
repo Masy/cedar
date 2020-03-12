@@ -8,37 +8,49 @@ using namespace cedar;
 
 Scene::Scene(const cedar::Vector3f &position)
 {
-	this->m_models = std::vector<Model*>();
+	this->m_entityManager = new EntityManager();
+	this->m_models = std::vector<Model *>();
 	this->m_position = position;
 }
 
-void Scene::update(const unsigned long currentTime, const unsigned long tickCount) {
-
+Scene::~Scene()
+{
+	delete this->m_entityManager;
 }
 
-void Scene::render(const unsigned long currentTime, const unsigned long tickCount) {
+void Scene::update(const unsigned long currentTime, const unsigned long tickCount)
+{
+	this->m_entityManager->update(currentTime, tickCount);
+}
+
+void Scene::render(const unsigned long currentTime, const unsigned long tickCount)
+{
 	for (Model *model : this->m_models)
 	{
 		model->render();
 	}
 }
 
-Vector3f Scene::getPosition() const {
+Vector3f Scene::getPosition() const
+{
 	return this->m_position;
 }
 
-Vector3f *Scene::getPosition(Vector3f *position) const {
+Vector3f *Scene::getPosition(Vector3f *position) const
+{
 	*position = this->m_position;
 	return position;
 }
 
-void Scene::setPosition(const Vector3f &newPosition) {
+void Scene::setPosition(const Vector3f &newPosition)
+{
 	this->m_position = newPosition;
 }
 
-bool Scene::addModel(Model *model) {
+bool Scene::addModel(Model *model)
+{
 	auto it = this->m_models.begin();
-	while(it != this->m_models.end())
+	while (it != this->m_models.end())
 	{
 		if ((*it) == model)
 			return false;
@@ -50,9 +62,10 @@ bool Scene::addModel(Model *model) {
 	return true;
 }
 
-bool Scene::removeModel(Model *model) {
+bool Scene::removeModel(Model *model)
+{
 	auto it = this->m_models.begin();
-	while(it != this->m_models.end())
+	while (it != this->m_models.end())
 	{
 		if ((*it) == model)
 		{
@@ -63,4 +76,9 @@ bool Scene::removeModel(Model *model) {
 		it++;
 	}
 	return false;
+}
+
+EntityManager *Scene::getEntityManager() const
+{
+	return this->m_entityManager;
 }

@@ -62,7 +62,7 @@ void Camera::fixRotation()
 	else if (this->m_rotationEuler.z > M_PIf32)
 		this->m_rotationEuler.z -= PI_2f32;
 
-	this->m_rotation.rotation(&this->m_rotationEuler);
+	this->m_rotation.rotation(this->m_rotationEuler);
 }
 
 void Camera::rotate(const float pitch, const float yaw, const float roll)

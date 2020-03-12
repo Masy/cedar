@@ -96,11 +96,19 @@ float Vector3f::dot(const Vector3f &other) const
 	return this->x * other.x + this->y * other.y + this->z + other.z;
 }
 
-Vector3f *Vector3f::lerp(const Vector3f *other, Vector3f *result, const float t) const
+Vector3f Vector3f::lerp(const Vector3f &other, float t) const {
+	return Vector3f(
+			cedar::lerp(this->x, other.x, t),
+			cedar::lerp(this->y, other.y, t),
+			cedar::lerp(this->z, other.z, t)
+			);
+}
+
+Vector3f *Vector3f::lerp(const Vector3f &other, Vector3f *result, const float t) const
 {
-	result->x = cedar::lerp(this->x, other->x, t);
-	result->y = cedar::lerp(this->y, other->y, t);
-	result->z = cedar::lerp(this->z, other->z, t);
+	result->x = cedar::lerp(this->x, other.x, t);
+	result->y = cedar::lerp(this->y, other.y, t);
+	result->z = cedar::lerp(this->z, other.z, t);
 	return result;
 }
 

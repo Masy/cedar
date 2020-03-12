@@ -106,8 +106,6 @@ Model *ModelRegistry::loadBMFModel(const std::string &name, const std::string &p
 	unsigned int vertexDataSize = vertexCount * vertexSize;
 	unsigned int indexDataSize = indexCount * 4;
 
-	Cedar::getCoreLogger()->info("Loaded model with %d vertices and %d indices. Mode: %x; Bitmask: %x", vertexCount, indexCount, mode, *bitMask);
-
 	unsigned int expectedFileSize = vertexDataSize + indexDataSize + 10;
 	if (fileSize < expectedFileSize)
 	{
