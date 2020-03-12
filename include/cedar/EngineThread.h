@@ -10,6 +10,19 @@
 #include "cedar/Scene.h"
 
 /**
+ * The state of the engine when the engine thread hasn't been started yet.
+ */
+#define CEDAR_STATE_OFF 0x00u
+/**
+ * The state of the engine when the engine thread is currently starting up.
+ */
+#define CEDAR_STATE_INITIALIZATION 0x01u
+/**
+ * The state of the engine when the engine thread has finished starting up.
+ */
+#define CEDAR_STATE_RUNNING 0x02u
+
+/**
  * Base namespace of the cedar engine.
  */
 namespace cedar
@@ -28,6 +41,10 @@ namespace cedar
 		 * The camera of the game.
 		 */
 		Camera *m_camera;
+		/**
+		 * The current game state.
+		 */
+		unsigned int m_gameState;
 		/**
 		 * The initialization callback of the engine thread.
 		 *
@@ -150,6 +167,20 @@ namespace cedar
 		 * @return A pointer to the old loaded scene.
 		 */
 		Scene *loadScene(Scene *scene);
+
+		/**
+		 * Gets the current state of the game.
+		 *
+		 * @return The current state of the game.
+		 */
+		[[nodiscard]] unsigned int getGameState() const;
+
+		/**
+		 * Sets the state of the game.
+		 *
+		 * @param newGameState The new state of the game.
+		 */
+		void setGameState(unsigned int newGameState);
 	};
 }
 
