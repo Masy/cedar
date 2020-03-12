@@ -59,7 +59,7 @@ namespace cedar
 		 * @param currentTime The current time in microseconds.
 		 * @param tickCount The current tick count.
 		 */
-		void update(unsigned long currentTime, unsigned long tickCount);
+		virtual void update(unsigned long currentTime, unsigned long tickCount);
 
 		/**
 		 * Renders all models inside the scene.
@@ -68,7 +68,7 @@ namespace cedar
 		 * @param tickCount The current tick count.
 		 * @param shader A pointer to the shader that is currently bound.
 		 */
-		void render(unsigned long currentTime, unsigned long tickCount, const ShaderProgram *shader);
+		virtual void render(unsigned long currentTime, unsigned long tickCount, const ShaderProgram *shader);
 
 		/**
 		 * Gets the position of the scene.
@@ -98,7 +98,7 @@ namespace cedar
 		 * @param model A pointer to the model that will be added.
 		 * @return <code>true</code> if the model was successfully added.
 		 */
-		bool addModel(Model *model);
+		virtual bool addModel(Model *model);
 
 		/**
 		 * Removes a model from the scene.
@@ -106,7 +106,7 @@ namespace cedar
 		 * @param model A pointer to the model tha will be removed.
 		 * @return <code>true</code> if the model was successfully removed.
 		 */
-		bool removeModel(Model *model);
+		virtual bool removeModel(Model *model);
 
 		/**
 		 * Gets the entity manager of the scene.
