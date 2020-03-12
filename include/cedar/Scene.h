@@ -9,6 +9,7 @@
 
 #include "cedar/Model.h"
 #include "cedar/Vector3f.h"
+#include "cedar/EntityManager.h"
 
 /**
  * Base namespace of the cedar engine.
@@ -23,6 +24,10 @@ namespace cedar
 	class Scene
 	{
 	protected:
+		/**
+		 * A pointer to the entity manager of the scene.
+		 */
+		 EntityManager *m_entityManager;
 		/**
 		 * A list of models that are in the scene.
 		 */
@@ -39,6 +44,11 @@ namespace cedar
 		 * @param position The position of the scene.
 		 */
 		explicit Scene(const Vector3f &position);
+
+		/**
+		 * Destroys the scene.
+		 */
+		~Scene();
 
 		/**
 		 * Updates the scene.
@@ -95,6 +105,13 @@ namespace cedar
 		 * @return <code>true</code> if the model was successfully removed.
 		 */
 		bool removeModel(Model *model);
+
+		/**
+		 * Gets the entity manager of the scene.
+		 *
+		 * @return A pointer to the entity manager of the scene.
+		 */
+		[[nodiscard]] EntityManager *getEntityManager() const;
 	};
 }
 

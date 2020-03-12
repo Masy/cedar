@@ -113,7 +113,7 @@ add_library(cedar
 		include/cedar/Scene.h
 		src/scene/Scene.cpp
 		include/cedar/MeshCollider2D.h
-		src/math/collision/MeshCollider2D.cpp)
+		src/math/collision/MeshCollider2D.cpp include/cedar/Entity.h src/entity/Entity.cpp include/cedar/EntityManager.h src/entity/EntityManager.cpp)
 
 target_include_directories(cedar PUBLIC
 		glad/include

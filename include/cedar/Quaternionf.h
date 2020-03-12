@@ -32,51 +32,53 @@ namespace cedar
 
 		Quaternionf(const Quaternionf &copy);
 
-		void identity();
+		Quaternionf *identity();
 
-		void normalize();
+		Quaternionf *normalize();
 
-		void invert();
+		Quaternionf *invert();
 
-		void rotateX(float angle);
+		Quaternionf *rotateX(float angle);
 
-		void rotateLocalX(float angle);
+		Quaternionf *rotateLocalX(float angle);
 
-		void rotationX(float angle);
+		Quaternionf *rotationX(float angle);
 
-		void rotateY(float angle);
+		Quaternionf *rotateY(float angle);
 
-		void rotateLocalY(float angle);
+		Quaternionf *rotateLocalY(float angle);
 
-		void rotationY(float angle);
+		Quaternionf *rotationY(float angle);
 
-		void rotateZ(float angle);
+		Quaternionf *rotateZ(float angle);
 
-		void rotateLocalZ(float angle);
+		Quaternionf *rotateLocalZ(float angle);
 
-		void rotationZ(float angle);
+		Quaternionf *rotationZ(float angle);
 
-		void rotate(float angleX, float angleY, float angleZ);
+		Quaternionf *rotate(float angleX, float angleY, float angleZ);
 
-		void rotate(const Vector3f *angles);
+		Quaternionf *rotate(const Vector3f *angles);
 
-		void rotation(float angleX, float angleY, float angleZ);
+		Quaternionf *rotation(float angleX, float angleY, float angleZ);
 
-		void rotation(const Vector3f *angles);
+		Quaternionf *rotation(const Vector3f &angles);
 
-		void rotateAxis(float angle, float axisX, float axisY, float axisZ);
+		Quaternionf *rotateAxis(float angle, float axisX, float axisY, float axisZ);
 
-		void rotateAxis(float angle, const Vector3f *axis);
+		Quaternionf *rotateAxis(float angle, const Vector3f &axis);
 
-		void rotationAxis(float angle, float axisX, float axisY, float axisZ);
+		Quaternionf *rotationAxis(float angle, float axisX, float axisY, float axisZ);
 
-		void rotationAxis(float angle, const Vector3f *axis);
+		Quaternionf *rotationAxis(float angle, const Vector3f &axis);
 
-		void transform(float x, float y, float z, Vector3f *dest) const;
+		Vector3f *transform(float x, float y, float z, Vector3f *storage) const;
 
-		Vector3f *getEulerAngles(Vector3f *result);
+		Vector3f *getEulerAngles(Vector3f *result) const;
 
-		Quaternionf *slerp(const Quaternionf *other, Quaternionf *dest, float t) const;
+		Quaternionf slerp(const Quaternionf &other, float t) const;
+
+		Quaternionf *slerp(const Quaternionf &other, Quaternionf *storage, float t) const;
 
 		Quaternionf &operator=(const Quaternionf &other);
 

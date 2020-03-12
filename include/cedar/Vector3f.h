@@ -51,7 +51,9 @@ namespace cedar
 
 		[[nodiscard]] float dot(const Vector3f &other) const;
 
-		Vector3f *lerp(const Vector3f *other, Vector3f *result, float t) const;
+		Vector3f lerp(const Vector3f &other, float t) const;
+
+		Vector3f *lerp(const Vector3f &other, Vector3f *result, float t) const;
 
 		void crossP(const Vector3f &other, Vector3f *result) const;
 
