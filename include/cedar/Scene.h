@@ -10,6 +10,7 @@
 #include "cedar/Model.h"
 #include "cedar/Vector3f.h"
 #include "cedar/EntityManager.h"
+#include "cedar/ShaderProgram.h"
 
 /**
  * Base namespace of the cedar engine.
@@ -65,8 +66,9 @@ namespace cedar
 		 *
 		 * @param currentTime The current time in microseconds.
 		 * @param tickCount The current tick count.
+		 * @param shader A pointer to the shader that is currently bound.
 		 */
-		void render(unsigned long currentTime, unsigned long tickCount);
+		void render(unsigned long currentTime, unsigned long tickCount, const ShaderProgram *shader);
 
 		/**
 		 * Gets the position of the scene.
