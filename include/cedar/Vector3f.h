@@ -63,6 +63,18 @@ namespace cedar
 
 		void rotateZ(float angle);
 
+		Vector2f xy() const;
+
+		Vector2f *xy(Vector2f *storage) const;
+
+		Vector2f yz() const;
+
+		Vector2f *yz(Vector2f *storage) const;
+
+		Vector2f xz() const;
+
+		Vector2f *xz(Vector2f *storage) const;
+
 		Vector3f &operator=(const Vector3f &other);
 
 		Vector3f &operator+=(const Vector3f &other);
@@ -86,6 +98,11 @@ namespace cedar
 			return Vector3f(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
 		};
 
+		inline friend Vector3f operator+(const float lhs, const Vector3f &rhs)
+		{
+			return Vector3f(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z);
+		};
+
 		inline friend Vector3f operator+(const Vector3f &lhs, const float rhs)
 		{
 			return Vector3f(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs);
@@ -94,6 +111,11 @@ namespace cedar
 		inline friend Vector3f operator-(const Vector3f &lhs, const Vector3f &rhs)
 		{
 			return Vector3f(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+		};
+
+		inline friend Vector3f operator-(const float lhs, const Vector3f &rhs)
+		{
+			return Vector3f(lhs - rhs.x, lhs - rhs.y, lhs - rhs.z);
 		};
 
 		inline friend Vector3f operator-(const Vector3f &rhs)
@@ -111,6 +133,11 @@ namespace cedar
 			return Vector3f(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z);
 		};
 
+		inline friend Vector3f operator*(const float lhs, const Vector3f &rhs)
+		{
+			return Vector3f(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z);
+		};
+
 		inline friend Vector3f operator*(const Vector3f &lhs, const float rhs)
 		{
 			return Vector3f(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs);
@@ -119,6 +146,11 @@ namespace cedar
 		inline friend Vector3f operator/(const Vector3f &lhs, const Vector3f &rhs)
 		{
 			return Vector3f(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z);
+		};
+
+		inline friend Vector3f operator/(const float lhs, const Vector3f &rhs)
+		{
+			return Vector3f(lhs / rhs.x, lhs / rhs.y, lhs / rhs.z);
 		};
 
 		inline friend Vector3f operator/(const Vector3f &lhs, const float rhs)

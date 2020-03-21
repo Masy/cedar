@@ -155,6 +155,33 @@ void Vector3f::rotateZ(const float angle)
 	this->y = _y;
 }
 
+Vector2f Vector3f::xy() const {
+	return Vector2f(this->x, this->y);
+}
+
+Vector2f *Vector3f::xy(Vector2f *storage) const {
+	*storage = Vector2f(this->x, this->y);
+	return storage;
+}
+
+Vector2f Vector3f::yz() const {
+	return Vector2f(this->y, this->z);
+}
+
+Vector2f *Vector3f::yz(Vector2f *storage) const {
+	*storage = Vector2f(this->y, this->z);
+	return storage;
+}
+
+Vector2f Vector3f::xz() const {
+	return Vector2f(this->x, this->z);
+}
+
+Vector2f *Vector3f::xz(Vector2f *storage) const {
+	*storage = Vector2f(this->x, this->z);
+	return storage;
+}
+
 Vector3f &Vector3f::operator=(const Vector3f &other) = default;
 
 Vector3f &Vector3f::operator+=(const Vector3f &other)

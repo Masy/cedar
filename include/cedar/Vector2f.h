@@ -55,9 +55,34 @@ namespace cedar
 			return Vector2f(lhs.x + rhs.x, lhs.y + rhs.y);
 		};
 
+		inline friend Vector2f operator+(const float lhs, const Vector2f &rhs)
+		{
+			return Vector2f(lhs + rhs.x, lhs + rhs.y);
+		};
+
+		inline friend Vector2f operator+(const Vector2f &lhs, const float rhs)
+		{
+			return Vector2f(lhs.x + rhs, lhs.y + rhs);
+		};
+
+		inline friend Vector2f operator-(const Vector2f &rhs)
+		{
+			return Vector2f(-rhs.x, -rhs.y);
+		};
+
 		inline friend Vector2f operator-(const Vector2f &lhs, const Vector2f &rhs)
 		{
 			return Vector2f(lhs.x - rhs.x, lhs.y - rhs.y);
+		};
+
+		inline friend Vector2f operator-(const float lhs, const Vector2f &rhs)
+		{
+			return Vector2f(lhs - rhs.x, lhs - rhs.y);
+		};
+
+		inline friend Vector2f operator-(const Vector2f &lhs, const float rhs)
+		{
+			return Vector2f(lhs.x - rhs, lhs.y - rhs);
 		};
 
 		inline friend Vector2f operator*(const Vector2f &lhs, const Vector2f &rhs)
@@ -65,9 +90,29 @@ namespace cedar
 			return Vector2f(lhs.x * rhs.x, lhs.y * rhs.y);
 		};
 
+		inline friend Vector2f operator*(const float lhs, const Vector2f &rhs)
+		{
+			return Vector2f(lhs * rhs.x, lhs * rhs.y);
+		};
+
+		inline friend Vector2f operator*(const Vector2f &lhs, const float rhs)
+		{
+			return Vector2f(lhs.x * rhs, lhs.y * rhs);
+		};
+
 		inline friend Vector2f operator/(const Vector2f &lhs, const Vector2f &rhs)
 		{
 			return Vector2f(lhs.x / rhs.x, lhs.y / rhs.y);
+		};
+
+		inline friend Vector2f operator/(const float lhs, const Vector2f &rhs)
+		{
+			return Vector2f(lhs / rhs.x, lhs / rhs.y);
+		};
+
+		inline friend Vector2f operator/(const Vector2f &lhs, const float rhs)
+		{
+			return Vector2f(lhs.x / rhs, lhs.y / rhs);
 		};
 
 		inline friend bool operator==(const Vector2f &lhs, const Vector2f &rhs)
