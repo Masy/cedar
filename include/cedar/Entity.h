@@ -131,7 +131,7 @@ namespace cedar
 		 * @param currentTime The current time in microseconds.
 		 * @param tickCount The current tick count.
 		 */
-		void update(unsigned long currentTime, unsigned long tickCount);
+		virtual void update(unsigned long currentTime, unsigned long tickCount);
 
 		/**
 		 * Moves the entity in the given direction.

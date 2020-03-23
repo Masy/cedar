@@ -2,6 +2,7 @@
 // Created by masy on 12.03.20.
 //
 
+#include <cedar/Cedar.h>
 #include "cedar/EntityManager.h"
 
 using namespace cedar;
@@ -20,7 +21,7 @@ EntityManager::~EntityManager()
 }
 
 bool EntityManager::addEntity(Entity *entity) {
-	if (this->m_entities.find(entity->getEntityId()) != this->m_entities.end())
+	if (this->m_entities.find(entity->getEntityId()) == this->m_entities.end())
 	{
 		this->m_entities.insert(std::make_pair(entity->getEntityId(), entity));
 		return true;
@@ -47,6 +48,7 @@ bool EntityManager::removeEntity(const unsigned int entityId) {
 
 	if (it != this->m_entities.end())
 	{
+		delete it->second;
 		this->m_entities.erase(it);
 		return true;
 	}
@@ -61,3 +63,6 @@ void EntityManager::update(const unsigned long currentTime, const unsigned long 
 	}
 }
 
+const std::map<unsigned int, Entity*> *EntityManager::getEntities() const {
+	return &this->m_entities;
+}

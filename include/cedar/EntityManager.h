@@ -75,6 +75,8 @@ namespace cedar
 		 * @param tickCount The current tick count.
 		 */
 		void update(unsigned long currentTime, unsigned long tickCount);
+
+		[[nodiscard]] const std::map<unsigned int, Entity*> *getEntities() const;
 	};
 }
 
