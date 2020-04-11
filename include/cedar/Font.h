@@ -41,20 +41,6 @@ namespace cedar
 	};
 
 	/**
-	 * Exception which is thrown when freetype could not be initialized.
-	 */
-	class FreetypeInitException : public FontException
-	{
-	public:
-		/**
-		 * Creates a new Freetype init exception.
-		 *
-		 * @param message The message of the exception.
-		 */
-		explicit FreetypeInitException(const std::string &message);
-	};
-
-	/**
 	 * Exception which is thrown when a font could not be created.
 	 */
 	class FontCreationException : public FontException
@@ -73,16 +59,7 @@ namespace cedar
 	 */
 	class Font
 	{
-	private:
-		/**
-		 * Gets the singleton instance of the freetype library.
-		 *
-		 * @return The singleton instance of the freetype libary.
-		 *
-		 * @throws FreetypeInitException if freetype could not be initialized.
-		 */
-		static FT_Library &getFontLibrary();
-
+	protected:
 		/**
 		 * The name of the font.
 		 */
@@ -105,10 +82,6 @@ namespace cedar
 		 * A pointer to the glyph atlas of the font.
 		 */
 		Texture2D *m_glyphAtlas;
-		/**
-		 * The freetype face of the font.
-		 */
-		FT_Face m_face;
 
 		/**
 		 * The current offset in the glyph atlas on the x axis.
@@ -127,23 +100,26 @@ namespace cedar
 		 *
 		 * <p>This is used to calculate the new y offset if the current row is full.</p>
 		 */
-		 unsigned int m_tallestCharacterInRow;
-		 /**
-		  * Map for storing glyphs for unicode characters.
-		  */
-		std::map<unsigned int, Glyph*> m_glyphs;
+		unsigned int m_tallestCharacterInRow;
+		/**
+		 * Map for storing glyphs for unicode characters.
+		 */
+		std::map<unsigned int, Glyph *> m_glyphs;
 		/**
 		 * Pointer to temporary storage that is used by {@link generate
 		 */
 		GlyphData *m_glyphData;
 
 		/**
-		 * Generates the glyph with the given unicode if it does not exist.
+		 * Loads the glyph image of the given unicode code point if it does not exist and generates the glyph.
 		 *
 		 * @param unicode The unicode character of which the glyph will be generated.
 		 * @return A constant pointer to the generated glyph.
 		 */
-		const Glyph *generateGlyph(unsigned int unicode);
+		virtual const Glyph *loadGlyph(unsigned int unicode) = 0;
+
+		const Glyph *createGlyph(unsigned int unicode, unsigned int glyphWidth, unsigned int glyphHeight, int bearingX, int bearingY,
+								 unsigned int advance, const unsigned char *imageData);
 
 		/**
 		 * Resizes the glyph atlas.
@@ -219,17 +195,15 @@ namespace cedar
 		 * </ul></p>
 		 *
 		 * @param name The name of the font.
-		 * @param path The path to the font file.
 		 * @param size The size of the font in pixel.
-		 * @param firstCharacter The unicode of the first character to pre-generate.
-		 * @param lastCharacter The unicode of the last character to pre-generate.
 		 * @param renderingMode The rendering mode of the font.
 		 */
-		Font(const std::string &name, const std::string &path, unsigned int size, unsigned int firstCharacter = 0, unsigned int lastCharacter = 255, unsigned int renderingMode = CEDAR_RENDERING_SMOOTH);
+		Font(const std::string &name, unsigned int size, unsigned int renderingMode = CEDAR_RENDERING_SMOOTH);
+
 		/**
 		 * Deletes the font.
 		 */
-		~Font();
+		virtual ~Font();
 
 		/**
 		 * Generates the glyphs for the characters in the given range.
@@ -237,7 +211,7 @@ namespace cedar
 		 * @param firstCharacter The unicode of the first character that will be generated.
 		 * @param lastCharacter The unicode of the last character that will be generated.
 		 */
-		void generateGlyphs(unsigned int firstCharacter, unsigned int lastCharacter);
+		virtual void generateGlyphs(unsigned int firstCharacter, unsigned int lastCharacter) = 0;
 
 		/**
 		 * Gets the size of the font in pixel.
@@ -245,12 +219,14 @@ namespace cedar
 		 * @return The size of the font in pixel.
 		 */
 		[[nodiscard]] unsigned int getSize() const;
+
 		/**
 		 * Gets the rendering mode of the font.
 		 *
 		 * @return The rendering mode of the font.
 		 */
 		[[nodiscard]] unsigned int getRenderingMode() const;
+
 		/**
 		 * Gets the glyph of the given unicode character.
 		 *
