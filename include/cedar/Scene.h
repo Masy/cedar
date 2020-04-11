@@ -49,7 +49,7 @@ namespace cedar
 		/**
 		 * Destroys the scene.
 		 */
-		~Scene();
+		virtual ~Scene();
 
 		/**
 		 * Updates the scene.
