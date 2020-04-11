@@ -75,6 +75,13 @@ namespace cedar
 		 * @param tickCount The current tick count.
 		 */
 		void update(unsigned long currentTime, unsigned long tickCount);
+
+		/**
+		 * Gets the entities the entity manager manages.
+		 *
+		 * @return The entities of the entity manager.
+		 */
+		[[nodiscard]] const std::map<unsigned int, Entity*> *getEntities() const;
 	};
 }
 
