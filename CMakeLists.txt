@@ -118,7 +118,7 @@ add_library(cedar
 		src/entity/Entity.cpp
 		include/cedar/EntityManager.h
 		src/entity/EntityManager.cpp
-		include/cedar/Distance2D.h include/cedar/FreeTypeFont.hpp src/graphics/font/FreeTypeFont.cpp)
+		include/cedar/Distance2D.h include/cedar/FreeTypeFont.hpp src/graphics/font/FreeTypeFont.cpp include/cedar/PTFFont.hpp src/graphics/font/PTFFont.cpp)
 
 target_include_directories(cedar PUBLIC
 		glad/include

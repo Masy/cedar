@@ -3,9 +3,11 @@
 //
 
 #include <map>
+#include <regex>
 
 #include "cedar/FontRegistry.h"
 #include "cedar/FreeTypeFont.hpp"
+#include "cedar/PTFFont.hpp"
 
 using namespace cedar;
 
@@ -14,6 +16,18 @@ std::map<std::string, Font*> LOADED_FONTS = std::map<std::string, Font*>();
 Font *FontRegistry::loadFont(const std::string &name, const std::string &path, const unsigned int size, const unsigned int firstCharacter,
 							 const unsigned int lastCharacter, const unsigned int renderingMode)
 {
+	std::regex ptfPattern("^.*(\\.ptf)$");
+	std::smatch matcher;
+	std::regex_match(path, matcher, ptfPattern);
+
+	if (!matcher.empty())
+	{
+		Font *font = new PTFFont(name, path, size);
+		font->generateGlyphs(firstCharacter, lastCharacter);
+		LOADED_FONTS.insert(std::make_pair(name, font));
+		return font;
+	}
+
 	Font *font = new FreeTypeFont(name, path, size, renderingMode);
 	font->generateGlyphs(firstCharacter, lastCharacter);
 	LOADED_FONTS.insert(std::make_pair(name, font));

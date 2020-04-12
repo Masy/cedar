@@ -2,12 +2,11 @@
 // Created by masy on 11.04.20.
 //
 
-#ifndef CEDAR_FREETYPEFONT_HPP
-#define CEDAR_FREETYPEFONT_HPP
+#ifndef CEDAR_PTFFONT_HPP
+#define CEDAR_PTFFONT_HPP
 
-#include "Font.h"
-#include "freetype2/ft2build.h"
-#include FT_FREETYPE_H
+#include "cedar/Font.h"
+#include <fstream>
 
 /**
  * Base namespace of the cedar engine.
@@ -16,38 +15,49 @@ namespace cedar
 {
 
 	/**
-	 * Exception which is thrown when FreeType could not be initialized.
+	 * Class representing a PTF (Pixel Type Format) Font.
 	 */
-	class FreeTypeInitException : public FontException
-	{
-	public:
-		/**
-		 * Creates a new FreeType init exception.
-		 *
-		 * @param message The message of the exception.
-		 */
-		explicit FreeTypeInitException(const std::string &message);
-	};
-
-	/**
-	 * Class representing a font that was loaded with FreeType.
-	 */
-	class FreeTypeFont : public Font
+	class PTFFont : public Font
 	{
 	private:
 		/**
-		 * Gets the singleton instance of the FreeType library.
-		 *
-		 * @return The singleton instance of the FreeType library.
-		 *
-		 * @throws FreeTypeInitException if FreeType could not be initialized.
+		 * The scale of the ptf font.
 		 */
-		static FT_Library &getFontLibrary();
+		unsigned int m_scale;
+		/**
+		 * The number of colors in the palette.
+		 */
+		unsigned int m_paletteSize;
+		/**
+		 * The array of colors the ptf font uses.
+		 */
+		unsigned int *m_palette;
+		/**
+		 * The pointer to the dictionary in the ptf font file.
+		 */
+		unsigned int m_dictionaryPointer;
+		/**
+		 * The dictionary of the ptf font.
+		 */
+		std::map<unsigned int, unsigned int> m_dictionary;
+		/**
+		 * The path to the font file of ptf font.
+		 */
+		std::string m_fontPath;
+		/**
+		 * The input file stream of the ptf font.
+		 */
+		std::ifstream m_fontFile;
 
 		/**
-		 * The FreeType face of the font.
+		 * Loads the palette of the ptf font.
 		 */
-		FT_Face m_face;
+		void loadPalette();
+
+		/**
+		 * Loads the dictionary of the ptf font.
+		 */
+		void loadDictionary();
 
 		/**
 		 * Loads the glyph image of the given unicode code point if it does not exist and generates the glyph.
@@ -73,28 +83,20 @@ namespace cedar
 		 */
 		void stitchAtlas(unsigned int firstIndex, unsigned int lastIndex, const Vector4ui &region) override;
 
-
 	public:
 		/**
-		 * Creates a new FreeType font.
-		 *
-		 * <p>The <code>rendering mode</code> of the font should be one of the following:
-		 * <ul>
-		 *   <li>{@link CEDAR_RENDERING_SHARP}<li>
-		 *   <li>{@link CEDAR_RENDERING_SMOOTH}</li>
-		 * </ul></p>
+		 * Creates a new PTF font.
 		 *
 		 * @param name The name of the font.
 		 * @param path The path to the font file.
-		 * @param size The size of the font in pixel.
-		 * @param renderingMode The rendering mode of the font.
+		 * @param scale The scale by which the size of the PTF font will be scaled.
 		 */
-		FreeTypeFont(const std::string &name, const std::string &path, unsigned int size, unsigned int renderingMode = CEDAR_RENDERING_SMOOTH);
+		PTFFont(const std::string &name, const std::string &path, unsigned int scale);
 
 		/**
 		 * Deletes the font.
 		 */
-		~FreeTypeFont() override;
+		~PTFFont() override;
 
 		/**
 		 * Generates the glyphs for the characters in the given range.
@@ -102,9 +104,9 @@ namespace cedar
 		 * @param firstCharacter The unicode of the first character that will be generated.
 		 * @param lastCharacter The unicode of the last character that will be generated.
 		 */
-		void generateGlyphs(unsigned int firstCharacter, unsigned int lastCharacter) override;
+		void generateGlyphs(unsigned int firstCharacter, unsigned int lastCharacter);
 	};
 
 }
 
-#endif //CEDAR_FREETYPEFONT_HPP
+#endif //CEDAR_PTFFONT_HPP

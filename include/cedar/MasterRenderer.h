@@ -61,6 +61,11 @@ namespace cedar
 		 */
 		std::vector<Renderer *> m_renderers;
 
+		/**
+		 * The clear color of the master renderer.
+		 */
+		Vector4f m_clearColor;
+
 	public:
 		/**
 		 * Creates a new master renderer.
@@ -143,6 +148,28 @@ namespace cedar
 		 * @param rayDir A pointer to the vector where the normalized mouse ray direction will be stored.
 		 */
 		void getMouseRay(Vector3f *origin, Vector3f *rayDir) const;
+
+		/**
+		 * Gets the clear color of the master renderer.
+		 *
+		 * @return The clear color of the master renderer.
+		 */
+		[[nodiscard]] Vector4f getClearColor() const;
+
+		/**
+		 * Gets the clear color of the master renderer and stores it in the given vector.
+		 *
+		 * @param storage A pointer to the vector where the clear color will be stored.
+		 * @return The pointer to the <code>storage</code> vector.
+		 */
+		Vector4f *getClearColor(Vector4f *storage) const;
+
+		/**
+		 * Sets the clear color of the master renderer.
+		 *
+		 * @param newColor The new clear color of the master renderer.
+		 */
+		void setClearColor(const Vector4f &newColor);
 	};
 }
 

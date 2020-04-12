@@ -55,6 +55,20 @@ namespace cedar
 	};
 
 	/**
+	 * Exception which is thrown when the file of a font could not be opened.
+	 */
+	class FontLoadException : public FontException
+	{
+	public:
+		/**
+		 * Creates a new font load exception.
+		 *
+		 * @param message The message of the exception.
+		 */
+		explicit FontLoadException(const std::string &message);
+	};
+
+	/**
 	 * Class representing a font with a fixed size.
 	 */
 	class Font
@@ -78,6 +92,7 @@ namespace cedar
 		 * </ul></p>
 		 */
 		unsigned int m_renderingMode;
+		int m_internalFormat;
 		/**
 		 * A pointer to the glyph atlas of the font.
 		 */
@@ -118,8 +133,12 @@ namespace cedar
 		 */
 		virtual const Glyph *loadGlyph(unsigned int unicode) = 0;
 
-		const Glyph *createGlyph(unsigned int unicode, unsigned int glyphWidth, unsigned int glyphHeight, int bearingX, int bearingY,
-								 unsigned int advance, const unsigned char *imageData);
+		/**
+		 * Creates a glyph from the glyph data {@link #m_glyphData} is currently pointing to and copies it to the atlas.
+		 *
+		 * @return A constant pointer to the created glyph.
+		 */
+		virtual const Glyph *createGlyph() = 0;
 
 		/**
 		 * Resizes the glyph atlas.
@@ -136,7 +155,7 @@ namespace cedar
 		 * @param lastIndex The last (exclusive) index of the glyphs to stitch.
 		 * @param region The coordinates and size of the region that is being uploaded to the glyph atlas.
 		 */
-		void stitchAtlas(unsigned int firstIndex, unsigned int lastIndex, const Vector4ui &region);
+		virtual void stitchAtlas(unsigned int firstIndex, unsigned int lastIndex, const Vector4ui &region) = 0;
 
 	public:
 
@@ -198,7 +217,7 @@ namespace cedar
 		 * @param size The size of the font in pixel.
 		 * @param renderingMode The rendering mode of the font.
 		 */
-		Font(const std::string &name, unsigned int size, unsigned int renderingMode = CEDAR_RENDERING_SMOOTH);
+		Font(const std::string &name, unsigned int size, int internalFormat, unsigned int renderingMode = CEDAR_RENDERING_SMOOTH);
 
 		/**
 		 * Deletes the font.

@@ -22,6 +22,7 @@ MasterRenderer::MasterRenderer(Window *window)
 	this->m_invProjectionViewMatrix = new Matrix4f();
 	this->m_viewMatrix = new Matrix4f();
 	this->m_frustumRayBuilder = new FrustumRayBuilder();
+	this->m_clearColor = Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 MasterRenderer::~MasterRenderer()
@@ -52,7 +53,7 @@ void MasterRenderer::init()
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(this->m_clearColor.x, this->m_clearColor.y, this->m_clearColor.z, this->m_clearColor.w);
 
 	Renderer2D::init(2048, this->m_orthographicProjectionMatrix);
 
@@ -156,4 +157,18 @@ void MasterRenderer::getMouseRay(Vector3f *origin, Vector3f *rayDir) const {
 		this->m_frustumRayBuilder->getOrigin(origin);
 		this->m_frustumRayBuilder->getRayDir(winX, winY, rayDir);
 		*origin += (*rayDir * 1E-2f);
+}
+
+Vector4f MasterRenderer::getClearColor() const {
+	return this->m_clearColor;
+}
+
+Vector4f *MasterRenderer::getClearColor(Vector4f *storage) const {
+	*storage = this->m_clearColor;
+	return storage;
+}
+
+void MasterRenderer::setClearColor(const Vector4f &newColor) {
+	this->m_clearColor = newColor;
+	glClearColor(newColor.x, newColor.y, newColor.z, newColor.w);
 }
