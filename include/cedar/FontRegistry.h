@@ -30,6 +30,7 @@ namespace cedar
 		 * @param name The name of the font.
 		 * @param path The path to the font file.
 		 * @param size The size of the font in pixel.
+		 *             <p>If the font is a ptf font the size will be the scale by which the ptf font size will be multiplied.</p>
 		 * @param firstCharacter The unicode of the first character to pre-generate.
 		 * @param lastCharacter The unicode of the last character to pre-generate.
 		 * @param renderingMode The rendering mode of the font.

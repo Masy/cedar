@@ -23,3 +23,13 @@ Vector2i::Vector2i(const cedar::Vector2i &copy)
 	this->x = copy.x;
 	this->y = copy.y;
 }
+
+Vector2i Vector2i::operator*(const cedar::Vector2i &rhs)
+{
+	return Vector2i(this->x *rhs.x, this->y * rhs.y);
+}
+
+Vector2i Vector2i::operator*(const float rhs)
+{
+	return Vector2i(this->x *rhs, this->y * rhs);
+}

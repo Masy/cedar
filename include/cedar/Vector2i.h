@@ -28,6 +28,10 @@ namespace cedar
 
 		Vector2i(const Vector2i &copy);
 
+		Vector2i operator *(const Vector2i &rhs);
+
+		Vector2i operator *(float rhs);
+
 	};
 
 }
