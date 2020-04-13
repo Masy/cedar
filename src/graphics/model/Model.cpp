@@ -2,7 +2,7 @@
 // Created by masy on 02.03.20.
 //
 
-#include "cedar/Model.h"
+#include "cedar/Model.hpp"
 #include "glad/glad.h"
 
 using namespace cedar;

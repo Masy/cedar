@@ -5,7 +5,7 @@
 #include <map>
 #include <regex>
 
-#include "cedar/FontRegistry.h"
+#include "cedar/FontRegistry.hpp"
 #include "cedar/FreeTypeFont.hpp"
 #include "cedar/PTFFont.hpp"
 

@@ -2,8 +2,8 @@
 // Created by masy on 28.02.20.
 //
 
-#include "cedar/OpenSimplexNoise.h"
-#include "cedar/Math.h"
+#include "cedar/OpenSimplexNoise.hpp"
+#include "cedar/Math.hpp"
 #include <cmath>
 
 using namespace cedar;

@@ -2,8 +2,8 @@
 // Created by masy on 07.02.20.
 //
 
-#include "cedar/Quaternionf.h"
-#include "cedar/Math.h"
+#include "cedar/Quaternionf.hpp"
+#include "cedar/Math.hpp"
 #include <cmath>
 
 // Normally i wouldn't do this, but i guess in the implementation file of a class its's ok.

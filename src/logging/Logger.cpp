@@ -2,8 +2,8 @@
 // Created by masy on 01.02.20.
 //
 
-#include "cedar/Logger.h"
-#include "cedar/LoggerFactory.h"
+#include "cedar/Logger.hpp"
+#include "cedar/LoggerFactory.hpp"
 
 // Normally i wouldn't do this, but i guess in the implementation file of a class its's ok.
 using namespace cedar;

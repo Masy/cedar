@@ -2,8 +2,8 @@
 // Created by masy on 12.03.20.
 //
 
-#include "cedar/Entity.h"
-#include "cedar/Math.h"
+#include "cedar/Entity.hpp"
+#include "cedar/Math.hpp"
 
 using namespace cedar;
 

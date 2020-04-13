@@ -2,8 +2,8 @@
 // Created by masy on 09.02.20.
 //
 
-#include "cedar/InputHandler.h"
-#include "cedar/Input.h"
+#include "cedar/InputHandler.hpp"
+#include "cedar/Input.hpp"
 
 using namespace cedar;
 

@@ -2,8 +2,8 @@
 // Created by masy on 23.02.20.
 //
 
-#include "cedar/Renderer2D.h"
-#include "cedar/Cedar.h"
+#include "cedar/Renderer2D.hpp"
+#include "cedar/Cedar.hpp"
 #include "glad/glad.h"
 #include <cmath>
 #include <regex>

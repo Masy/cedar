@@ -2,7 +2,7 @@
 // Created by Marcel Schauer on 27.01.20.
 //
 
-#include "cedar/XException.h"
+#include "cedar/XException.hpp"
 
 using namespace cedar;
 

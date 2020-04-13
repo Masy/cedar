@@ -2,7 +2,7 @@
 // Created by masy on 06.03.20.
 //
 
-#include "cedar/Config.h"
+#include "cedar/Config.hpp"
 
 using namespace cedar;
 

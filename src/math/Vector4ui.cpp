@@ -2,7 +2,7 @@
 // Created by masy on 03.03.20.
 //
 
-#include "cedar/Vector4ui.h"
+#include "cedar/Vector4ui.hpp"
 
 using namespace cedar;
 

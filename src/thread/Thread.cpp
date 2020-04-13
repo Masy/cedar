@@ -2,8 +2,8 @@
 // Created by masy on 26.01.20.
 //
 
-#include "cedar/Thread.h"
-#include "cedar/LoggerFactory.h"
+#include "cedar/Thread.hpp"
+#include "cedar/LoggerFactory.hpp"
 
 using namespace cedar;
 

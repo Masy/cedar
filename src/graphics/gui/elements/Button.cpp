@@ -2,9 +2,9 @@
 // Created by masy on 08.03.20.
 //
 
-#include "cedar/Button.h"
-#include "cedar/Renderer2D.h"
-#include "cedar/Cedar.h"
+#include "cedar/Button.hpp"
+#include "cedar/Renderer2D.hpp"
+#include "cedar/Cedar.hpp"
 
 using namespace cedar;
 

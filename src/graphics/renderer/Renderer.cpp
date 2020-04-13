@@ -2,7 +2,7 @@
 // Created by masy on 06.03.20.
 //
 
-#include "cedar/Renderer.h"
+#include "cedar/Renderer.hpp"
 
 using namespace cedar;
 

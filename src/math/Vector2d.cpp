@@ -1,7 +1,7 @@
 //
 // Created by masy on 10.02.20.
 //
-#include "cedar/Vector2d.h"
+#include "cedar/Vector2d.hpp"
 #include <cmath>
 
 using namespace cedar;

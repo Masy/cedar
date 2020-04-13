@@ -2,7 +2,7 @@
 // Created by masy on 01.02.20.
 //
 
-#include "cedar/LoggerFactory.h"
+#include "cedar/LoggerFactory.hpp"
 #include <vector>
 
 // Normally i wouldn't do this, but i guess in the implementation file of a class its's ok.

@@ -2,7 +2,7 @@
 // Created by masy on 11.03.20.
 //
 
-#include "cedar/MeshCollider2D.h"
+#include "cedar/MeshCollider2D.hpp"
 
 using namespace cedar;
 

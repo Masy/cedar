@@ -2,8 +2,8 @@
 // Created by masy on 06.03.20.
 //
 
-#include "cedar/Camera.h"
-#include "cedar/Math.h"
+#include "cedar/Camera.hpp"
+#include "cedar/Math.hpp"
 
 using namespace cedar;
 

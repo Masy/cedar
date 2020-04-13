@@ -2,7 +2,7 @@
 // Created by masy on 07.03.20.
 //
 
-#include "cedar/ScreenRegistry.h"
+#include "cedar/ScreenRegistry.hpp"
 
 using namespace cedar;
 

@@ -5,7 +5,7 @@
 #ifndef CEDAR_PTFFONT_HPP
 #define CEDAR_PTFFONT_HPP
 
-#include "cedar/Font.h"
+#include "cedar/Font.hpp"
 #include <fstream>
 
 /**

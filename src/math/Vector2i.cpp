@@ -2,7 +2,7 @@
 // Created by masy on 03.03.20.
 //
 
-#include "cedar/Vector2i.h"
+#include "cedar/Vector2i.hpp"
 
 using namespace cedar;
 
