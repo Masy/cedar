@@ -4,8 +4,8 @@
 
 #include <fstream>
 
-#include "cedar/ModelRegistry.h"
-#include "cedar/Cedar.h"
+#include "cedar/ModelRegistry.hpp"
+#include "cedar/Cedar.hpp"
 
 using namespace cedar;
 

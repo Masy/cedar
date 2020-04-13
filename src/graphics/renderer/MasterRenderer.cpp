@@ -4,12 +4,12 @@
 
 #include <iostream>
 
-#include "cedar/MasterRenderer.h"
-#include "cedar/Renderer2D.h"
-#include "cedar/Math.h"
-#include "cedar/EngineThread.h"
-#include "cedar/Cedar.h"
-#include "cedar/ScreenRegistry.h"
+#include "cedar/MasterRenderer.hpp"
+#include "cedar/Renderer2D.hpp"
+#include "cedar/Math.hpp"
+#include "cedar/EngineThread.hpp"
+#include "cedar/Cedar.hpp"
+#include "cedar/ScreenRegistry.hpp"
 
 using namespace cedar;
 

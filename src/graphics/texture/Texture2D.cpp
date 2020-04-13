@@ -2,7 +2,7 @@
 // Created by masy on 23.02.20.
 //
 
-#include "cedar/Texture2D.h"
+#include "cedar/Texture2D.hpp"
 #include "glad/glad.h"
 
 using namespace cedar;

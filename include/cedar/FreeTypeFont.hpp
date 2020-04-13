@@ -5,7 +5,7 @@
 #ifndef CEDAR_FREETYPEFONT_HPP
 #define CEDAR_FREETYPEFONT_HPP
 
-#include "Font.h"
+#include "Font.hpp"
 #include "freetype2/ft2build.h"
 #include FT_FREETYPE_H
 

@@ -2,7 +2,7 @@
 // Created by masy on 06.02.20.
 //
 
-#include "cedar/Matrix4f.h"
+#include "cedar/Matrix4f.hpp"
 
 // Normally i wouldn't do this, but i guess in the implementation file of a class its's ok.
 using namespace cedar;

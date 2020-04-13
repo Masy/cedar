@@ -2,7 +2,7 @@
 // Created by masy on 05.03.20.
 //
 
-#include "cedar/Quad.h"
+#include "cedar/Quad.hpp"
 
 using namespace cedar;
 

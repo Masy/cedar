@@ -2,7 +2,7 @@
 // Created by masy on 08.02.20.
 //
 
-#include "cedar/ShaderProgram.h"
+#include "cedar/ShaderProgram.hpp"
 #include "glad/glad.h"
 #include <cstring>
 

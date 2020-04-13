@@ -2,8 +2,8 @@
 // Created by masy on 03.03.20.
 //
 
-#include <cedar/Cedar.h>
-#include "cedar/Font.h"
+#include <cedar/Cedar.hpp>
+#include "cedar/Font.hpp"
 
 #define STB_IMAGE_WRITE_STATIC
 #define STB_IMAGE_WRITE_IMPLEMENTATION

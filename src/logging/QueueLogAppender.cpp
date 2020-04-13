@@ -2,7 +2,7 @@
 // Created by masy on 01.02.20.
 //
 
-#include "cedar/QueueLogAppender.h"
+#include "cedar/QueueLogAppender.hpp"
 
 // Normally i wouldn't do this, but i guess in the implementation file of a class it's ok.
 using namespace cedar;

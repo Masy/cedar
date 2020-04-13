@@ -2,8 +2,8 @@
 // Created by masy on 12.03.20.
 //
 
-#include <cedar/Cedar.h>
-#include "cedar/EntityManager.h"
+#include <cedar/Cedar.hpp>
+#include "cedar/EntityManager.hpp"
 
 using namespace cedar;
 

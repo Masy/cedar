@@ -2,10 +2,10 @@
 // Created by Marcel on 27.01.20.
 //
 
-#include "cedar/Window.h"
-#include "cedar/ScreenRegistry.h"
-#include "cedar/Cedar.h"
-#include "cedar/Input.h"
+#include "cedar/Window.hpp"
+#include "cedar/ScreenRegistry.hpp"
+#include "cedar/Cedar.hpp"
+#include "cedar/Input.hpp"
 
 using namespace cedar;
 

@@ -2,9 +2,9 @@
 // Created by masy on 02.03.20.
 //
 
-#include "cedar/Cedar.h"
-#include "cedar/EngineThread.h"
-#include "cedar/OpenGLThread.h"
+#include "cedar/Cedar.hpp"
+#include "cedar/EngineThread.hpp"
+#include "cedar/OpenGLThread.hpp"
 
 using namespace cedar;
 

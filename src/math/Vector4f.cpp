@@ -2,7 +2,7 @@
 // Created by masy on 04.02.20.
 //
 
-#include "cedar/Vector4f.h"
+#include "cedar/Vector4f.hpp"
 #include <cmath>
 
 // Normally i wouldn't do this, but i guess in the implementation file of a class its's ok.

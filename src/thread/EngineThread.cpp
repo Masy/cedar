@@ -2,7 +2,7 @@
 // Created by masy on 06.03.20.
 //
 
-#include "cedar/EngineThread.h"
+#include "cedar/EngineThread.hpp"
 
 using namespace cedar;
 

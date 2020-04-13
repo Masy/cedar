@@ -2,9 +2,9 @@
 // Created by masy on 08.03.20.
 //
 
-#include "cedar/Screen.h"
-#include "cedar/Intersection.h"
-#include "cedar/Input.h"
+#include "cedar/Screen.hpp"
+#include "cedar/Intersection.hpp"
+#include "cedar/Input.hpp"
 
 using namespace cedar;
 

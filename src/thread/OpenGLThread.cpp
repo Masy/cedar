@@ -2,8 +2,8 @@
 // Created by masy on 06.03.20.
 //
 
-#include "cedar/OpenGLThread.h"
-#include "cedar/Cedar.h"
+#include "cedar/OpenGLThread.hpp"
+#include "cedar/Cedar.hpp"
 
 using namespace cedar;
 

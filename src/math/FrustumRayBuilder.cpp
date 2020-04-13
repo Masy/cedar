@@ -2,7 +2,7 @@
 // Created by masy on 11.03.20.
 //
 
-#include "cedar/FrustumRayBuilder.h"
+#include "cedar/FrustumRayBuilder.hpp"
 
 using namespace cedar;
 

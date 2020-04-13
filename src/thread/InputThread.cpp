@@ -2,7 +2,7 @@
 // Created by masy on 06.03.20.
 //
 
-#include "cedar/InputThread.h"
+#include "cedar/InputThread.hpp"
 
 using namespace cedar;
 

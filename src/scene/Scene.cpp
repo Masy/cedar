@@ -2,7 +2,7 @@
 // Created by masy on 11.03.20.
 //
 
-#include "cedar/Scene.h"
+#include "cedar/Scene.hpp"
 
 using namespace cedar;
 

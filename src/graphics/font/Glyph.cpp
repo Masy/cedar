@@ -2,7 +2,7 @@
 // Created by masy on 03.03.20.
 //
 
-#include "cedar/Glyph.h"
+#include "cedar/Glyph.hpp"
 
 using namespace cedar;
 

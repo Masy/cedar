@@ -2,8 +2,8 @@
 // Created by masy on 04.02.20.
 //
 
-#include "cedar/Vector3f.h"
-#include "cedar/Math.h"
+#include "cedar/Vector3f.hpp"
+#include "cedar/Math.hpp"
 #include <cmath>
 
 // Normally i wouldn't do this, but i guess in the implementation file of a class its's ok.

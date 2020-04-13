@@ -2,8 +2,8 @@
 // Created by masy on 08.03.20.
 //
 
-#include "cedar/Label.h"
-#include "cedar/Renderer2D.h"
+#include "cedar/Label.hpp"
+#include "cedar/Renderer2D.hpp"
 
 using namespace cedar;
 
