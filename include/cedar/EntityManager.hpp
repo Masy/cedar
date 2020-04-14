@@ -6,6 +6,7 @@
 #define CEDAR_ENTITYMANAGER_HPP
 
 #include <map>
+#include <memory>
 
 #include "cedar/Entity.hpp"
 
@@ -23,7 +24,7 @@ namespace cedar
 		/**
 		 * The map storing all entities of the manager.
 		 */
-		std::map<unsigned int, Entity *> m_entities;
+		std::map<unsigned int, std::shared_ptr<Entity>> m_entities;
 
 	public:
 		/**
@@ -50,15 +51,15 @@ namespace cedar
 		 * @param entityId The id of the entity that will be gotten.
 		 * @return A pointer to the entity with the given id or <code>nullptr</code> if there is no entity with that id in this entity manager.
 		 */
-		[[nodiscard]] Entity *getEntity(unsigned int entityId) const;
+		[[nodiscard]] std::shared_ptr<Entity> getEntity(unsigned int entityId) const;
 
 		/**
 		 * Removes the given entity from the entity manager.
 		 *
-		 * @param entity A pointer to the entity what will be removed.
+		 * @param entity A shared pointer to the entity what will be removed.
 		 * @return <code>true</code> if the entity was successfully removed.
 		 */
-		bool removeEntity(Entity *entity);
+		bool removeEntity(const std::shared_ptr<Entity> &entity);
 
 		/**
 		 * Removes the entity with the given id from the entity manager.
@@ -81,7 +82,7 @@ namespace cedar
 		 *
 		 * @return The entities of the entity manager.
 		 */
-		[[nodiscard]] const std::map<unsigned int, Entity*> *getEntities() const;
+		[[nodiscard]] const std::map<unsigned int, std::shared_ptr<Entity>> *getEntities() const;
 	};
 }
 
