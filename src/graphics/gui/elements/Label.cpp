@@ -32,7 +32,7 @@ Label::~Label()
 
 void Label::render(unsigned long currentTime)
 {
-	Renderer2D::drawText(this->m_posX, this->m_posY, this->m_zIndex, this->m_textBuffer, &this->m_textColor);
+	Renderer2D::drawText(this->m_originX, this->m_originY, this->m_zIndex, this->m_textBuffer, &this->m_textColor);
 }
 
 std::string Label::getText() const {
