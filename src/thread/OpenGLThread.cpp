@@ -2,6 +2,10 @@
 // Created by masy on 06.03.20.
 //
 
+#include <cedar/TextureRegistry.hpp>
+#include <cedar/FontRegistry.hpp>
+#include <cedar/ScreenRegistry.hpp>
+#include <cedar/ModelRegistry.hpp>
 #include "cedar/OpenGLThread.hpp"
 #include "cedar/Cedar.hpp"
 
@@ -82,6 +86,10 @@ void OpenGLThread::onStop()
 	// First delete the master renderer and then the window because the window will destroy the context causing segfaults
 	// when trying to delete GL objects.
 	delete this->m_masterRenderer;
+	ScreenRegistry::cleanup();
+	ModelRegistry::cleanup();
+	TextureRegistry::cleanup();
+	FontRegistry::cleanup();
 	delete this->m_window;
 
 	if (this->m_stopCallback)
