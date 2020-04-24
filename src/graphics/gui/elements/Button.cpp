@@ -9,7 +9,7 @@
 using namespace cedar;
 
 Button::Button(const float originX, const float originY, const unsigned char zIndex,
-			   const float width, const float height, const std::string &text, Font *font,
+			   const float width, const float height, const std::string &text, const std::shared_ptr<Font> &font,
 			   const Vector4f &color, const unsigned int alignment)
 		: Element(originX, originY, zIndex, width, height, alignment)
 {
@@ -56,7 +56,7 @@ void Button::render(unsigned long currentTime)
 
 	Renderer2D::drawRect(this->m_posX, this->m_posY, this->m_zIndex, this->m_width, this->m_height, &bgColor);
 	if (this->m_textBuffer)
-		Renderer2D::drawText(this->m_posX + (this->m_width * 0.5f), this->m_posY + (this->m_height * 0.5f), this->m_zIndex, this->m_textBuffer, &textColor);
+		Renderer2D::drawText(this->m_posX + (this->m_width * 0.5f), this->m_posY + (this->m_height * 0.5f), this->m_zIndex, this->m_textBuffer, textColor);
 }
 
 void Button::setBackgroundColor(const Vector4f &color) {
@@ -96,11 +96,11 @@ void Button::setText(const std::string &text) {
 	this->m_textBuffer = Renderer2D::generateTextBuffer(text, this->m_font, CEDAR_ALIGNMENT_CENTER | CEDAR_ALIGNMENT_MIDDLE);
 }
 
-Font *Button::getFont() const {
+std::shared_ptr<Font> Button::getFont() const {
 	return this->m_font;
 }
 
-void Button::setFont(Font *newFont) {
+void Button::setFont(const std::shared_ptr<Font> &newFont) {
 	if (!newFont)
 		throw ElementUpdateException("Could not set font of button. The new font can't be a nullptr!");
 

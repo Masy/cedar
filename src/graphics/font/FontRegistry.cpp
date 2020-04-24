@@ -11,9 +11,9 @@
 
 using namespace cedar;
 
-std::map<std::string, Font*> LOADED_FONTS = std::map<std::string, Font*>();
+std::map<std::string, std::shared_ptr<Font>> FontRegistry::m_loadedFonts = std::map<std::string, std::shared_ptr<Font>>();
 
-Font *FontRegistry::loadFont(const std::string &name, const std::string &path, const unsigned int size, const unsigned int firstCharacter,
+std::shared_ptr<Font> FontRegistry::loadFont(const std::string &name, const std::string &path, const unsigned int size, const unsigned int firstCharacter,
 							 const unsigned int lastCharacter, const unsigned int renderingMode)
 {
 	std::regex ptfPattern("^.*(\\.ptf)$");
@@ -22,39 +22,34 @@ Font *FontRegistry::loadFont(const std::string &name, const std::string &path, c
 
 	if (!matcher.empty())
 	{
-		Font *font = new PTFFont(name, path, size);
+		std::shared_ptr<Font> font = std::shared_ptr<Font>(new PTFFont(name, path, size));
 		font->generateGlyphs(firstCharacter, lastCharacter);
-		LOADED_FONTS.insert(std::make_pair(name, font));
+		m_loadedFonts.insert(std::make_pair(name, font));
 		return font;
 	}
 
-	Font *font = new FreeTypeFont(name, path, size, renderingMode);
+	std::shared_ptr<Font> font = std::shared_ptr<Font>(new FreeTypeFont(name, path, size, renderingMode));
 	font->generateGlyphs(firstCharacter, lastCharacter);
-	LOADED_FONTS.insert(std::make_pair(name, font));
+	m_loadedFonts.insert(std::make_pair(name, font));
 	return font;
 }
 
-Font *FontRegistry::getFont(const std::string &name)
+std::shared_ptr<Font> FontRegistry::getFont(const std::string &name)
 {
-	auto it = LOADED_FONTS.find(name);
-	return it != LOADED_FONTS.end() ? it->second : nullptr;
+	auto it = m_loadedFonts.find(name);
+	return it != m_loadedFonts.end() ? it->second : nullptr;
 }
 
 void FontRegistry::cleanup()
 {
-	for (const auto &pair : LOADED_FONTS)
-	{
-		delete pair.second;
-	}
-	LOADED_FONTS.clear();
+	m_loadedFonts.clear();
 }
 
 void FontRegistry::cleanup(const std::string &name)
 {
-	auto it = LOADED_FONTS.find(name);
-	if (it != LOADED_FONTS.end())
+	auto it = m_loadedFonts.find(name);
+	if (it != m_loadedFonts.end())
 	{
-		delete it->second;
-		LOADED_FONTS.erase(it);
+		m_loadedFonts.erase(it);
 	}
 }

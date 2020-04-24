@@ -5,6 +5,7 @@
 #ifndef CEDAR_RENDERER2D_HPP
 #define CEDAR_RENDERER2D_HPP
 
+#include <memory>
 #include "cedar/Vector4f.hpp"
 #include "cedar/ShaderProgram.hpp"
 #include "cedar/Matrix4f.hpp"
@@ -174,14 +175,35 @@ namespace cedar
 		 * @param posZ The z index of the rectangle.
 		 * @param width The width of the rectangle in pixel.
 		 * @param height The height of the rectangle in pixel.
+		 * @param uvs The uv coordinates of the rectangle.
+		 * @param texture A shared pointer to the 2 dimensional texture a section will be rendered of.
+		 * @param color The tint of the texture.
+		 */
+		static void drawTexturedRect(float posX, float posY, float posZ, float width, float height, const Vector4f &uvs,
+									 const std::shared_ptr<Texture> &texture, const Vector4f &color = Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+		/**
+		 * Draws a textured rectangle.
+		 *
+		 * <p>This will automatically flush the current and begin a new batch if the size of the batch or the texture count
+		 * is exceeded.<p>
+		 *
+		 * <p>For most efficient use, render rectangles using the same texture successively.</p>
+		 *
+		 * @param posX The x coordinate of the rectangle in pixel.
+		 * @param posY The y coordinate of the rectangle in pixel.
+		 * @param posZ The z index of the rectangle.
+		 * @param width The width of the rectangle in pixel.
+		 * @param height The height of the rectangle in pixel.
 		 * @param uvX1 The x coordinate of the first corner of the uv section of the texture.
 		 * @param uvY1 The y coordinate of the first corner of the uv section of the texture.
 		 * @param uvX2 The x coordinate of the second corner of the uv section of the texture.
 		 * @param uvY2 The y coordinate of the second corner of the uv section of the texture.
-		 * @param texture A pointer to the 2 dimensional texture a section will be rendered of.
+		 * @param texture A shared pointer to the 2 dimensional texture a section will be rendered of.
+		 * @param color The tint of the texture.
 		 */
 		static void drawTexturedRect(float posX, float posY, float posZ, float width, float height, float uvX1, float uvY1, float uvX2, float uvY2,
-							  const Texture2D *texture);
+							  const std::shared_ptr<Texture> &texture, const Vector4f &color = Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
 		/**
 		 * Draws a text.
@@ -203,12 +225,12 @@ namespace cedar
 		 * @param posY The y coordinate of the text.
 		 * @param posZ The z index of the text.
 		 * @param text The string of the text.
-		 * @param font A pointer to the font of the text.
-		 * @param color A pointer to the color of the text.
+		 * @param font A shared pointer to the font of the text.
+		 * @param color The color of the text.
 		 * @param alignment The alignment of the text.
 		 * @param size A pointer to a vector where the size of the text will be stored if it is not <code>nullptr</code>.
 		 */
-		static void drawText(float posX, float posY, float posZ, const std::string &text, Font *font, const Vector4f *color,
+		static void drawText(float posX, float posY, float posZ, const std::string &text, const std::shared_ptr<Font> &font, const Vector4f &color,
 					  unsigned int alignment = CEDAR_ALIGNMENT_TOP | CEDAR_ALIGNMENT_LEFT, Vector2f *size = nullptr);
 
 		/**
@@ -230,11 +252,11 @@ namespace cedar
 		 * </ul></p>
 		 *
 		 * @param text The string of the text.
-		 * @param font A pointer to the font of the text.
+		 * @param font A shared pointer to the font of the text.
 		 * @param alignment The alignment of the text.
 		 * @return A pointer to the generated text buffer.
 		 */
-		static TextBuffer *generateTextBuffer(const std::string &text, Font *font, unsigned int alignment = CEDAR_ALIGNMENT_TOP | CEDAR_ALIGNMENT_LEFT);
+		static TextBuffer *generateTextBuffer(const std::string &text, const std::shared_ptr<Font> &font, unsigned int alignment = CEDAR_ALIGNMENT_TOP | CEDAR_ALIGNMENT_LEFT);
 
 		/**
 		 * Draws the text stored in the text buffer.
@@ -243,9 +265,9 @@ namespace cedar
 		 * @param offsetY The offset applied to the text buffer on the x axis.
 		 * @param offsetZ The z index of the text.
 		 * @param textBuffer A pointer to the text buffer that will be drawn.
-		 * @param color A pointer to the color of the text.
+		 * @param color The color of the text.
 		 */
-		static void drawText(float offsetX, float offsetY, float offsetZ, const TextBuffer *textBuffer, const Vector4f *color);
+		static void drawText(float offsetX, float offsetY, float offsetZ, const TextBuffer *textBuffer, const Vector4f &color);
 	};
 }
 

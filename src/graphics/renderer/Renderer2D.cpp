@@ -32,7 +32,8 @@ unsigned int Renderer2D::instanceVboId = 0;
 Renderer2D::Renderer2D()
 = default;
 
-void Renderer2D::cleanup() {
+void Renderer2D::cleanup()
+{
 	delete[] batch;
 	delete[] textures;
 	delete[] textureUnits;
@@ -144,7 +145,7 @@ void Renderer2D::init(const unsigned int _batchSize, Matrix4f *_projectionMatrix
 	glVertexAttribDivisor(1, 1);
 	glVertexAttribPointer(2, 1, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_zIndex)));
 	glVertexAttribDivisor(2, 1);
-	glVertexAttribIPointer(3, 1, GL_INT, sizeof(Quad), (const void*) (offsetof(Quad, m_textureUnit)));
+	glVertexAttribIPointer(3, 1, GL_INT, sizeof(Quad), (const void *) (offsetof(Quad, m_textureUnit)));
 	glVertexAttribDivisor(3, 1);
 	glVertexAttribPointer(4, 4, GL_FLOAT, false, sizeof(Quad), (void *) (offsetof(Quad, m_uvs)));
 	glVertexAttribDivisor(4, 1);
@@ -216,8 +217,14 @@ void Renderer2D::drawRect(const float posX, const float posY, const float posZ, 
 	quadCount++;
 }
 
+void Renderer2D::drawTexturedRect(float posX, float posY, float posZ, float width, float height, const Vector4f &uvs,
+								  const std::shared_ptr<Texture> &texture, const Vector4f &color)
+{
+	drawTexturedRect(posX, posY, posZ, width, height, uvs.x, uvs.y, uvs.z, uvs.w, texture, color);
+}
+
 void Renderer2D::drawTexturedRect(float posX, float posY, float posZ, float width, float height, float uvX1, float uvY1, float uvX2, float uvY2,
-								  const Texture2D *texture)
+								  const std::shared_ptr<Texture> &texture, const Vector4f &color)
 {
 	if (quadCount == batchSize)
 	{
@@ -253,13 +260,14 @@ void Renderer2D::drawTexturedRect(float posX, float posY, float posZ, float widt
 	}
 
 	nextQuad->set(posX, posY, posX + width, posY + height, -posZ, textureUnit,
-				  uvX1, uvY1, uvX2, uvY2, 1.0f, 1.0f, 1.0f, 1.0f);
+				  uvX1, uvY1, uvX2, uvY2, color.x, color.y, color.z, color.w);
 
 	nextQuad++;
 	quadCount++;
 }
 
-void Renderer2D::drawText(const float posX, const float posY, const float posZ, const std::string &text, Font *font, const Vector4f *color,
+void Renderer2D::drawText(const float posX, const float posY, const float posZ, const std::string &text, const std::shared_ptr<Font> &font,
+						  const Vector4f &color,
 						  const unsigned int alignment, Vector2f *size)
 {
 	if (quadCount + text.length() > batchSize)
@@ -330,10 +338,8 @@ void Renderer2D::drawText(const float posX, const float posY, const float posZ, 
 						break;
 				}
 
-				nextQuad->set(
-						Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyph->m_size.x), nextPosY + static_cast<float>(glyph->m_size.y)),
-						-posZ, textureUnit, glyph->m_uvs, *color
-							 );
+				nextQuad->set(Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyph->m_size.x), nextPosY + static_cast<float>(glyph->m_size.y)),
+							  -posZ, textureUnit, glyph->m_uvs, color);
 
 				nextQuad++;
 				quadCount++;
@@ -383,10 +389,8 @@ void Renderer2D::drawText(const float posX, const float posY, const float posZ, 
 					break;
 			}
 
-			nextQuad->set(
-					Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyphs[n].m_size.x), nextPosY + static_cast<float>(glyphs[n].m_size.y)),
-					-posZ, textureUnit, glyphs[n].m_uvs, *color
-						 );
+			nextQuad->set(Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyphs[n].m_size.x), nextPosY + static_cast<float>(glyphs[n].m_size.y)),
+						  -posZ, textureUnit, glyphs[n].m_uvs, color);
 
 			nextQuad++;
 			quadCount++;
@@ -399,7 +403,7 @@ void Renderer2D::drawText(const float posX, const float posY, const float posZ, 
 		*size = Vector2f(width, height);
 }
 
-TextBuffer *Renderer2D::generateTextBuffer(const std::string &text, Font *font, const unsigned int alignment)
+TextBuffer *Renderer2D::generateTextBuffer(const std::string &text, const std::shared_ptr<Font> &font, const unsigned int alignment)
 {
 	Quad *quads = new Quad[text.length()];
 
@@ -491,7 +495,7 @@ TextBuffer *Renderer2D::generateTextBuffer(const std::string &text, Font *font, 
 			quads[glyphCount++].set(
 					Vector4f(currentPosX, nextPosY, currentPosX + static_cast<float>(glyphs[n].m_size.x), nextPosY + static_cast<float>(glyphs[n].m_size.y)),
 					0.0f, 0, glyphs[n].m_uvs, Vector4f(1.0f, 1.0f, 1.0f, 1.0f)
-			);
+								   );
 
 			nextPosX += static_cast<float>(glyphs[n].m_advance);
 		}
@@ -500,7 +504,7 @@ TextBuffer *Renderer2D::generateTextBuffer(const std::string &text, Font *font, 
 	return new TextBuffer(font->getGlyphAtlas()->getId(), glyphCount, quads, Vector2f(width, height));
 }
 
-void Renderer2D::drawText(const float offsetX, const float offsetY, const float offsetZ, const TextBuffer *textBuffer, const Vector4f *color)
+void Renderer2D::drawText(const float offsetX, const float offsetY, const float offsetZ, const TextBuffer *textBuffer, const Vector4f &color)
 {
 	if (quadCount + textBuffer->getGlyphCount() > batchSize)
 	{
@@ -538,7 +542,7 @@ void Renderer2D::drawText(const float offsetX, const float offsetY, const float 
 	for (int n = 0; n < textBuffer->getGlyphCount(); n++)
 	{
 		nextQuad->set(textBuffer->getQuads()[n].m_corners + Vector4f(offsetX, offsetY, offsetX, offsetY),
-					  -offsetZ, textureUnit, textBuffer->getQuads()[n].m_uvs, *color);
+					  -offsetZ, textureUnit, textBuffer->getQuads()[n].m_uvs, color);
 
 		nextQuad++;
 		quadCount++;

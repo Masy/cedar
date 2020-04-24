@@ -22,5 +22,5 @@ void Image::render(const unsigned long currentTime)
 {
 	Renderer2D::drawTexturedRect(this->m_posX, this->m_posY, this->m_zIndex, this->m_width, this->m_height,
 								 this->m_uvSection.x, this->m_uvSection.y, this->m_uvSection.z, this->m_uvSection.w,
-								 dynamic_cast<Texture2D *>(this->m_texture.get()));
+								this->m_texture);
 }

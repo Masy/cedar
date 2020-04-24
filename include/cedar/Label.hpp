@@ -5,6 +5,7 @@
 #ifndef CEDAR_LABEL_HPP
 #define CEDAR_LABEL_HPP
 
+#include <memory>
 #include "cedar/Element.hpp"
 #include "cedar/Vector4f.hpp"
 #include "cedar/Font.hpp"
@@ -25,9 +26,9 @@ namespace cedar
 		 */
 		std::string m_text;
 		/**
-		 * A pointer to the font of the text.
+		 * A shared pointer to the font of the text.
 		 */
-		Font *m_font;
+		std::shared_ptr<Font> m_font;
 		/**
 		 * The color of the text.
 		 */
@@ -47,14 +48,14 @@ namespace cedar
 		 * @param originY The y coordinate of the origin of the element in pixel.
 		 * @param zIndex The z index of the element.
 		 * @param text The text of the button. Can be empty.
-		 * @param font A pointer to the font of the text.
+		 * @param font A shared pointer to the font of the text.
 		 * @param textColor The color of the text.
 		 * @param alignment The alignment of the element.
 		 *
 		 * @throws ElementCreationException if the provided text is empty.
 		 * @throws ElementCreationException if <code>font</code> is a <code>nullptr</code>.
 		 */
-		Label(float originX, float originY, unsigned char zIndex, const std::string &text, Font *font, const Vector4f &textColor,
+		Label(float originX, float originY, unsigned char zIndex, const std::string &text, const std::shared_ptr<Font> &font, const Vector4f &textColor,
 			  unsigned int alignment = CEDAR_ALIGNMENT_TOP | CEDAR_ALIGNMENT_LEFT);
 
 		/**
@@ -88,18 +89,18 @@ namespace cedar
 		/**
 		 * Gets the font of the label.
 		 *
-		 * @return A pointer to the font of the label.
+		 * @return A shared pointer to the font of the label.
 		 */
-		[[nodiscard]] Font *getFont() const;
+		[[nodiscard]] std::shared_ptr<Font> getFont() const;
 
 		/**
 		 * Sets the font of the label.
 		 *
-		 * @param newFont A pointer to the new font of the label.
+		 * @param newFont A shared pointer to the new font of the label.
 		 *
 		 * @throws ElementUpdateException if the provided font is a <code>nullptr</code>.
 		 */
-		void setFont(Font *newFont);
+		void setFont(const std::shared_ptr<Font> &newFont);
 
 		/**
 		 * Sets the color of the label's text.
