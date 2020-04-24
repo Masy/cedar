@@ -5,6 +5,7 @@
 #ifndef CEDAR_BUTTON_HPP
 #define CEDAR_BUTTON_HPP
 
+#include <memory>
 #include "cedar/Element.hpp"
 #include "cedar/Font.hpp"
 
@@ -26,11 +27,11 @@ namespace cedar
 		 */
 		std::string m_text;
 		/**
-		 * A pointer to the font the text of the button is rendered with.
+		 * A shared pointer to the font the text of the button is rendered with.
 		 *
 		 * <p>Can be a <code>nullptr</code> if the button has no text.</p>
 		 */
-		Font *m_font;
+		std::shared_ptr<Font> m_font;
 		/**
 		 * The default color of the text.
 		 */
@@ -74,13 +75,13 @@ namespace cedar
 		 * @param width The width of the element in pixel.
 		 * @param height The height of the element in pixel.
 		 * @param text The text of the button. Can be empty.
-		 * @param font A pointer to the font of the text.
+		 * @param font A shared pointer to the font of the text.
 		 * @param color The color of the text.
 		 * @param alignment The alignment of the element.
 		 *
 		 * @throws ElementCreationException if the <code>font</code> is <code>nullptr</code> when the <code>text</code> is not empty.
 		 */
-		Button(float originX, float originY, unsigned char zIndex, float width, float height, const std::string &text, Font *font,
+		Button(float originX, float originY, unsigned char zIndex, float width, float height, const std::string &text, const std::shared_ptr<Font> &font,
 			   const Vector4f &color, unsigned int alignment = CEDAR_ALIGNMENT_TOP | CEDAR_ALIGNMENT_LEFT);
 
 		/**
@@ -156,18 +157,18 @@ namespace cedar
 		/**
 		 * Gets the font of the text of the button.
 		 *
-		 * @return A pointer to the font of text of the button
+		 * @return A shared pointer to the font of text of the button
 		 */
-		[[nodiscard]] Font *getFont() const;
+		[[nodiscard]] std::shared_ptr<Font> getFont() const;
 
 		/**
 		 * Sets the font of the text of the button.
 		 *
-		 * @param newFont A pointer to the new font of the text of the button.
+		 * @param newFont A shared pointer to the new font of the text of the button.
 		 *
 		 * @throws ElementUpdateException if the provided font is a <code>nullptr</code>.
 		 */
-		void setFont(Font *newFont);
+		void setFont(const std::shared_ptr<Font> &newFont);
 	};
 }
 

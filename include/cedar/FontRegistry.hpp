@@ -5,6 +5,7 @@
 #ifndef CEDAR_FONTREGISTRY_HPP
 #define CEDAR_FONTREGISTRY_HPP
 
+#include <memory>
 #include "cedar/Font.hpp"
 
 /**
@@ -17,6 +18,9 @@ namespace cedar
 	 */
 	class FontRegistry
 	{
+	private:
+		static std::map<std::string, std::shared_ptr<Font>> m_loadedFonts;
+
 	public:
 		/**
 		 * Loads the given font.
@@ -34,20 +38,20 @@ namespace cedar
 		 * @param firstCharacter The unicode of the first character to pre-generate.
 		 * @param lastCharacter The unicode of the last character to pre-generate.
 		 * @param renderingMode The rendering mode of the font.
-		 * @return A pointer to the loaded font.
+		 * @return A shared pointer to the loaded font.
 		 *
 		 * @see Font
 		 * @throws FontCreationException if the font could not be loaded.
 		 */
-		static Font *loadFont(const std::string &name, const std::string &path, unsigned int size, unsigned int firstCharacter = 0, unsigned int lastCharacter = 255, unsigned int renderingMode = CEDAR_RENDERING_SMOOTH);
+		static std::shared_ptr<Font> loadFont(const std::string &name, const std::string &path, unsigned int size, unsigned int firstCharacter = 0, unsigned int lastCharacter = 255, unsigned int renderingMode = CEDAR_RENDERING_SMOOTH);
 
 		/**
 		 * Gets the loaded font with the given name.
 		 *
 		 * @param name The name of the font.
-		 * @return A pointer to the font or <code>nullptr</code> if no font with that name is loaded.
+		 * @return A shared pointer to the font or <code>nullptr</code> if no font with that name is loaded.
 		 */
-		static Font *getFont(const std::string &name);
+		static std::shared_ptr<Font> getFont(const std::string &name);
 
 		/**
 		 * Deletes all fonts.

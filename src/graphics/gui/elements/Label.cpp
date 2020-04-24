@@ -7,7 +7,7 @@
 
 using namespace cedar;
 
-Label::Label(float originX, float originY, unsigned char zIndex, const std::string &text, cedar::Font *font, const cedar::Vector4f &textColor,
+Label::Label(float originX, float originY, unsigned char zIndex, const std::string &text, const std::shared_ptr<Font> &font, const cedar::Vector4f &textColor,
 			 unsigned int alignment)
 		: Element(originX, originY, zIndex, 0.0f, 0.0f, alignment)
 {
@@ -32,7 +32,7 @@ Label::~Label()
 
 void Label::render(unsigned long currentTime)
 {
-	Renderer2D::drawText(this->m_originX, this->m_originY, this->m_zIndex, this->m_textBuffer, &this->m_textColor);
+	Renderer2D::drawText(this->m_originX, this->m_originY, this->m_zIndex, this->m_textBuffer, this->m_textColor);
 }
 
 std::string Label::getText() const {
@@ -83,11 +83,11 @@ void Label::setText(const std::string &text) {
 	}
 }
 
-Font *Label::getFont() const {
+std::shared_ptr<Font> Label::getFont() const {
 	return this->m_font;
 }
 
-void Label::setFont(Font *newFont) {
+void Label::setFont(const std::shared_ptr<Font> &newFont) {
 	if (!newFont)
 		throw ElementUpdateException("Could not set font of label. The new font can't be a nullptr!");
 
