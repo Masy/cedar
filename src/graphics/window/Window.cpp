@@ -138,20 +138,21 @@ void Window::init(const int selectedMonitor)
 
 	glfwSetMouseButtonCallback(this->m_windowHandle, [](GLFWwindow *glfwWindow, int mouseButton, int state, int modifier) {
 		Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfwWindow));
-		window->m_inputHandler->setState(static_cast<unsigned int>(mouseButton), static_cast<unsigned char>(state));
 
 		if (state == GLFW_PRESS)
 			for (Screen *screen : *ScreenRegistry::getLoadedScreens())
 			{
 				if (screen->isVisible() && screen->isEnabled() && screen->onMousePress(window->m_inputHandler->getCursorX(), window->m_inputHandler->getCursorY(), mouseButton, modifier))
-					break;
+					return;
 			}
 		else
 			for (Screen *screen : *ScreenRegistry::getLoadedScreens())
 			{
 				if (screen->isVisible() && screen->isEnabled() && screen->onMouseRelease(window->m_inputHandler->getCursorX(), window->m_inputHandler->getCursorY(), mouseButton, modifier))
-					break;
+					return;
 			}
+
+		window->m_inputHandler->setState(static_cast<unsigned int>(mouseButton), static_cast<unsigned char>(state));
 	});
 
 	glfwSetCursorEnterCallback(this->m_windowHandle, [](GLFWwindow *glfwWindow, int entered) {

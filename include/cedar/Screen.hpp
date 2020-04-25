@@ -126,7 +126,7 @@ namespace cedar
 		 * @param modifiers A bit mask containing information about which modifier keys were also pressed down.
 		 * @return <code>true</code> if there was an element at the coordinates of the cursor.
 		 */
-		bool onMousePress(float cursorX, float cursorY, int mouseButton, unsigned int modifiers);
+		virtual bool onMousePress(float cursorX, float cursorY, int mouseButton, unsigned int modifiers);
 
 		/**
 		 * Method which is called when a mouse button is released.
@@ -137,7 +137,7 @@ namespace cedar
 		 * @param modifiers A bit mask containing information about which modifier keys were also pressed down.
 		 * @return <code>true</code> if there was an element at the coordinates of the cursor.
 		 */
-		bool onMouseRelease(float cursorX, float cursorY, int mouseButton, unsigned int modifiers);
+		virtual bool onMouseRelease(float cursorX, float cursorY, int mouseButton, unsigned int modifiers);
 
 		/**
 		 * Method which is called when the mouse is moved.
@@ -146,7 +146,7 @@ namespace cedar
 		 * @param cursorY The new y coordinate of the cursor.
 		 * @return <code>true</code> if this screen has a focused element which handled the mouse move event.
 		 */
-		bool onMouseMove(float cursorX, float cursorY);
+		virtual bool onMouseMove(float cursorX, float cursorY);
 
 		/**
 		 * Method which is called when the mouse wheel is scrolled.
@@ -158,7 +158,7 @@ namespace cedar
 		 * @param modifiers A bit mask containing information about which modifier keys were also pressed down.
 		 * @return <code>true</code> if there was an element at the coordinates of the cursor.
 		 */
-		bool onScroll(float cursorX, float cursorY, float offsetX, float offsetY, unsigned int modifiers);
+		virtual bool onScroll(float cursorX, float cursorY, float offsetX, float offsetY, unsigned int modifiers);
 
 		/**
 		 * Method which is called when the window is resized.
@@ -168,7 +168,7 @@ namespace cedar
 		 * @param deltaWidth The difference between the new and the old width.
 		 * @param deltaHeight The difference between the new and the old height.
 		 */
-		void onResize(int width, int height, int deltaWidth, int deltaHeight);
+		virtual void onResize(int width, int height, int deltaWidth, int deltaHeight);
 
 		/**
 		 * Method which updates all elements in the screen.
@@ -176,7 +176,7 @@ namespace cedar
 		 * @param currentTime The current time of the frame in microseconds.
 		 * @param tickCount The current tick count.
 		 */
-		void onUpdate(unsigned long currentTime, unsigned long tickCount);
+		virtual void onUpdate(unsigned long currentTime, unsigned long tickCount);
 
 		/**
 		 * Renders all elements of the screen that are visible.
@@ -192,7 +192,7 @@ namespace cedar
 		 *
 		 * @throws ElementAddException if <code>element</code> is a <code>nullptr</code>.
 		 */
-		void addElement(Element *element);
+		virtual void addElement(Element *element);
 
 		/**
 		 * Gets the name of the screen.
