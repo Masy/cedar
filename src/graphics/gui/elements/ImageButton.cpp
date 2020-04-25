@@ -40,6 +40,9 @@ ImageButton::ImageButton(const float originX, const float originY, const unsigne
 	this->m_defaultCaptionColor = defaultCaptionColor;
 	this->m_hoveredCaptionColor = hoveredCaptionColor;
 	this->m_pressedCaptionColor = pressedCaptionColor;
+	this->m_defaultCaptionOffset = 0.0f;
+	this->m_hoveredCaptionOffset = 0.0f;
+	this->m_pressedCaptionOffset = 0.0f;
 
 	if (!caption.empty())
 		this->m_textBuffer = Renderer2D::generateTextBuffer(caption, font, CEDAR_ALIGNMENT_MIDDLE | CEDAR_ALIGNMENT_CENTER);
@@ -52,15 +55,18 @@ ImageButton::~ImageButton()
 	delete this->m_textBuffer;
 }
 
-std::shared_ptr<Texture> ImageButton::getTexture() const {
+std::shared_ptr<Texture> ImageButton::getTexture() const
+{
 	return this->m_texture;
 }
 
-std::string ImageButton::getCaption() const {
+std::string ImageButton::getCaption() const
+{
 	return this->m_caption;
 }
 
-void ImageButton::setCaption(const std::string &newCaption) {
+void ImageButton::setCaption(const std::string &newCaption)
+{
 	if (!this->m_font)
 		throw ElementUpdateException("Could not set caption of image button. The font is not set yet!");
 
@@ -69,11 +75,13 @@ void ImageButton::setCaption(const std::string &newCaption) {
 	this->m_textBuffer = Renderer2D::generateTextBuffer(newCaption, this->m_font, CEDAR_ALIGNMENT_MIDDLE | CEDAR_ALIGNMENT_CENTER);
 }
 
-std::shared_ptr<Font> ImageButton::getFont() const {
+std::shared_ptr<Font> ImageButton::getFont() const
+{
 	return this->m_font;
 }
 
-void ImageButton::setFont(const std::shared_ptr<Font> &newFont) {
+void ImageButton::setFont(const std::shared_ptr<Font> &newFont)
+{
 	if (!newFont)
 		throw ElementUpdateException("Could not set font of image button. The font can't be a nullptr!");
 
@@ -82,28 +90,64 @@ void ImageButton::setFont(const std::shared_ptr<Font> &newFont) {
 	this->m_textBuffer = Renderer2D::generateTextBuffer(this->m_caption, this->m_font, CEDAR_ALIGNMENT_MIDDLE | CEDAR_ALIGNMENT_CENTER);
 }
 
-Vector4f ImageButton::getDefaultCaptionColor() const {
+Vector4f ImageButton::getDefaultCaptionColor() const
+{
 	return this->m_defaultCaptionColor;
 }
 
-void ImageButton::setDefaultCaptionColor(const Vector4f &newColor) {
+void ImageButton::setDefaultCaptionColor(const Vector4f &newColor)
+{
 	this->m_defaultCaptionColor = newColor;
 }
 
-Vector4f ImageButton::getHoveredCaptionColor() const {
+Vector4f ImageButton::getHoveredCaptionColor() const
+{
 	return this->m_hoveredCaptionColor;
 }
 
-void ImageButton::setHoveredCaptionColor(const Vector4f &newColor) {
+void ImageButton::setHoveredCaptionColor(const Vector4f &newColor)
+{
 	this->m_hoveredCaptionColor = newColor;
 }
 
-Vector4f ImageButton::getPressedCaptionColor() const {
+Vector4f ImageButton::getPressedCaptionColor() const
+{
 	return this->m_pressedCaptionColor;
 }
 
-void ImageButton::setPressedCaptionColor(const Vector4f &newColor) {
+void ImageButton::setPressedCaptionColor(const Vector4f &newColor)
+{
 	this->m_pressedCaptionColor = newColor;
+}
+
+float ImageButton::getDefaultCaptionOffset() const
+{
+	return this->m_defaultCaptionOffset;
+}
+
+void ImageButton::setDefaultCaptionOffset(const float newOffset)
+{
+	this->m_defaultCaptionOffset = newOffset;
+}
+
+float ImageButton::getHoveredCaptionOffset() const
+{
+	return this->m_hoveredCaptionOffset;
+}
+
+void ImageButton::setHoveredCaptionOffset(const float newOffset)
+{
+	this->m_hoveredCaptionOffset = newOffset;
+}
+
+float ImageButton::getPressedCaptionOffset() const
+{
+	return this->m_pressedCaptionOffset;
+}
+
+void ImageButton::setPressedCaptionOffset(const float newOffset)
+{
+	this->m_pressedCaptionOffset = newOffset;
 }
 
 void ImageButton::render(const unsigned long currentTime)
@@ -111,31 +155,36 @@ void ImageButton::render(const unsigned long currentTime)
 	Vector4f tint(1.0f, 1.0f, 1.0f, 1.0f);
 	Vector4f captionColor;
 	Vector4f uvs;
+	float offset;
 
 	if (!this->m_enabled)
 	{
 		uvs = this->m_defaultUVs;
 		tint = Vector4f(0.5f, 0.5f, 0.5f, 1.0f);
 		captionColor = this->m_defaultCaptionColor * Vector4f(0.5f, 0.5f, 0.5f, 1.0f);
+		offset = this->m_defaultCaptionOffset;
 	}
 	else if (this->m_pressed)
 	{
 		uvs = this->m_pressedUVs;
 		captionColor = this->m_pressedCaptionColor;
+		offset = this->m_pressedCaptionOffset;
 	}
 	else if (this->m_hovered)
 	{
 		uvs = this->m_hoveredUVs;
 		captionColor = this->m_hoveredCaptionColor;
+		offset = this->m_hoveredCaptionOffset;
 	}
 	else
 	{
 		uvs = this->m_defaultUVs;
 		captionColor = this->m_defaultCaptionColor;
+		offset = this->m_defaultCaptionOffset;
 	}
 
 	Renderer2D::drawTexturedRect(this->m_posX, this->m_posY, this->m_zIndex, this->m_width, this->m_height, uvs, this->m_texture, tint);
 
 	if (this->m_textBuffer)
-		Renderer2D::drawText(this->m_posX + (this->m_width * 0.5f), this->m_posY + (this->m_height * 0.5f), this->m_zIndex, this->m_textBuffer, captionColor);
+		Renderer2D::drawText(this->m_posX + (this->m_width * 0.5f), this->m_posY + std::floor(this->m_height * 0.5f) + offset, this->m_zIndex, this->m_textBuffer, captionColor);
 }

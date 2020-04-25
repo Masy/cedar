@@ -61,6 +61,18 @@ namespace cedar
 		 * The color of the caption when the button is being pressed down.
 		 */
 		Vector4f m_pressedCaptionColor;
+		/**
+		 * The offset of the button's caption on the y axis in it's default state.
+		 */
+		float m_defaultCaptionOffset;
+		/**
+		 * The offset of the button's caption on the y axis in it's hovered state.
+		 */
+		float m_hoveredCaptionOffset;
+		/**
+		 * The offset of the button's caption on the y axis in it's pressed state.
+		 */
+		float m_pressedCaptionOffset;
 
 	public:
 		/**
@@ -191,6 +203,48 @@ namespace cedar
 		 * @param newColor The new color of the button's caption in it's pressed state.
 		 */
 		void setPressedCaptionColor(const Vector4f &newColor);
+
+		/**
+		 * Gets the offset of the button's caption on the y axis in it's default state.
+		 *
+		 * @return The offset of the button's caption on the y axis in it's default state.
+		 */
+		[[nodiscard]] float getDefaultCaptionOffset() const;
+
+		/**
+		 * Sets the offset of the button's caption on the y axis in it's default state.
+		 *
+		 * @param newOffset The new offset of the button's caption on the y axis in it's default state.
+		 */
+		void setDefaultCaptionOffset(float newOffset);
+
+		/**
+		 * Gets the offset of the button's caption on the y axis in it's hovered state.
+		 *
+		 * @return The offset of the button's caption on the y axis in it's hovered state.
+		 */
+		[[nodiscard]] float getHoveredCaptionOffset() const;
+
+		/**
+		 * Sets the offset of the button's caption on the y axis in it's hovered state.
+		 *
+		 * @param newOffset The new offset of the button's caption on the y axis in it's hovered state.
+		 */
+		void setHoveredCaptionOffset(float newOffset);
+
+		/**
+		 * Gets the offset of the button's caption on the y axis in it's pressed state.
+		 *
+		 * @return The offset of the button's caption on the y axis in it's pressed state.
+		 */
+		[[nodiscard]] float getPressedCaptionOffset() const;
+
+		/**
+		 * Sets the offset of the button's caption on the y axis in it's pressed state.
+		 *
+		 * @param newOffset The new offset of the button's caption on the y axis in it's pressed state.
+		 */
+		void setPressedCaptionOffset(float newOffset);
 
 		/**
 		 * Renders the button.
