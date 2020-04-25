@@ -54,13 +54,9 @@ bool Screen::onMousePress(const float cursorX, const float cursorY, const int mo
 
 				if (currElement->getMousePressCallback())
 					currElement->getMousePressCallback()(currElement, mouseButton, modifiers);
+			}
 
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return true;
 		}
 	}
 
@@ -93,7 +89,6 @@ bool Screen::onMouseRelease(const float cursorX, const float cursorY, const int 
 				if (currElement->getMouseReleaseCallback())
 					currElement->getMouseReleaseCallback()(currElement, mouseButton, modifiers);
 
-				return true;
 			}
 			else
 			{
@@ -102,8 +97,9 @@ bool Screen::onMouseRelease(const float cursorX, const float cursorY, const int 
 					PRESSED_ELEMENT->setPressed(false);
 					PRESSED_ELEMENT = nullptr;
 				}
-				return false;
 			}
+
+			return true;
 		}
 	}
 
@@ -150,13 +146,8 @@ bool Screen::onMouseMove(const float cursorX, const float cursorY)
 
 					HOVERED_ELEMENT = newHovered;
 				}
-
-				return true;
 			}
-			else
-			{
-				return false;
-			}
+			return true;
 		}
 	}
 
@@ -251,7 +242,7 @@ void Screen::onResize(const int width, const int height, const int deltaWidth, c
 void Screen::onUpdate(unsigned long currentTime, unsigned long tickCount) {
 	for (Element *element : this->m_elements)
 	{
-		if (element->getUpdateCallback())
+		if (element->isVisible() && element->isEnabled() && element->getUpdateCallback())
 			element->getUpdateCallback()(element, currentTime, tickCount);
 	}
 }

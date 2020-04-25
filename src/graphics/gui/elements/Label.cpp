@@ -32,6 +32,7 @@ Label::~Label()
 
 void Label::render(unsigned long currentTime)
 {
+	if (!this->m_text.empty())
 	Renderer2D::drawText(this->m_originX, this->m_originY, this->m_zIndex, this->m_textBuffer, this->m_textColor);
 }
 
@@ -40,9 +41,6 @@ std::string Label::getText() const {
 }
 
 void Label::setText(const std::string &text) {
-	if (text.empty())
-		throw ElementUpdateException("Could not set text of label. The text can't be empty!");
-
 	this->m_text = text;
 	delete this->m_textBuffer;
 
