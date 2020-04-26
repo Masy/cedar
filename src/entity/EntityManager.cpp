@@ -68,3 +68,8 @@ const std::map<unsigned int, std::shared_ptr<Entity>> *EntityManager::getEntitie
 {
 	return &this->m_entities;
 }
+
+void EntityManager::cleanup()
+{
+	this->m_entities.clear();
+}
