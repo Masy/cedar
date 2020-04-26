@@ -83,6 +83,11 @@ namespace cedar
 		 * @return The entities of the entity manager.
 		 */
 		[[nodiscard]] const std::map<unsigned int, std::shared_ptr<Entity>> *getEntities() const;
+
+		/**
+		 * Clears the entity map.
+		 */
+		void cleanup();
 	};
 }
 
